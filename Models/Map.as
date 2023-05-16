@@ -5,7 +5,6 @@ m 2023-05-16
 
 namespace Models {
     class Map {
-        // string   authorName;
         string   authorId;
         uint     authorTime;
         bool     badUploadTime;
@@ -13,16 +12,13 @@ namespace Models {
         string   downloadUrl;
         uint     goldTime;
         string   mapId;
-        // string   mapName;
+        string   mapNameColor;
         string   mapNameRaw;
         string   mapNameText;
         string   mapUid;
-        // int      personalMedal;
-        // uint     personalTime;
-        // Record[] records;
+        Record[] records;
         uint     silverTime;
         string   thumbnailUrl;
-        // string   uploadedIsoUtc;
         uint     uploadedUnix;
 
         int opCmp(int i) { return uploadedUnix - i; }
@@ -34,6 +30,7 @@ namespace Models {
             mapUid       = map["uid"];
             mapId        = map["mapId"];
             mapNameRaw   = map["name"];
+            mapNameColor = ColoredString(mapNameRaw);
             mapNameText  = StripFormatCodes(mapNameRaw);
             authorId     = map["author"];
             authorTime   = map["authorTime"];

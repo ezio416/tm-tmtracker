@@ -16,7 +16,6 @@ namespace Models {
         string recordId;
         float  time;
         string timeFormatted;
-        string timestampIsoUtc;
         uint   timestampUnix;
         string zoneId;
         string zoneName;
