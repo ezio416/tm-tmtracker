@@ -1,0 +1,9 @@
+[meta]
+name     = "TMTracker"
+author   = "Ezio414"
+category = "Utilities"
+version  = "0.1"
+
+[script]
+dependencies = [ "NadeoServices" ]
+timeout      = 10000
