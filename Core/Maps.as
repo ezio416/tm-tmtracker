@@ -5,6 +5,8 @@ m 2023-05-16
 
 namespace Core {
     Models::Map[] GetMyMaps() {
+        trace("refreshing my map list...");
+
         string live = "NadeoLiveServices";
         NadeoServices::AddAudience(live);
         while (!NadeoServices::IsAuthenticated(live)) yield();
