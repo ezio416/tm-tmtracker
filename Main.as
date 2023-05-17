@@ -5,7 +5,7 @@ m 2023-05-16
 
 void Main() {
     if (Settings::loadMyMapsOnBoot)
-        Core::LoadMaps();
+        DB::LoadMyMaps();
 }
 
 void RenderMenu() {
@@ -20,24 +20,21 @@ void RenderInterface() {
 		UI::Begin(Storage::title, Settings::windowOpen);
 
         if (UI::Button(Icons::Refresh + " Refresh Map List", vec2(250, 50))) {
-            print("refreshing map list...");
             Storage::maps = Core::GetMyMaps();
-            Core::SaveMaps();
+            DB::SaveMyMaps();
         }
 
         UI::SameLine();
         if (UI::Button(Icons::Refresh + " Refresh All Records", vec2(250, 50))) {
-            print("refreshing all records...");
-
         }
 
         UI::SameLine();
         if (UI::Button(Icons::Upload, vec2(50, 50)))
-            Core::LoadMaps();
+            DB::LoadMyMaps();
 
         UI::SameLine();
         if (UI::Button(Icons::FloppyO, vec2(50, 50)))
-            Core::SaveMaps();
+            DB::SaveMyMaps();
 
         UI::Separator();
 

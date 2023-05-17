@@ -3,17 +3,15 @@ c 2023-05-16
 m 2023-05-16
 */
 
-namespace Core {
-    void LoadMaps() {
+namespace DB {
+    void LoadMyMaps() {
         trace("loading my maps from file...");
+
         Storage::maps.RemoveRange(0, Storage::maps.Length);
         SQLite::Statement@ s;
         try {
-            @s = Storage::db.Prepare("SELECT * FROM myMaps");
-        } catch {
-            print("no myMaps table");
-            return;
-        }
+            @s = Storage::db.Prepare("SELECT * FROM MyMaps");
+        } catch { return; }
 
         while (true) {
             if (!s.NextRow()) return;
@@ -21,10 +19,11 @@ namespace Core {
         }
     }
 
-    void SaveMaps() {
+    void SaveMyMaps() {
         trace("saving my maps to file...");
+
         Storage::db.Execute("""
-            CREATE TABLE IF NOT EXISTS myMaps (
+            CREATE TABLE IF NOT EXISTS MyMaps (
                 authorId      CHAR(36),
                 authorTime    INT,
                 badUploadTime BOOL,
@@ -35,7 +34,7 @@ namespace Core {
                 mapNameColor  TEXT,
                 mapNameRaw    TEXT,
                 mapNameText   TEXT,
-                mapUid        VARCHAR(27) PRIMARY KEY,
+                mapUid        VARCHAR(27),
                 silverTime    INT,
                 thumbnailUrl  CHAR(97),
                 timestamp     INT
@@ -46,7 +45,7 @@ namespace Core {
             auto map = Storage::maps[i];
             SQLite::Statement@ s;
             @s = Storage::db.Prepare("""
-                INSERT INTO myMaps (
+                INSERT INTO MyMaps (
                     authorId,
                     authorTime,
                     badUploadTime,
