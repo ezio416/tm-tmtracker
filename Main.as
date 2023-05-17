@@ -4,12 +4,10 @@ m 2023-05-17
 */
 
 void Main() {
-    if (Settings::loadMyMapsOnBoot) {
-        DB::LoadMyMaps();
-    }
-    if (Settings::loadZonesOnBoot) {
+    if (Settings::loadMyMapsOnBoot)
+        DB::MyMaps::LoadAll();
+    if (Settings::loadZonesOnBoot)
         Zones::Load();
-    }
 }
 
 void RenderMenu() {
@@ -25,7 +23,7 @@ void RenderInterface() {
 
         if (UI::Button(Icons::Refresh + " Refresh Map List", vec2(250, 50))) {
             Storage::maps = Maps::GetMyMaps();
-            DB::SaveMyMaps();
+            DB::MyMaps::SaveAll();
         }
 
         // UI::SameLine();
@@ -34,12 +32,12 @@ void RenderInterface() {
 
         UI::SameLine();
         if (UI::Button(Icons::Upload, vec2(50, 50)))
-            DB::LoadMyMaps();
+            DB::MyMaps::LoadAll();
 
         UI::SameLine();
         if (UI::Button(Icons::FloppyO, vec2(50, 50)))
-            DB::SaveMyMaps();
-        
+            DB::MyMaps::SaveAll();
+
         // UI::SameLine();
         // if (UI::Button(Icons::MapMarker + " Zones", vec2(130, 50)))
         //     Zones::Load();
