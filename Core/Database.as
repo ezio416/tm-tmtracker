@@ -1,16 +1,16 @@
 /*
 c 2023-05-16
-m 2023-05-16
+m 2023-05-17
 */
 
 namespace DB {
     void LoadMyMaps() {
-        trace("loading my maps from file...");
+        trace('loading my maps from file...');
 
         Storage::maps.RemoveRange(0, Storage::maps.Length);
         SQLite::Statement@ s;
         try {
-            @s = Storage::db.Prepare("SELECT * FROM MyMaps");
+            @s = Storage::db.Prepare('SELECT * FROM MyMaps');
         } catch { return; }
 
         while (true) {
@@ -20,7 +20,7 @@ namespace DB {
     }
 
     void SaveMyMaps() {
-        trace("saving my maps to file...");
+        trace('saving my maps to file...');
 
         Storage::db.Execute("""
             CREATE TABLE IF NOT EXISTS MyMaps (
