@@ -4,7 +4,8 @@ m 2023-05-16
 */
 
 void Main() {
-    Core::LoadMaps();
+    if (Settings::loadMyMapsOnBoot)
+        Core::LoadMaps();
 }
 
 void RenderMenu() {
@@ -14,8 +15,8 @@ void RenderMenu() {
 
 void RenderInterface() {
     if (Settings::windowOpen) {
-        UI::SetNextWindowSize(400, 600, UI::Cond::Once);
-		UI::SetNextWindowPos(200, 200, UI::Cond::Once);
+        UI::SetNextWindowSize(500, 300, UI::Cond::Once);
+		UI::SetNextWindowPos(100, 100, UI::Cond::Once);
 		UI::Begin(Storage::title, Settings::windowOpen);
 
         if (UI::Button(Icons::Refresh + " Refresh Map List", vec2(250, 50))) {
