@@ -4,7 +4,7 @@ m 2023-05-17
 */
 
 namespace Maps {
-    Models::Map[] GetMyMaps() {
+    void GetMyMaps() {
         auto now = Time::Now;
         trace("refreshing my maps...");
 
@@ -43,9 +43,13 @@ namespace Maps {
         if (Settings::sortMapsNewest)
             maps.Reverse();
 
+        for (int i = maps.Length - 1; i >= 0; i--)
+            if (Storage::myMapsIgnoredUids.Exists(maps[i].mapUid))
+                maps.RemoveAt(i);
+
+        Storage::myMaps = maps;
+
         if (Settings::printDurations)
             trace("refreshing my maps took " + (Time::Now - now) + " ms");
-
-        return maps;
     }
 }

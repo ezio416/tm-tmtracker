@@ -9,21 +9,34 @@ namespace DB {
             auto now = Time::Now;
             trace("loading my maps from " + Storage::dbFile);
 
-            Storage::maps.RemoveRange(0, Storage::maps.Length);
             SQLite::Statement@ s;
             @Storage::db = SQLite::Database(Storage::dbFile);
-            try {
-                @s = Storage::db.Prepare("SELECT * FROM MyMaps");
-            } catch {
+
+            Storage::myMaps.RemoveRange(0, Storage::myMaps.Length);
+            try { @s = Storage::db.Prepare("SELECT * FROM MyMaps"); } catch {
                 trace("no MyMaps table in database, plugin hasn't been run yet");
                 if (Settings::printDurations)
                     trace("returning after " + (Time::Now - now) + " ms");
                 return;
             }
-
             while (true) {
                 if (!s.NextRow()) break;
-                Storage::maps.InsertLast(Models::Map(s));
+                Storage::myMaps.InsertLast(Models::Map(s));
+            }
+
+            Storage::myMapsIgnored.RemoveRange(0, Storage::myMapsIgnored.Length);
+            Storage::myMapsIgnoredUids.DeleteAll();
+            try { @s = Storage::db.Prepare("SELECT * FROM MyMapsIgnored"); } catch {
+                trace("no MyMapsIgnored table in database, maps haven't been ignored yet");
+                if (Settings::printDurations)
+                    trace("returning after " + (Time::Now - now) + " ms");
+                return;
+            }
+            while (true) {
+                if (!s.NextRow()) break;
+                auto map = Models::Map(s);
+                Storage::myMapsIgnored.InsertLast(map);
+                Storage::myMapsIgnoredUids.Set(map.mapUid, "");
             }
 
             if (Settings::printDurations)
@@ -53,8 +66,8 @@ namespace DB {
                 );
             """);
 
-            for (uint i = 0; i < Storage::maps.Length; i++) {
-                auto map = Storage::maps[i];
+            for (uint i = 0; i < Storage::myMaps.Length; i++) {
+                auto map = Storage::myMaps[i];
                 SQLite::Statement@ s;
                 @s = Storage::db.Prepare("""
                     INSERT INTO MyMaps (
@@ -93,6 +106,65 @@ namespace DB {
 
             if (Settings::printDurations)
                 trace("saving my maps took " + (Time::Now - now) + " ms");
+        }
+
+        void Ignore(Models::Map@ map) {
+            auto now = Time::Now;
+            trace("ignoring my map (" + map.mapNameText + ") in " + Storage::dbFile);
+
+            Storage::db.Execute("""
+                CREATE TABLE IF NOT EXISTS MyMapsIgnored (
+                    authorId      CHAR(36),
+                    authorTime    INT,
+                    badUploadTime BOOL,
+                    bronzeTime    INT,
+                    downloadUrl   CHAR(93),
+                    goldTime      INT,
+                    mapId         CHAR(36),
+                    mapNameColor  TEXT,
+                    mapNameRaw    TEXT,
+                    mapNameText   TEXT,
+                    mapUid        VARCHAR(27) PRIMARY KEY,
+                    silverTime    INT,
+                    thumbnailUrl  CHAR(97),
+                    timestamp     INT
+                );
+            """);
+
+            SQLite::Statement@ s;
+
+            @s = Storage::db.Prepare("INSERT INTO MyMapsIgnored SELECT * FROM MyMaps WHERE mapUid=?");
+            s.Bind(1, map.mapUid);
+            s.Execute();
+
+            @s = Storage::db.Prepare("DELETE FROM MyMaps WHERE mapUid=?");
+            s.Bind(1, map.mapUid);
+            s.Execute();
+
+            LoadAll();
+
+            if (Settings::printDurations)
+                trace("ignoring my map took " + (Time::Now - now) + " ms (includes previous value)");
+        }
+
+        void UnIgnore(Models::Map@ map) {
+            auto now = Time::Now;
+            trace("unignoring my map (" + map.mapNameText + ") in " + Storage::dbFile);
+
+            SQLite::Statement@ s;
+
+            @s = Storage::db.Prepare("INSERT INTO MyMaps SELECT * FROM MyMapsIgnored WHERE mapUid=?");
+            s.Bind(1, map.mapUid);
+            s.Execute();
+
+            @s = Storage::db.Prepare("DELETE FROM MyMapsIgnored WHERE mapUid=?");
+            s.Bind(1, map.mapUid);
+            s.Execute();
+
+            LoadAll();
+
+            if (Settings::printDurations)
+                trace("unignoring my map took " + (Time::Now - now) + " ms (includes previous value)");
         }
     }
 }
