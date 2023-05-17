@@ -4,12 +4,27 @@ m 2023-05-16
 */
 
 namespace Core {
-    // void LoadMaps() {
-    // }
+    void LoadMaps() {
+        trace("loading my maps from file...");
+        Storage::maps.RemoveRange(0, Storage::maps.Length);
+        SQLite::Statement@ s;
+        try {
+            @s = Storage::db.Prepare("SELECT * FROM myMaps");
+        } catch {
+            print("no myMaps table");
+            return;
+        }
+
+        while (true) {
+            if (!s.NextRow()) return;
+            Storage::maps.InsertLast(Models::Map(s));
+        }
+    }
 
     void SaveMaps() {
+        trace("saving my maps to file...");
         Storage::db.Execute("""
-            CREATE TABLE IF NOT EXISTS maps (
+            CREATE TABLE IF NOT EXISTS myMaps (
                 authorId      CHAR(36),
                 authorTime    INT,
                 badUploadTime BOOL,
@@ -23,7 +38,7 @@ namespace Core {
                 mapUid        VARCHAR(27) PRIMARY KEY,
                 silverTime    INT,
                 thumbnailUrl  CHAR(97),
-                uploadedUnix  INT
+                timestamp     INT
             );
         """);
 
@@ -31,7 +46,7 @@ namespace Core {
             auto map = Storage::maps[i];
             SQLite::Statement@ s;
             @s = Storage::db.Prepare("""
-                INSERT INTO maps (
+                INSERT INTO myMaps (
                     authorId,
                     authorTime,
                     badUploadTime,
@@ -45,7 +60,7 @@ namespace Core {
                     mapUid,
                     silverTime,
                     thumbnailUrl,
-                    uploadedUnix
+                    timestamp
                 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);
             """);
             s.Bind(1,  map.authorId);
@@ -61,7 +76,7 @@ namespace Core {
             s.Bind(11, map.mapUid);
             s.Bind(12, map.silverTime);
             s.Bind(13, map.thumbnailUrl);
-            s.Bind(14, map.uploadedUnix);
+            s.Bind(14, map.timestamp);
             s.Execute();
         }
     }

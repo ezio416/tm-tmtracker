@@ -19,10 +19,10 @@ namespace Models {
         Record[] records;
         uint     silverTime;
         string   thumbnailUrl;
-        uint     uploadedUnix;
+        uint     timestamp;
 
-        int opCmp(int i) { return uploadedUnix - i; }
-        int opCmp(Map m) { return uploadedUnix - m.uploadedUnix; }
+        int opCmp(int i) { return timestamp - i; }
+        int opCmp(Map m) { return timestamp - m.timestamp; }
 
         Map() {}
 
@@ -41,9 +41,26 @@ namespace Models {
             thumbnailUrl = string(map["thumbnailUrl"]).Replace("\\", "");
             if (map["uploadTimestamp"] < 1600000000) {
                 badUploadTime = true;  // for some maps, Nadeo only provides the year
-                uploadedUnix  = map["updateTimestamp"];
+                timestamp  = map["updateTimestamp"];
             } else
-                uploadedUnix  = map["uploadTimestamp"];
+                timestamp  = map["uploadTimestamp"];
+        }
+
+        Map(SQLite::Statement@ s) {
+            authorId      = s.GetColumnString("authorId");
+            authorTime    = s.GetColumnInt("authorTime");
+            badUploadTime = s.GetColumnInt("badUploadTime") == 1 ? true : false;
+            bronzeTime    = s.GetColumnInt("bronzeTime");
+            downloadUrl   = s.GetColumnString("downloadUrl");
+            goldTime      = s.GetColumnInt("goldTime");
+            mapId         = s.GetColumnString("mapId");
+            mapNameRaw    = s.GetColumnString("mapNameRaw");
+            mapNameColor  = ColoredString(mapNameRaw);
+            mapNameText   = StripFormatCodes(mapNameRaw);
+            mapUid        = s.GetColumnString("mapUid");
+            silverTime    = s.GetColumnInt("silverTime");
+            thumbnailUrl  = s.GetColumnString("thumbnailUrl");
+            timestamp     = s.GetColumnInt("timestamp");
         }
     }
 }
