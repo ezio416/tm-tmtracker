@@ -5,22 +5,33 @@ m 2023-05-17
 
 namespace DB {
     void LoadMyMaps() {
-        trace('loading my maps from file...');
+        auto now = Time::Now;
+        trace("loading my maps from " + Storage::dbFile);
 
         Storage::maps.RemoveRange(0, Storage::maps.Length);
         SQLite::Statement@ s;
+        @Storage::db = SQLite::Database(Storage::dbFile);
         try {
-            @s = Storage::db.Prepare('SELECT * FROM MyMaps');
-        } catch { return; }
+            @s = Storage::db.Prepare("SELECT * FROM MyMaps");
+        } catch {
+            trace("no MyMaps table in database, plugin hasn't been run yet");
+            if (Settings::printDurations)
+                trace("returning after " + (Time::Now - now) + " ms");
+            return;
+        }
 
         while (true) {
-            if (!s.NextRow()) return;
+            if (!s.NextRow()) break;
             Storage::maps.InsertLast(Models::Map(s));
         }
+
+        if (Settings::printDurations)
+            trace("loading my maps took " + (Time::Now - now) + " ms");
     }
 
     void SaveMyMaps() {
-        trace('saving my maps to file...');
+        auto now = Time::Now;
+        trace("saving my maps to " + Storage::dbFile);
 
         Storage::db.Execute("""
             CREATE TABLE IF NOT EXISTS MyMaps (
@@ -78,5 +89,8 @@ namespace DB {
             s.Bind(14, map.timestamp);
             s.Execute();
         }
+
+        if (Settings::printDurations)
+            trace("saving my maps took " + (Time::Now - now) + " ms");
     }
 }

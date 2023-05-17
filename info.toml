@@ -6,4 +6,4 @@ version  = "0.1"
 
 [script]
 dependencies = [ "NadeoServices" ]
-timeout      = 10000
+timeout      = 5000
