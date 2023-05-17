@@ -5,9 +5,10 @@ m 2023-05-17
 
 namespace Maps {
     Models::Map[] GetMyMaps() {
-        trace('refreshing my map list...');
+        auto now = Time::Now;
+        trace("refreshing my maps...");
 
-        string live = 'NadeoLiveServices';
+        string live = "NadeoLiveServices";
         NadeoServices::AddAudience(live);
         while (!NadeoServices::IsAuthenticated(live)) yield();
 
@@ -18,13 +19,13 @@ namespace Maps {
         do {
             auto req = NadeoServices::Get(
                 live,
-                NadeoServices::BaseURL() + '/api/token/map?length=1000&offset=' + offset
+                NadeoServices::BaseURL() + "/api/token/map?length=1000&offset=" + offset
             );
             offset += 1000;
             req.Start();
             while (!req.Finished()) continue;
 
-            auto mapList = Json::Parse(req.String())['mapList'];
+            auto mapList = Json::Parse(req.String())["mapList"];
             tooManyMaps = mapList.Length == 1000;
             for (uint i = 0; i < mapList.Length; i++)
                 maps.InsertLast(Models::Map(mapList[i]));
@@ -41,6 +42,10 @@ namespace Maps {
 
         if (Settings::sortMapsNewest)
             maps.Reverse();
+
+        if (Settings::printDurations)
+            trace("refreshing my maps took " + (Time::Now - now) + " ms");
+
         return maps;
     }
 }

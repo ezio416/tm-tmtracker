@@ -4,11 +4,11 @@ m 2023-05-17
 */
 
 namespace Storage {
-    string            title  = '\\$2f3' + Icons::MapO + '\\$z TMTracker';
-    string            dbFile = IO::FromStorageFolder('TMTracker.db');
-    SQLite::Database@ db     = SQLite::Database(dbFile);
     Models::Account[] accounts;
+    SQLite::Database@ db;
+    string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");
     Models::Map[]     maps;
     Models::Record[]  records;
+    string            title  = "\\$2f3" + Icons::MapO + "\\$z TMTracker";
     Json::Value       zones;
 }
