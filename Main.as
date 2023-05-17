@@ -1,15 +1,16 @@
 /*
 c 2023-05-14
-m 2023-05-16
+m 2023-05-17
 */
 
 void Main() {
+    Zones::Load();
     if (Settings::loadMyMapsOnBoot)
         DB::LoadMyMaps();
 }
 
 void RenderMenu() {
-	if (UI::MenuItem(Storage::title, "", Settings::windowOpen))
+	if (UI::MenuItem(Storage::title, '', Settings::windowOpen))
 		Settings::windowOpen = !Settings::windowOpen;
 }
 
@@ -19,13 +20,13 @@ void RenderInterface() {
 		UI::SetNextWindowPos(100, 100, UI::Cond::Once);
 		UI::Begin(Storage::title, Settings::windowOpen);
 
-        if (UI::Button(Icons::Refresh + " Refresh Map List", vec2(250, 50))) {
+        if (UI::Button(Icons::Refresh + ' Refresh Map List', vec2(250, 50))) {
             Storage::maps = Maps::GetMyMaps();
             DB::SaveMyMaps();
         }
 
         // UI::SameLine();
-        // if (UI::Button(Icons::Refresh + " Refresh All Records", vec2(250, 50))) {
+        // if (UI::Button(Icons::Refresh + ' Refresh All Records', vec2(250, 50))) {
         // }
 
         UI::SameLine();
@@ -35,6 +36,10 @@ void RenderInterface() {
         UI::SameLine();
         if (UI::Button(Icons::FloppyO, vec2(50, 50)))
             DB::SaveMyMaps();
+        
+        // UI::SameLine();
+        // if (UI::Button(Icons::MapMarker + ' Zones', vec2(130, 50)))
+        //     Zones::Load();
 
         UI::Separator();
 
