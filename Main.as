@@ -22,13 +22,9 @@ void RenderInterface() {
 		UI::Begin(Storage::title, Settings::windowOpen);
 
         if (UI::Button(Icons::Refresh + " Refresh Map List", vec2(250, 50))) {
-            Storage::maps = Maps::GetMyMaps();
+            Maps::GetMyMaps();
             DB::MyMaps::SaveAll();
         }
-
-        // UI::SameLine();
-        // if (UI::Button(Icons::Refresh + " Refresh All Records", vec2(250, 50))) {
-        // }
 
         UI::SameLine();
         if (UI::Button(Icons::Upload, vec2(50, 50)))
@@ -38,15 +34,20 @@ void RenderInterface() {
         if (UI::Button(Icons::FloppyO, vec2(50, 50)))
             DB::MyMaps::SaveAll();
 
-        // UI::SameLine();
-        // if (UI::Button(Icons::MapMarker + " Zones", vec2(130, 50)))
-        //     Zones::Load();
+        if (Storage::myMapsIgnoredUids.GetKeys().Length > 0) {
+            UI::SameLine();
+            if (UI::Button("clear uids", vec2(130, 50)))
+                Storage::myMapsIgnoredUids.DeleteAll();
+        }
 
         UI::Separator();
 
-        for (uint i = 0; i < Storage::maps.Length; i++) {
-            if (UI::Button(Storage::maps[i].mapNameText))
-                print(Storage::maps[i].mapNameColor);
+        for (uint i = 0; i < Storage::myMaps.Length; i++) {
+            if (UI::Button(Storage::myMaps[i].timestamp + " " + Storage::myMaps[i].mapNameText)) {
+                trace("ignoring my map: " + Storage::myMaps[i].mapNameText);
+                DB::MyMaps::Ignore(Storage::myMaps[i]);
+                break;
+            }
         }
 
 		UI::End();
