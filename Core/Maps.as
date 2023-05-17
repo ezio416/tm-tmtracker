@@ -3,7 +3,7 @@ c 2023-05-16
 m 2023-05-16
 */
 
-namespace Core {
+namespace Maps {
     Models::Map[] GetMyMaps() {
         trace("refreshing my map list...");
 

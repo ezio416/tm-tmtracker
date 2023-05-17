@@ -20,13 +20,13 @@ void RenderInterface() {
 		UI::Begin(Storage::title, Settings::windowOpen);
 
         if (UI::Button(Icons::Refresh + " Refresh Map List", vec2(250, 50))) {
-            Storage::maps = Core::GetMyMaps();
+            Storage::maps = Maps::GetMyMaps();
             DB::SaveMyMaps();
         }
 
-        UI::SameLine();
-        if (UI::Button(Icons::Refresh + " Refresh All Records", vec2(250, 50))) {
-        }
+        // UI::SameLine();
+        // if (UI::Button(Icons::Refresh + " Refresh All Records", vec2(250, 50))) {
+        // }
 
         UI::SameLine();
         if (UI::Button(Icons::Upload, vec2(50, 50)))
