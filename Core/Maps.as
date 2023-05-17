@@ -28,13 +28,12 @@ namespace Core {
                 maps.InsertLast(Models::Map(mapList[i]));
         } while (tooManyMaps);
 
+        // insertion sort, most maps are already in order
         for (uint i = 1; i < maps.Length; i++) {
             Models::Map key = maps[i];
             int j = i - 1;
-            while (j >= 0 && maps[j] > key) {
+            for (j; j >= 0 && maps[j] > key; j--)
                 maps[j + 1] = maps[j];
-                j -= 1;
-            }
             maps[j + 1] = key;
         }
 

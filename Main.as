@@ -28,11 +28,12 @@ void RenderInterface() {
 
         UI::SameLine();
         if (UI::Button(Icons::Upload, vec2(50, 50)))
-            Core::LoadFile();
+            print("load");
+            // Core::LoadMaps();
 
         UI::SameLine();
         if (UI::Button(Icons::FloppyO, vec2(50, 50)))
-            Core::SaveFile();
+            Core::SaveMaps();
 
         UI::Separator();
 
