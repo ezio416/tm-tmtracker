@@ -28,8 +28,7 @@ void RenderInterface() {
 
         UI::SameLine();
         if (UI::Button(Icons::Upload, vec2(50, 50)))
-            print("load");
-            // Core::LoadMaps();
+            Core::LoadMaps();
 
         UI::SameLine();
         if (UI::Button(Icons::FloppyO, vec2(50, 50)))
