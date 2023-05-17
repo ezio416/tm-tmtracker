@@ -3,6 +3,10 @@ c 2023-05-14
 m 2023-05-16
 */
 
+void Main() {
+    Core::LoadMaps();
+}
+
 void RenderMenu() {
 	if (UI::MenuItem(Storage::title, "", Settings::windowOpen))
 		Settings::windowOpen = !Settings::windowOpen;
@@ -17,7 +21,7 @@ void RenderInterface() {
         if (UI::Button(Icons::Refresh + " Refresh Map List", vec2(250, 50))) {
             print("refreshing map list...");
             Storage::maps = Core::GetMyMaps();
-            print(Storage::maps.Length);
+            Core::SaveMaps();
         }
 
         UI::SameLine();
