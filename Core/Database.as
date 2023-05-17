@@ -34,7 +34,7 @@ namespace DB {
                 mapNameColor  TEXT,
                 mapNameRaw    TEXT,
                 mapNameText   TEXT,
-                mapUid        VARCHAR(27),
+                mapUid        VARCHAR(27) PRIMARY KEY,
                 silverTime    INT,
                 thumbnailUrl  CHAR(97),
                 timestamp     INT
