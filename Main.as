@@ -35,9 +35,12 @@ void RenderInterface() {
         if (UI::Button(Icons::FloppyO, vec2(50, 50)))
             DB::MyMaps::SaveAll();
 
+        if (UI::Button(Icons::Bomb + " Nuke MyMaps", vec2(200, 50)))
+            DB::MyMaps::Nuke();
+
         if (Storage::myMapsHidden.Length > 0) {
             UI::SameLine();
-            if (UI::Button("show hidden (" + Storage::myMapsHidden.Length + ")", vec2(180, 50))) {
+            if (UI::Button("Show Hidden (" + Storage::myMapsHidden.Length + ")", vec2(200, 50))) {
                 auto now = Time::Now;
                 for (uint i = 0; i < Storage::myMapsHidden.Length; i++)
                     DB::MyMaps::UnHide(Storage::myMapsHidden[i]);
@@ -49,7 +52,7 @@ void RenderInterface() {
 
         if (Storage::myMapsHiddenUids.GetKeys().Length > 0) {
             UI::SameLine();
-            if (UI::Button("clear uids", vec2(130, 50)))
+            if (UI::Button("Clear UIDs", vec2(130, 50)))
                 Storage::myMapsHiddenUids.DeleteAll();
         }
 

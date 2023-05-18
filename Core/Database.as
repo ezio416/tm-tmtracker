@@ -151,5 +151,20 @@ namespace DB {
             if (Settings::printDurations)
                 trace("unhiding my map took " + (Time::Now - now) + " ms");
         }
+
+        void Nuke() {
+            auto now = Time::Now;
+            trace("nuking my map data from program and " + Storage::dbFile);
+
+            Storage::myMaps.RemoveRange(0, Storage::myMaps.Length);
+            Storage::myMapsHidden.RemoveRange(0, Storage::myMapsHidden.Length);
+            Storage::myMapsHiddenUids.DeleteAll();
+
+            Storage::db.Execute("DELETE FROM MyMaps");
+            Storage::db.Execute("DELETE FROM MyMapsHidden");
+
+            if (Settings::printDurations)
+                trace("nuking my map data took " + (Time::Now - now) + " ms");
+        }
     }
 }

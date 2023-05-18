@@ -35,10 +35,10 @@ namespace Maps {
             if (Storage::myMapsHiddenUids.Exists(Storage::myMaps[i].mapUid))
                 Storage::myMaps.RemoveAt(i);
 
+        if (Settings::printDurations)
+            trace("refreshing my maps took " + (Time::Now - now) + " ms");
+
         DB::MyMaps::SaveAll();
         DB::MyMaps::LoadAll();
-
-        if (Settings::printDurations)
-            trace("refreshing my maps took " + (Time::Now - now) + " ms (including save+load)");
     }
 }
