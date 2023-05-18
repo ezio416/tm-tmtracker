@@ -13,8 +13,16 @@ namespace Settings {
     [Setting name="Print task durations to the log"]
     bool printDurations = false;
 
-    [Setting hidden]
+    [Setting name="Sort my maps by newest first"]
     bool sortMapsNewest = true;
+    bool sortMapsNewestTemp = sortMapsNewest;
+    bool DetectSortMapsNewest() {
+        if (sortMapsNewestTemp != sortMapsNewest) {
+            sortMapsNewestTemp = sortMapsNewest;
+            return true;
+        }
+        return false;
+    }
 
     [Setting hidden]
     bool windowOpen = true;

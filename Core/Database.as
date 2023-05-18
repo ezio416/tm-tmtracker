@@ -5,6 +5,23 @@ m 2023-05-17
 
 namespace DB {
     namespace MyMaps {
+        string tableColumns = """ (
+            authorId      CHAR(36),
+            authorTime    INT,
+            badUploadTime BOOL,
+            bronzeTime    INT,
+            downloadUrl   CHAR(93),
+            goldTime      INT,
+            mapId         CHAR(36),
+            mapNameColor  TEXT,
+            mapNameRaw    TEXT,
+            mapNameText   TEXT,
+            mapUid        VARCHAR(27) PRIMARY KEY,
+            silverTime    INT,
+            thumbnailUrl  CHAR(97),
+            timestamp     INT
+        ); """;
+
         void LoadAll() {
             auto now = Time::Now;
             trace("loading my maps from " + Storage::dbFile);
@@ -13,7 +30,10 @@ namespace DB {
             @Storage::db = SQLite::Database(Storage::dbFile);
 
             Storage::myMaps.RemoveRange(0, Storage::myMaps.Length);
-            try { @s = Storage::db.Prepare("SELECT * FROM MyMaps"); } catch {
+            try {
+                string order = (Settings::sortMapsNewest) ? "DESC" : "ASC";
+                @s = Storage::db.Prepare("SELECT * FROM MyMaps ORDER BY timestamp " + order);
+            } catch {
                 trace("no MyMaps table in database, plugin hasn't been run yet");
                 if (Settings::printDurations)
                     trace("returning after " + (Time::Now - now) + " ms");
@@ -24,20 +44,21 @@ namespace DB {
                 Storage::myMaps.InsertLast(Models::Map(s));
             }
 
-            Storage::myMapsIgnored.RemoveRange(0, Storage::myMapsIgnored.Length);
-            Storage::myMapsIgnoredUids.DeleteAll();
-            try { @s = Storage::db.Prepare("SELECT * FROM MyMapsIgnored"); } catch {
-                trace("no MyMapsIgnored table in database, maps haven't been ignored yet");
-                if (Settings::printDurations)
-                    trace("returning after " + (Time::Now - now) + " ms");
-                return;
-            }
-            while (true) {
-                if (!s.NextRow()) break;
-                auto map = Models::Map(s);
-                Storage::myMapsIgnored.InsertLast(map);
-                Storage::myMapsIgnoredUids.Set(map.mapUid, "");
-            }
+            Storage::myMapsHidden.RemoveRange(0, Storage::myMapsHidden.Length);
+            Storage::myMapsHiddenUids.DeleteAll();
+            bool anyHidden = false;
+            try {
+                @s = Storage::db.Prepare("SELECT * FROM MyMapsHidden");
+                anyHidden = true;
+            } catch { trace("no MyMapsHidden table in database, maps haven't been hidden yet"); }
+
+            if (anyHidden)
+                while (true) {
+                    if (!s.NextRow()) break;
+                    auto map = Models::Map(s);
+                    Storage::myMapsHidden.InsertLast(map);
+                    Storage::myMapsHiddenUids.Set(map.mapUid, "");
+                }
 
             if (Settings::printDurations)
                 trace("loading my maps took " + (Time::Now - now) + " ms");
@@ -47,24 +68,7 @@ namespace DB {
             auto now = Time::Now;
             trace("saving my maps to " + Storage::dbFile);
 
-            Storage::db.Execute("""
-                CREATE TABLE IF NOT EXISTS MyMaps (
-                    authorId      CHAR(36),
-                    authorTime    INT,
-                    badUploadTime BOOL,
-                    bronzeTime    INT,
-                    downloadUrl   CHAR(93),
-                    goldTime      INT,
-                    mapId         CHAR(36),
-                    mapNameColor  TEXT,
-                    mapNameRaw    TEXT,
-                    mapNameText   TEXT,
-                    mapUid        VARCHAR(27) PRIMARY KEY,
-                    silverTime    INT,
-                    thumbnailUrl  CHAR(97),
-                    timestamp     INT
-                );
-            """);
+            Storage::db.Execute("CREATE TABLE IF NOT EXISTS MyMaps" + tableColumns);
 
             for (uint i = 0; i < Storage::myMaps.Length; i++) {
                 auto map = Storage::myMaps[i];
@@ -108,32 +112,15 @@ namespace DB {
                 trace("saving my maps took " + (Time::Now - now) + " ms");
         }
 
-        void Ignore(Models::Map@ map) {
+        void Hide(Models::Map map) {
             auto now = Time::Now;
-            trace("ignoring my map (" + map.mapNameText + ") in " + Storage::dbFile);
+            trace("hiding my map (" + map.mapNameText + ") in " + Storage::dbFile);
 
-            Storage::db.Execute("""
-                CREATE TABLE IF NOT EXISTS MyMapsIgnored (
-                    authorId      CHAR(36),
-                    authorTime    INT,
-                    badUploadTime BOOL,
-                    bronzeTime    INT,
-                    downloadUrl   CHAR(93),
-                    goldTime      INT,
-                    mapId         CHAR(36),
-                    mapNameColor  TEXT,
-                    mapNameRaw    TEXT,
-                    mapNameText   TEXT,
-                    mapUid        VARCHAR(27) PRIMARY KEY,
-                    silverTime    INT,
-                    thumbnailUrl  CHAR(97),
-                    timestamp     INT
-                );
-            """);
+            Storage::db.Execute("CREATE TABLE IF NOT EXISTS MyMapsHidden" + tableColumns);
 
             SQLite::Statement@ s;
 
-            @s = Storage::db.Prepare("INSERT INTO MyMapsIgnored SELECT * FROM MyMaps WHERE mapUid=?");
+            @s = Storage::db.Prepare("INSERT INTO MyMapsHidden SELECT * FROM MyMaps WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
 
@@ -141,30 +128,28 @@ namespace DB {
             s.Bind(1, map.mapUid);
             s.Execute();
 
-            LoadAll();
-
             if (Settings::printDurations)
-                trace("ignoring my map took " + (Time::Now - now) + " ms (includes previous value)");
+                trace("hiding my map took " + (Time::Now - now) + " ms");
+
+            LoadAll();
         }
 
-        void UnIgnore(Models::Map@ map) {
+        void UnHide(Models::Map map) {
             auto now = Time::Now;
-            trace("unignoring my map (" + map.mapNameText + ") in " + Storage::dbFile);
+            trace("unhiding my map (" + map.mapNameText + ") in " + Storage::dbFile);
 
             SQLite::Statement@ s;
 
-            @s = Storage::db.Prepare("INSERT INTO MyMaps SELECT * FROM MyMapsIgnored WHERE mapUid=?");
+            @s = Storage::db.Prepare("INSERT INTO MyMaps SELECT * FROM MyMapsHidden WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
 
-            @s = Storage::db.Prepare("DELETE FROM MyMapsIgnored WHERE mapUid=?");
+            @s = Storage::db.Prepare("DELETE FROM MyMapsHidden WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
-
-            LoadAll();
 
             if (Settings::printDurations)
-                trace("unignoring my map took " + (Time::Now - now) + " ms (includes previous value)");
+                trace("unhiding my map took " + (Time::Now - now) + " ms");
         }
     }
 }
