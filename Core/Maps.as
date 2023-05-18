@@ -38,7 +38,7 @@ namespace Maps {
         if (Settings::printDurations)
             trace("refreshing my maps took " + (Time::Now - now) + " ms");
 
-        DB::MyMaps::SaveAll();
-        DB::MyMaps::LoadAll();
+        DB::MyMaps::Save();
+        DB::MyMaps::Load();
     }
 }
