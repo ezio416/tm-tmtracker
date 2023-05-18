@@ -22,7 +22,7 @@ namespace DB {
             timestamp     INT
         ); """;
 
-        void LoadAll() {
+        void Load() {
             auto now = Time::Now;
             trace("loading my maps from " + Storage::dbFile);
 
@@ -64,7 +64,7 @@ namespace DB {
                 trace("loading my maps took " + (Time::Now - now) + " ms");
         }
 
-        void SaveAll() {
+        void Save() {
             auto now = Time::Now;
             trace("saving my maps to " + Storage::dbFile);
 
@@ -131,7 +131,7 @@ namespace DB {
             if (Settings::printDurations)
                 trace("hiding my map took " + (Time::Now - now) + " ms");
 
-            LoadAll();
+            Load();
         }
 
         void UnHide(Models::Map map) {

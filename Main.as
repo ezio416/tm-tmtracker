@@ -5,7 +5,7 @@ m 2023-05-17
 
 void Main() {
     if (Settings::loadMyMapsOnBoot)
-        DB::MyMaps::LoadAll();
+        DB::MyMaps::Load();
     if (Settings::loadZonesOnBoot)
         Zones::Load();
 }
@@ -18,7 +18,7 @@ void RenderMenu() {
 void RenderInterface() {
     if (Settings::windowOpen) {
         if (Settings::DetectSortMapsNewest())
-            DB::MyMaps::LoadAll();
+            DB::MyMaps::Load();
 
         UI::SetNextWindowSize(600, 800, UI::Cond::Once);
 		UI::SetNextWindowPos(100, 100, UI::Cond::Once);
@@ -29,11 +29,11 @@ void RenderInterface() {
 
         UI::SameLine();
         if (UI::Button(Icons::Upload, vec2(50, 50)))
-            DB::MyMaps::LoadAll();
+            DB::MyMaps::Load();
 
         UI::SameLine();
         if (UI::Button(Icons::FloppyO, vec2(50, 50)))
-            DB::MyMaps::SaveAll();
+            DB::MyMaps::Save();
 
         if (UI::Button(Icons::Bomb + " Nuke MyMaps", vec2(200, 50)))
             DB::MyMaps::Nuke();
@@ -46,7 +46,7 @@ void RenderInterface() {
                     DB::MyMaps::UnHide(Storage::myMapsHidden[i]);
                 if (Settings::printDurations)
                     trace("unhiding all maps took " + (Time::Now - now) + " ms");
-                DB::MyMaps::LoadAll();
+                DB::MyMaps::Load();
             }
         }
 
