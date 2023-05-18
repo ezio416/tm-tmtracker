@@ -160,8 +160,8 @@ namespace DB {
             Storage::myMapsHidden.RemoveRange(0, Storage::myMapsHidden.Length);
             Storage::myMapsHiddenUids.DeleteAll();
 
-            Storage::db.Execute("DELETE FROM MyMaps");
-            Storage::db.Execute("DELETE FROM MyMapsHidden");
+            try { Storage::db.Execute("DELETE FROM MyMaps"); } catch { }
+            try { Storage::db.Execute("DELETE FROM MyMapsHidden"); } catch { }
 
             if (Settings::printDurations)
                 trace("nuking my map data took " + (Time::Now - now) + " ms");
