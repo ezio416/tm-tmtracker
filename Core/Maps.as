@@ -6,13 +6,13 @@ m 2023-05-17
 namespace Maps {
     void GetMyMaps() {
         auto now = Time::Now;
-        trace("refreshing my maps...");
 
         string live = "NadeoLiveServices";
         NadeoServices::AddAudience(live);
         while (!NadeoServices::IsAuthenticated(live)) yield();
 
-        Models::Map[] maps;
+        Storage::myMaps.RemoveRange(0, Storage::myMaps.Length);
+
         uint offset = 0;
         bool tooManyMaps;
 
@@ -28,28 +28,17 @@ namespace Maps {
             auto mapList = Json::Parse(req.String())["mapList"];
             tooManyMaps = mapList.Length == 1000;
             for (uint i = 0; i < mapList.Length; i++)
-                maps.InsertLast(Models::Map(mapList[i]));
+                Storage::myMaps.InsertLast(Models::Map(mapList[i]));
         } while (tooManyMaps);
 
-        // insertion sort, most maps are already in order
-        for (uint i = 1; i < maps.Length; i++) {
-            Models::Map key = maps[i];
-            int j = i - 1;
-            for (j; j >= 0 && maps[j] > key; j--)
-                maps[j + 1] = maps[j];
-            maps[j + 1] = key;
-        }
+        for (int i = Storage::myMaps.Length - 1; i >= 0; i--)
+            if (Storage::myMapsHiddenUids.Exists(Storage::myMaps[i].mapUid))
+                Storage::myMaps.RemoveAt(i);
 
-        if (Settings::sortMapsNewest)
-            maps.Reverse();
-
-        for (int i = maps.Length - 1; i >= 0; i--)
-            if (Storage::myMapsIgnoredUids.Exists(maps[i].mapUid))
-                maps.RemoveAt(i);
-
-        Storage::myMaps = maps;
+        DB::MyMaps::SaveAll();
+        DB::MyMaps::LoadAll();
 
         if (Settings::printDurations)
-            trace("refreshing my maps took " + (Time::Now - now) + " ms");
+            trace("refreshing my maps took " + (Time::Now - now) + " ms (including save+load)");
     }
 }
