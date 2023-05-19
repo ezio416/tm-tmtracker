@@ -44,7 +44,7 @@ void RenderInterface() {
 
             UI::SameLine();
             if (UI::Button(Icons::CloudDownload + " Get All Thumbnails", vec2(250, 50)))
-                Maps::GetMyMapsThumbnails(Storage::myMaps);
+                Maps::GetMyMapsThumbnails();
 
             UI::SameLine();
             if (UI::Button(Icons::Upload, vec2(50, 50)))
@@ -75,6 +75,12 @@ void RenderInterface() {
                     Storage::myMapsHiddenUids.DeleteAll();
             }
 
+            if (Storage::currentMap.Length > 0) {
+                UI::SameLine();
+                if (UI::Button("Clear Current Map", vec2(250, 50)))
+                    Storage::currentMap.RemoveRange(0, Storage::currentMap.Length);
+            }
+
             UI::Separator();
 
             UI::BeginTabBar("MyMapsTabs");
@@ -82,11 +88,38 @@ void RenderInterface() {
                 for (uint i = 0; i < Storage::myMaps.Length; i++) {
                     if (UI::Button(Storage::myMaps[i].timestamp + " " + Storage::myMaps[i].mapNameText)) {
                         // DB::MyMaps::Hide(Storage::myMaps[i]);
-                        Storage::myMaps[i].GetThumbnail();
+                        // Storage::myMaps[i].GetThumbnail();
+                        Storage::currentMap.RemoveRange(0, Storage::currentMap.Length);
+                        Storage::currentMap.InsertAt(0, Storage::myMaps[i]);
+                        @Storage::myMaps[i].thumbnailTexture =
+                            UI::LoadTexture(Storage::thumbnailFolder + "/" + Storage::myMaps[i].mapUid + ".jpg");
                         break;
                     }
                 }
                 UI::EndTabItem();
+            }
+
+            // UI::Texture@ texture;
+            if (Storage::currentMap.Length > 0) {
+                auto map = Storage::currentMap[0];
+                if (UI::BeginTabItem(Icons::Map + " " + map.mapNameColor)) {
+                    string file = "thumbnails/" + map.mapUid + ".jpg";
+                    print(file + ((IO::FileExists(file)) ? " exists" : " nope"));
+                    // @texture = UI::LoadTexture(file);
+                    try {
+                        UI::Image(map.thumbnailTexture, vec2(300, 300));
+                    } catch {
+                        print(getExceptionInfo());
+                    }
+                    UI::Text(map.mapNameText);
+                    UI::Text(map.mapNameColor);
+                    UI::Text("" + map.timestamp);
+                    UI::Text("" + map.authorTime);
+                    UI::Text("" + map.goldTime);
+                    UI::Text("" + map.silverTime);
+                    UI::Text("" + map.bronzeTime);
+                    UI::EndTabItem();
+                }
             }
             UI::EndTabBar();
 
