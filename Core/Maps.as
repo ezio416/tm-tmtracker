@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-17
+m 2023-05-19
 */
 
 namespace Maps {
@@ -40,5 +40,15 @@ namespace Maps {
 
         DB::MyMaps::Save();
         DB::MyMaps::Load();
+    }
+
+    void GetMyMapsThumbnails() {
+        auto now = Time::Now;
+
+        for (uint i = 0; i < Storage::myMaps.Length; i++)
+            Storage::myMaps[i].GetThumbnail();
+
+        if (Settings::printDurations)
+            trace("getting " + Storage::myMaps.Length + " thumbnails took " + (Time::Now - now) + " ms");
     }
 }
