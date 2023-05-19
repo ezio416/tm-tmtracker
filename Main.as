@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-05-18
+m 2023-05-19
 */
 
 void Main() {
@@ -9,6 +9,8 @@ void Main() {
 
     if (Settings::loadZonesOnBoot)
         Zones::Load();
+
+    IO::CreateFolder(Storage::thumbnailFolder);
 }
 
 void RenderMenu() {
@@ -39,6 +41,10 @@ void RenderInterface() {
 
             if (UI::Button(Icons::Refresh + " Refresh Map List (" + Storage::myMaps.Length + ")", vec2(260, 50)))
                 Maps::GetMyMaps();
+
+            UI::SameLine();
+            if (UI::Button(Icons::CloudDownload + " Get All Thumbnails", vec2(250, 50)))
+                Maps::GetMyMapsThumbnails(Storage::myMaps);
 
             UI::SameLine();
             if (UI::Button(Icons::Upload, vec2(50, 50)))
@@ -75,7 +81,8 @@ void RenderInterface() {
             if (UI::BeginTabItem("Map List")) {
                 for (uint i = 0; i < Storage::myMaps.Length; i++) {
                     if (UI::Button(Storage::myMaps[i].timestamp + " " + Storage::myMaps[i].mapNameText)) {
-                        DB::MyMaps::Hide(Storage::myMaps[i]);
+                        // DB::MyMaps::Hide(Storage::myMaps[i]);
+                        Storage::myMaps[i].GetThumbnail();
                         break;
                     }
                 }

@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-17
+m 2023-05-19
 */
 
 namespace Models {
@@ -20,9 +20,6 @@ namespace Models {
         uint     silverTime;
         string   thumbnailUrl;
         uint     timestamp;
-
-        int opCmp(int i) { return timestamp - i; }
-        int opCmp(Map m) { return timestamp - m.timestamp; }
 
         Map() {}
 
@@ -61,6 +58,25 @@ namespace Models {
             silverTime    = s.GetColumnInt("silverTime");
             thumbnailUrl  = s.GetColumnString("thumbnailUrl");
             timestamp     = s.GetColumnInt("timestamp");
+        }
+
+        int opCmp(int i) { return timestamp - i; }
+        int opCmp(Map m) { return timestamp - m.timestamp; }
+
+        void GetThumbnail() {
+            auto now = Time::Now;
+
+            string file = Storage::thumbnailFolder + "/" + mapUid + ".jpg";
+            if (IO::FileExists(file)) return;
+
+            trace("downloading thumbnail for " + mapNameText);
+            auto req = Net::HttpGet(thumbnailUrl);
+            while (!req.Finished()) continue;
+
+            req.SaveToFile(file);
+
+            if (Settings::printDurations)
+                trace("downloading thumbnail took " + (Time::Now - now) + " ms");
         }
     }
 }
