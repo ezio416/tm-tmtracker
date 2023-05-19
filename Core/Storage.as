@@ -1,10 +1,11 @@
 /*
 c 2023-05-16
-m 2023-05-18
+m 2023-05-19
 */
 
 namespace Storage {
     // Models::Account[] accounts;
+    Models::Map[]     currentMap;
     SQLite::Database@ db;
     string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");
     Models::Map[]     myMaps;

@@ -5,21 +5,22 @@ m 2023-05-19
 
 namespace Models {
     class Map {
-        string   authorId;
-        uint     authorTime;
-        bool     badUploadTime;
-        uint     bronzeTime;
-        string   downloadUrl;
-        uint     goldTime;
-        string   mapId;
-        string   mapNameColor;
-        string   mapNameRaw;
-        string   mapNameText;
-        string   mapUid;
-        Record[] records;
-        uint     silverTime;
-        string   thumbnailUrl;
-        uint     timestamp;
+        string       authorId;
+        uint         authorTime;
+        bool         badUploadTime;
+        uint         bronzeTime;
+        string       downloadUrl;
+        uint         goldTime;
+        string       mapId;
+        string       mapNameColor;
+        string       mapNameRaw;
+        string       mapNameText;
+        string       mapUid;
+        Record[]     records;
+        uint         silverTime;
+        UI::Texture@ thumbnailTexture;
+        string       thumbnailUrl;
+        uint         timestamp;
 
         Map() {}
 
@@ -63,11 +64,11 @@ namespace Models {
         int opCmp(int i) { return timestamp - i; }
         int opCmp(Map m) { return timestamp - m.timestamp; }
 
-        void GetThumbnail() {
+        string GetThumbnail() {
             auto now = Time::Now;
 
             string file = Storage::thumbnailFolder + "/" + mapUid + ".jpg";
-            if (IO::FileExists(file)) return;
+            if (IO::FileExists(file)) return file;
 
             trace("downloading thumbnail for " + mapNameText);
             auto req = Net::HttpGet(thumbnailUrl);
@@ -77,6 +78,8 @@ namespace Models {
 
             if (Settings::printDurations)
                 trace("downloading thumbnail took " + (Time::Now - now) + " ms");
+
+            return file;
         }
     }
 }
