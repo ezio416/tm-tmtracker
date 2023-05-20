@@ -41,7 +41,9 @@ namespace DB {
             }
             while (true) {
                 if (!s.NextRow()) break;
-                Storage::myMaps.InsertLast(Models::Map(s));
+                auto map = Models::Map(s);
+                map.hidden = false;
+                Storage::myMaps.InsertLast(map);
             }
 
             Storage::myMapsHidden.RemoveRange(0, Storage::myMapsHidden.Length);
@@ -56,12 +58,15 @@ namespace DB {
                 while (true) {
                     if (!s.NextRow()) break;
                     auto map = Models::Map(s);
+                    map.hidden = true;
                     Storage::myMapsHidden.InsertLast(map);
                     Storage::myMapsHiddenUids.Set(map.mapUid, "");
                 }
 
             if (Settings::printDurations)
                 trace("loading my maps took " + (Time::Now - now) + " ms");
+
+            startnew(CoroutineFunc(Maps::LoadMyMapsThumbnailsCoro));
         }
 
         void Save() {
@@ -150,6 +155,8 @@ namespace DB {
 
             if (Settings::printDurations)
                 trace("unhiding my map took " + (Time::Now - now) + " ms");
+
+            Load();
         }
 
         void Nuke() {
@@ -159,7 +166,7 @@ namespace DB {
             Storage::ClearCurrentMap();
             Storage::ClearMyMaps();
             Storage::ClearMyMapsHidden();
-            Storage::myMapsHiddenUids.DeleteAll();
+            Storage::ClearMyMapsHiddenUIDs();
 
             try { Storage::db.Execute("DELETE FROM MyMaps");       } catch { }
             try { Storage::db.Execute("DELETE FROM MyMapsHidden"); } catch { }
