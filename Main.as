@@ -86,13 +86,13 @@ void RenderMapsTabs() {
             }
 
             if (map.hidden) {
-                if (UI::Button(Icons::Eye + " Unhide This Map")) {
-                    Storage::currentMaps[0].hidden = false;
+                if (UI::Button(Icons::Eye + " Show This Map (currently hidden)")) {
+                    Storage::currentMaps[i].hidden = false;
                     DB::MyMaps::UnHide(map);
                 }
             } else {
                 if (UI::Button(Icons::EyeSlash + " Hide This Map")) {
-                    Storage::currentMaps[0].hidden = true;
+                    Storage::currentMaps[i].hidden = true;
                     DB::MyMaps::Hide(map);
                 }
             }
@@ -123,23 +123,32 @@ void RenderTabs() {
             );
 
             if (UI::Button(Icons::Refresh + " Update Map List (" + Storage::myMaps.Length + ")"))
-                Maps::GetMyMaps();
+                startnew(CoroutineFunc(Maps::GetMyMapsCoro));
+
+            uint totalMaps = Storage::myMaps.Length + Storage::myMapsHidden.Length;
+            if (totalMaps > 0) {
+                UI::SameLine();
+                if (UI::Button(Icons::Bomb + " Nuke (" + totalMaps + ")"))
+                    DB::MyMaps::Nuke();
+            }
 
             if (Storage::myMapsHidden.Length > 0) {
                 UI::SameLine();
-                if (UI::Button(Icons::Eye + " Unhide All (" + Storage::myMapsHidden.Length + ")")) {
+                if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myMapsHidden.Length + ")")) {
                     auto now = Time::Now;
-                    for (uint i = 0; i < Storage::myMapsHidden.Length; i++)
+
+                    for (uint i = 0; i < Storage::myMapsHidden.Length;)
                         DB::MyMaps::UnHide(Storage::myMapsHidden[i]);
+
+                    for (uint i = 0; i < Storage::currentMaps.Length; i++)
+                        Storage::currentMaps[i].hidden = false;
+
                     if (Settings::printDurations)
                         trace("unhiding all maps took " + (Time::Now - now) + " ms");
+
                     DB::MyMaps::Load();
                 }
             }
-
-            UI::SameLine();
-            if (UI::Button(Icons::Bomb + " Nuke My Maps (" + (Storage::myMaps.Length + Storage::myMapsHidden.Length) + ")"))
-                DB::MyMaps::Nuke();
 
             if (Storage::currentMaps.Length > 0) {
                 UI::SameLine();
