@@ -39,6 +39,9 @@ namespace Settings {
     [Setting name="Thumbnail width (map tabs)" min=10 max=1000]
     uint myMapsThumbnailWidthTabs = 200;
 
+    [Setting name="Max records to get per map" min=100 max=1000 description="records are fetched in batches of 100 until this limit"]
+    uint maxRecordsPerMap = 100;
+
     [Setting hidden]
     bool windowOpen = true;
 }
