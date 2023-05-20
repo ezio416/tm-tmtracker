@@ -5,7 +5,7 @@ m 2023-05-20
 
 // Functions that don't fit nicely in other categories
 namespace Various {
-    void WaitToDoNadeoRequest() {
+    void WaitToDoNadeoRequestCoro() {
         if (Storage::latestNadeoRequest == 0) {
             Storage::latestNadeoRequest = Time::Now;
             return;
