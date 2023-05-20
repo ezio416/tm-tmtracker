@@ -87,9 +87,7 @@ void RenderMapsTabs() {
 
             UI::SameLine();
             UI::BeginGroup();
-                if (Settings::myMapsTabsColor) UI::Text(map.mapNameColor);
-                else                           UI::Text(map.mapNameText);
-
+                UI::Text(map.mapNameText);
                 UI::Text(Time::FormatStringUTC("%a \\$F98%Y-%m-%d \\$Z%H:%M:%S \\$F98UTC", map.timestamp));
                 UI::Text(Time::FormatString("%a \\$F98%Y-%m-%d \\$Z%H:%M:%S \\$F98Local", map.timestamp));
                 UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
