@@ -136,13 +136,6 @@ void RenderTabs() {
             if (UI::Button(Icons::Refresh + " Update Map List (" + Storage::myMaps.Length + ")"))
                 startnew(CoroutineFunc(Maps::GetMyMapsCoro));
 
-            // uint totalMaps = Storage::myMaps.Length + Storage::myMapsHidden.Length;
-            // if (totalMaps > 0) {
-            //     UI::SameLine();
-            //     if (UI::Button(Icons::Bomb + " Nuke (" + totalMaps + ")"))
-            //         DB::MyMaps::Nuke();
-            // }
-
             if (Storage::myMapsHidden.Length > 0) {
                 UI::SameLine();
                 if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myMapsHidden.Length + ")")) {
