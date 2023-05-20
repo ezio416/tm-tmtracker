@@ -8,11 +8,14 @@ namespace Storage {
     Models::Map[]     currentMap;
     SQLite::Database@ db;
     string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");
+    UI::Texture@      defaultTexture = UI::LoadTexture("Resources/1x1.png");
+    bool              mapTabOpen = false;
     Models::Map[]     myMaps;
     Models::Map[]     myMapsHidden;
     dictionary        myMapsHiddenUids;
     // Models::Record[]  records;
     string            thumbnailFolder = IO::FromStorageFolder("thumbnails");
+    dictionary        thumbnailTextures;
     string            title  = "\\$2f3" + Icons::MapO + "\\$z TMTracker";
     Json::Value       zones;
 
@@ -26,5 +29,9 @@ namespace Storage {
 
     void ClearMyMapsHidden() {
         Storage::myMapsHidden.RemoveRange(0, Storage::myMapsHidden.Length);
+    }
+
+    void ClearMyMapsHiddenUIDs() {
+        Storage::myMapsHiddenUids.DeleteAll();
     }
 }
