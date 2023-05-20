@@ -98,6 +98,18 @@ void RenderMapsTabs() {
                 UI::Text("\\$C80" + Icons::Circle + " " + Time::Format(map.bronzeTime));
             UI::EndGroup();
 
+            UI::SameLine();
+            UI::BeginGroup();
+                for (uint j = 0; j < map.records.Length; j++) {
+                    UI::Text(
+                        map.records[j].position  + " " + Time::Format(map.records[j].time) + "\n" +
+                        map.records[j].accountId + "\n" +
+                        map.records[j].zoneId    + "\n" +
+                        map.records[j].zoneName
+                    );
+                }
+            UI::EndGroup();
+
             if (map.hidden) {
                 if (UI::Button(Icons::Eye + " Show This Map (currently hidden)")) {
                     Storage::currentMaps[i].hidden = false;
@@ -109,6 +121,9 @@ void RenderMapsTabs() {
                     DB::MyMaps::Hide(map);
                 }
             }
+
+            if (UI::Button(Icons::Download + " Get Records"))
+                startnew(CoroutineFunc(map.GetRecordsCoro));
 
             UI::EndTabItem();
         }

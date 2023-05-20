@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-19
+m 2023-05-20
 */
 
 namespace Models {
@@ -71,6 +71,37 @@ namespace Models {
 
         int opCmp(int i) { return timestamp - i; }
         int opCmp(Map m) { return timestamp - m.timestamp; }
+
+        void GetRecordsCoro() {
+            auto now = Time::Now;
+            trace(logName + "getting records...");
+
+            uint offset = 0;
+            bool tooManyRecords;
+
+            do {
+                auto req = NadeoServices::Get(
+                    "NadeoLiveServices",
+                    NadeoServices::BaseURL() +
+                        "/api/token/leaderboard/group/Personal_Best/map/" + mapUid +
+                        "/top?onlyWorld=true&length=100&offset=" + offset
+                );
+                offset += 100;
+                req.Start();
+                while (!req.Finished()) yield();
+
+                auto top = Json::Parse(req.String())["tops"][0]["top"];
+                tooManyRecords = top.Length == 100;
+                for (uint i = 0; i < top.Length; i++) {
+                    auto record = Record(top[i]);
+                    record.mapUid = mapUid;
+                    records.InsertLast(record);
+                }
+            } while (tooManyRecords && records.Length < Settings::maxRecordsPerMap);
+
+            if (Settings::printDurations)
+                trace(logName + "getting records took " + (Time::Now - now) + " ms");
+        }
 
         void GetThumbnailCoro() {
             auto now = Time::Now;
