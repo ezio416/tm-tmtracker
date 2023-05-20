@@ -3,6 +3,7 @@ c 2023-05-16
 m 2023-05-20
 */
 
+// Functions relating to getting/loading data on maps
 namespace Maps {
     void GetMyMapsCoro() {
         auto now = Time::Now;

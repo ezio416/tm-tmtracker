@@ -3,6 +3,7 @@ c 2023-05-16
 m 2023-05-20
 */
 
+// Global variables for plugin operation and functions to clear some of them
 namespace Storage {
     Models::Map[]     currentMaps;
     dictionary        currentMapsUids;
