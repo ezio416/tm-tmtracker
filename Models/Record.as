@@ -28,7 +28,7 @@ namespace Models {
             position  = record["position"];
             time      = record["score"];
 
-            if (Storage::zones == null) Zones::Load();
+            Zones::Load();
             try   { zoneName = Storage::zones[zoneId]; }
             catch { zoneName = record["zoneName"]; }
         }

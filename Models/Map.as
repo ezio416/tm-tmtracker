@@ -81,6 +81,9 @@ namespace Models {
             records.RemoveRange(0, records.Length);
 
             do {
+                auto wait = startnew(CoroutineFunc(Various::WaitToDoNadeoRequest));
+                while (wait.IsRunning()) yield();
+
                 auto req = NadeoServices::Get(
                     "NadeoLiveServices",
                     NadeoServices::BaseURL() +
@@ -98,6 +101,8 @@ namespace Models {
                     record.mapUid = mapUid;
                     records.InsertLast(record);
                 }
+
+                Storage::requestsInProgress--;
             } while (tooManyRecords && records.Length < Settings::maxRecordsPerMap);
 
             if (Settings::printDurations)
@@ -144,13 +149,10 @@ namespace Models {
             if (Storage::thumbnailTextures.Exists(mapUid)) {
                 UI::Texture@ tex;
                 @tex = cast<UI::Texture@>(Storage::thumbnailTextures[mapUid]);
-                // print(logName + "existing texture");
                 if (@thumbnailTexture == null)
                     @thumbnailTexture = tex;
                 return;
             }
-
-            // trace(logName + "loading thumbnail...");
 
             if (!IO::FileExists(thumbnailFile)) {
                 auto @coro = startnew(CoroutineFunc(GetThumbnailCoro));

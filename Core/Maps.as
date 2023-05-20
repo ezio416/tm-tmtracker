@@ -18,6 +18,9 @@ namespace Maps {
         bool tooManyMaps;
 
         do {
+            auto wait = startnew(CoroutineFunc(Various::WaitToDoNadeoRequest));
+            while (wait.IsRunning()) yield();
+
             auto req = NadeoServices::Get(
                 live,
                 NadeoServices::BaseURL() + "/api/token/map?length=1000&offset=" + offset
@@ -30,6 +33,8 @@ namespace Maps {
             tooManyMaps = mapList.Length == 1000;
             for (uint i = 0; i < mapList.Length; i++)
                 Storage::myMaps.InsertLast(Models::Map(mapList[i]));
+
+            Storage::requestsInProgress--;
         } while (tooManyMaps);
 
         for (int i = Storage::myMaps.Length - 1; i >= 0; i--)
