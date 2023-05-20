@@ -6,7 +6,8 @@ m 2023-05-20
 // Global variables for plugin operation and functions to clear some of them
 namespace Storage {
     Models::Account[] accounts;
-    Models::Map[]     currentMaps;
+    dictionary        accountIds;
+    Models::Map@[]    currentMaps;
     dictionary        currentMapsUids;
     SQLite::Database@ db;
     string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");

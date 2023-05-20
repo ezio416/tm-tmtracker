@@ -102,13 +102,28 @@ namespace Models {
                 for (uint i = 0; i < top.Length; i++) {
                     auto record = Record(top[i]);
                     record.mapUid = mapUid;
+
+                    if (!Storage::accountIds.Exists(record.accountId)) {
+                        Storage::accountIds.Set(record.accountId, Storage::accountIds.GetKeys().Length);
+                        auto account = Account(record.accountId);
+                        account.GetName();
+                        record.accountName = account.accountName;
+                        account.recordMapUids.Set(record.mapUid, "");
+                        Storage::accounts.InsertLast(account);
+                    } else {
+                        auto ix = int(Storage::accountIds[record.accountId]);
+                        Storage::accounts[ix].GetName();
+                        record.accountName = Storage::accounts[ix].accountName;
+                        Storage::accounts[ix].recordMapUids.Set(record.mapUid, "");
+                    }
+
                     records.InsertLast(record);
                 }
 
                 Storage::requestsInProgress--;
             } while (tooManyRecords && records.Length < Settings::maxRecordsPerMap);
 
-            recordsTimestamp = Time::Now;
+            recordsTimestamp = Time::Stamp;
 
             if (Settings::printDurations)
                 trace(logName + "getting records took " + (Time::Now - now) + " ms");
