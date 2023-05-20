@@ -1,15 +1,16 @@
 /*
 c 2023-05-16
-m 2023-05-19
+m 2023-05-20
 */
 
 namespace Storage {
     // Models::Account[] accounts;
-    Models::Map[]     currentMap;
+    Models::Map[]     currentMaps;
+    dictionary        currentMapsUids;
     SQLite::Database@ db;
     string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");
     UI::Texture@      defaultTexture = UI::LoadTexture("Resources/1x1.png");
-    bool              mapTabOpen = false;
+    // bool              mapTabOpen = true;
     Models::Map[]     myMaps;
     Models::Map[]     myMapsHidden;
     dictionary        myMapsHiddenUids;
@@ -19,19 +20,23 @@ namespace Storage {
     string            title  = "\\$2f3" + Icons::MapO + "\\$z TMTracker";
     Json::Value       zones;
 
-    void ClearCurrentMap() {
-        Storage::currentMap.RemoveRange(0, Storage::currentMap.Length);
+    void ClearCurrentMaps() {
+        currentMaps.RemoveRange(0, currentMaps.Length);
+    }
+
+    void ClearCurrentMapsUids() {
+        currentMapsUids.DeleteAll();
     }
 
     void ClearMyMaps() {
-        Storage::myMaps.RemoveRange(0, Storage::myMaps.Length);
+        myMaps.RemoveRange(0, myMaps.Length);
     }
 
     void ClearMyMapsHidden() {
-        Storage::myMapsHidden.RemoveRange(0, Storage::myMapsHidden.Length);
+        myMapsHidden.RemoveRange(0, myMapsHidden.Length);
     }
 
-    void ClearMyMapsHiddenUIDs() {
-        Storage::myMapsHiddenUids.DeleteAll();
+    void ClearMyMapsHiddenUids() {
+        myMapsHiddenUids.DeleteAll();
     }
 }
