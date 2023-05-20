@@ -50,11 +50,9 @@ void RenderMapListTab() {
 
                 currentX = UI::GetCursorPos().x + Settings::myMapsThumbnailWidthList + 44;
                 UI::PushTextWrapPos(currentX - 44);  // 44 pixels for scrollbar works on 1.5x scaling at 4K
-                if (Settings::myMapsListColor)
-                    UI::Text(map.mapNameColor);
-                else
-                    UI::Text(map.mapNameText);
+                UI::Text((Settings::myMapsListColor) ? map.mapNameColor : map.mapNameText);
                 UI::PopTextWrapPos();
+                UI::Text("\n");
             UI::EndGroup();
         }
 
@@ -88,8 +86,8 @@ void RenderMapsTabs() {
             UI::SameLine();
             UI::BeginGroup();
                 UI::Text(map.mapNameText);
-                UI::Text(Time::FormatStringUTC("%a \\$F98%Y-%m-%d \\$Z%H:%M:%S \\$F98UTC", map.timestamp));
-                UI::Text(Time::FormatString("%a \\$F98%Y-%m-%d \\$Z%H:%M:%S \\$F98Local", map.timestamp));
+                UI::Text(Time::FormatStringUTC(Settings::dateFormat + "UTC", map.timestamp));
+                UI::Text(Time::FormatString(Settings::dateFormat + "Local", map.timestamp));
                 UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
                 UI::Text("\\$DD1" + Icons::Circle + " " + Time::Format(map.goldTime));
                 UI::Text("\\$AAA" + Icons::Circle + " " + Time::Format(map.silverTime));
