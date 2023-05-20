@@ -6,20 +6,21 @@ m 2023-05-20
 namespace DB {
     namespace MyMaps {
         string tableColumns = """ (
-            authorId      CHAR(36),
-            authorTime    INT,
-            badUploadTime BOOL,
-            bronzeTime    INT,
-            downloadUrl   CHAR(93),
-            goldTime      INT,
-            mapId         CHAR(36),
-            mapNameColor  TEXT,
-            mapNameRaw    TEXT,
-            mapNameText   TEXT,
-            mapUid        VARCHAR(27) PRIMARY KEY,
-            silverTime    INT,
-            thumbnailUrl  CHAR(97),
-            timestamp     INT
+            authorId         CHAR(36),
+            authorTime       INT,
+            badUploadTime    BOOL,
+            bronzeTime       INT,
+            downloadUrl      CHAR(93),
+            goldTime         INT,
+            mapId            CHAR(36),
+            mapNameColor     TEXT,
+            mapNameRaw       TEXT,
+            mapNameText      TEXT,
+            mapUid           VARCHAR(27) PRIMARY KEY,
+            recordsTimestamp INT,
+            silverTime       INT,
+            thumbnailUrl     CHAR(97),
+            timestamp        INT
         ); """;
 
         void Load() {
@@ -91,10 +92,11 @@ namespace DB {
                         mapNameRaw,
                         mapNameText,
                         mapUid,
+                        recordsTimestamp,
                         silverTime,
                         thumbnailUrl,
                         timestamp
-                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
                 """);
                 s.Bind(1,  map.authorId);
                 s.Bind(2,  map.authorTime);
@@ -107,9 +109,10 @@ namespace DB {
                 s.Bind(9,  map.mapNameRaw);
                 s.Bind(10, map.mapNameText);
                 s.Bind(11, map.mapUid);
-                s.Bind(12, map.silverTime);
-                s.Bind(13, map.thumbnailUrl);
-                s.Bind(14, map.timestamp);
+                s.Bind(12, map.recordsTimestamp);
+                s.Bind(13, map.silverTime);
+                s.Bind(14, map.thumbnailUrl);
+                s.Bind(15, map.timestamp);
                 s.Execute();
             }
 
