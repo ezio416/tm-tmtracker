@@ -24,6 +24,7 @@ namespace Models {
         UI::Texture@ thumbnailTexture;
         string       thumbnailUrl;
         uint         timestamp;
+        bool         viewing;
 
         Map() {}
 
@@ -44,9 +45,9 @@ namespace Models {
             thumbnailUrl  = string(map["thumbnailUrl"]).Replace("\\", "");
             if (map["uploadTimestamp"] < 1600000000) {
                 badUploadTime = true;  // for some maps, Nadeo only provides the year
-                timestamp  = map["updateTimestamp"];
+                timestamp = map["updateTimestamp"];
             } else
-                timestamp  = map["uploadTimestamp"];
+                timestamp = map["uploadTimestamp"];
         }
 
         Map(SQLite::Statement@ s) {
