@@ -11,6 +11,7 @@ namespace Models {
         uint         bronzeTime;
         string       downloadUrl;
         uint         goldTime;
+        string       logName;
         string       mapId;
         string       mapNameColor;
         string       mapNameRaw;
@@ -18,6 +19,7 @@ namespace Models {
         string       mapUid;
         Record[]     records;
         uint         silverTime;
+        string       thumbnailFile;
         UI::Texture@ thumbnailTexture;
         string       thumbnailUrl;
         uint         timestamp;
@@ -25,18 +27,20 @@ namespace Models {
         Map() {}
 
         Map(Json::Value map) {
-            mapUid       = map["uid"];
-            mapId        = map["mapId"];
-            mapNameRaw   = map["name"];
-            mapNameColor = ColoredString(mapNameRaw);
-            mapNameText  = StripFormatCodes(mapNameRaw);
-            authorId     = map["author"];
-            authorTime   = map["authorTime"];
-            goldTime     = map["goldTime"];
-            silverTime   = map["silverTime"];
-            bronzeTime   = map["bronzeTime"];
-            downloadUrl  = string(map["downloadUrl"]).Replace("\\", "");
-            thumbnailUrl = string(map["thumbnailUrl"]).Replace("\\", "");
+            mapUid        = map["uid"];
+            thumbnailFile = Storage::thumbnailFolder + "/" + mapUid + ".jpg";
+            mapId         = map["mapId"];
+            mapNameRaw    = map["name"];
+            mapNameColor  = ColoredString(mapNameRaw);
+            mapNameText   = StripFormatCodes(mapNameRaw);
+            logName       = "MAP[" + mapNameText + "] - ";
+            authorId      = map["author"];
+            authorTime    = map["authorTime"];
+            goldTime      = map["goldTime"];
+            silverTime    = map["silverTime"];
+            bronzeTime    = map["bronzeTime"];
+            downloadUrl   = string(map["downloadUrl"]).Replace("\\", "");
+            thumbnailUrl  = string(map["thumbnailUrl"]).Replace("\\", "");
             if (map["uploadTimestamp"] < 1600000000) {
                 badUploadTime = true;  // for some maps, Nadeo only provides the year
                 timestamp  = map["updateTimestamp"];
@@ -55,7 +59,9 @@ namespace Models {
             mapNameRaw    = s.GetColumnString("mapNameRaw");
             mapNameColor  = ColoredString(mapNameRaw);
             mapNameText   = StripFormatCodes(mapNameRaw);
+            logName       = "MAP[" + mapNameText + "] - ";
             mapUid        = s.GetColumnString("mapUid");
+            thumbnailFile = Storage::thumbnailFolder + "/" + mapUid + ".jpg";
             silverTime    = s.GetColumnInt("silverTime");
             thumbnailUrl  = s.GetColumnString("thumbnailUrl");
             timestamp     = s.GetColumnInt("timestamp");
@@ -64,22 +70,55 @@ namespace Models {
         int opCmp(int i) { return timestamp - i; }
         int opCmp(Map m) { return timestamp - m.timestamp; }
 
-        string GetThumbnail() {
+        void GetThumbnailCoro() {
             auto now = Time::Now;
 
-            string file = Storage::thumbnailFolder + "/" + mapUid + ".jpg";
-            if (IO::FileExists(file)) return file;
+            if (IO::FileExists(thumbnailFile)) return;
 
-            trace("downloading thumbnail for " + mapNameText);
-            auto req = Net::HttpGet(thumbnailUrl);
-            while (!req.Finished()) continue;
+            trace(logName + "downloading thumbnail...");
+            uint max_timeout = 3000;
+            uint max_wait = 2000;
+            while (true) {
+                auto nowTimeout = Time::Now;
+                bool timedOut = false;
 
-            req.SaveToFile(file);
+                auto req = Net::HttpGet(thumbnailUrl);
+                while (!req.Finished()) {
+                    if (Time::Now - nowTimeout > max_timeout) {
+                        timedOut = true;
+                        break;
+                    }
+                    yield();
+                }
+                if (timedOut) {
+                    trace(logName + "timed out, waiting " + max_wait + " ms");
+                    auto nowWait = Time::Now;
+                    while (Time::Now - nowWait < max_wait) yield();
+                    continue;
+                }
+                req.SaveToFile(thumbnailFile);
+                break;
+            }
 
             if (Settings::printDurations)
-                trace("downloading thumbnail took " + (Time::Now - now) + " ms");
+                trace(logName + "downloading thumbnail took " + (Time::Now - now) + " ms");
+        }
 
-            return file;
+        void LoadThumbnailCoro() {
+            auto now = Time::Now;
+            trace(logName + "loading thumbnail...");
+
+            if (!IO::FileExists(thumbnailFile)) {
+                auto @coro = startnew(CoroutineFunc(GetThumbnailCoro));
+                while (coro.IsRunning()) yield();
+            }
+
+            IO::File file(thumbnailFile, IO::FileMode::Read);
+            @thumbnailTexture = UI::LoadTexture(file.Read(file.Size()));
+            file.Close();
+
+            if (Settings::printDurations)
+                trace(logName + "loading thumbnail took " + (Time::Now - now) + " ms");
         }
     }
 }
