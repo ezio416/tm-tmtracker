@@ -9,23 +9,16 @@ namespace Models {
     class Account {
         string     accountId;
         string     accountName = "";
-        // uint       accountNameTimestamp;
-        // string     clubTagColor;
-        // uint       clubTagTimestamp;
-        // string     clubTagRaw;
-        // string     clubTagText;
         dictionary recordMapUids;
         uint       timestamp;
 
         Account() { }
-
-        Account(const string &in id) {
-            accountId = id;
-        }
+        Account(const string &in id) { accountId = id; }
 
         void GetName() {
             if (accountName != "") return;
             accountName = NadeoServices::GetDisplayNameAsync(accountId);
+            timestamp = Time::Stamp;
         }
     }
 }
