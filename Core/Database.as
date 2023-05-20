@@ -119,7 +119,7 @@ namespace DB {
 
         void Hide(Models::Map map) {
             auto now = Time::Now;
-            trace("hiding my map (" + map.mapNameText + ") in " + Storage::dbFile);
+            trace(map.logName + "hiding in " + Storage::dbFile);
 
             Storage::db.Execute("CREATE TABLE IF NOT EXISTS MyMapsHidden" + tableColumns);
 
@@ -134,14 +134,14 @@ namespace DB {
             s.Execute();
 
             if (Settings::printDurations)
-                trace("hiding my map took " + (Time::Now - now) + " ms");
+                trace(map.logName + "hiding took " + (Time::Now - now) + " ms");
 
             Load();
         }
 
         void UnHide(Models::Map map) {
             auto now = Time::Now;
-            trace("unhiding my map (" + map.mapNameText + ") in " + Storage::dbFile);
+            trace(map.logName + "unhiding in " + Storage::dbFile);
 
             SQLite::Statement@ s;
 
@@ -154,7 +154,7 @@ namespace DB {
             s.Execute();
 
             if (Settings::printDurations)
-                trace("unhiding my map took " + (Time::Now - now) + " ms");
+                trace(map.logName + "unhiding took " + (Time::Now - now) + " ms");
 
             Load();
         }
