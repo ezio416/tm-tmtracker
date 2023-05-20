@@ -78,6 +78,7 @@ namespace Models {
 
             uint offset = 0;
             bool tooManyRecords;
+            records.RemoveRange(0, records.Length);
 
             do {
                 auto req = NadeoServices::Get(
