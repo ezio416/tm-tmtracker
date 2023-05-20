@@ -24,8 +24,14 @@ namespace Settings {
         return false;
     }
 
-    [Setting name="Thumbnail width" min=10 max=1000]
-    uint myMapsThumbnailWidth = 200;
+    [Setting name="Switch to map tab when clicked"]
+    bool myMapsSwitchOnClicked = true;
+
+    [Setting name="Thumbnail width (map list)" min=10 max=1000]
+    uint myMapsThumbnailWidthList = 200;
+
+    [Setting name="Thumbnail width (map page)" min=10 max=1000]
+    uint myMapsThumbnailWidthPage = 200;
 
     [Setting hidden]
     bool windowOpen = true;
