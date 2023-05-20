@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-19
+m 2023-05-20
 */
 
 namespace Settings {
@@ -26,6 +26,9 @@ namespace Settings {
 
     [Setting name="Switch to map tab when clicked"]
     bool myMapsSwitchOnClicked = true;
+
+    [Setting name="Show map names in tabs with color"]
+    bool myMapsTabsColor = true;
 
     [Setting name="Thumbnail width (map list)" min=10 max=1000]
     uint myMapsThumbnailWidthList = 200;
