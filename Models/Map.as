@@ -19,6 +19,7 @@ namespace Models {
         string       mapNameText;
         string       mapUid;
         Record[]     records;
+        uint         recordsTimestamp;
         uint         silverTime;
         string       thumbnailFile;
         UI::Texture@ thumbnailTexture;
@@ -104,6 +105,8 @@ namespace Models {
 
                 Storage::requestsInProgress--;
             } while (tooManyRecords && records.Length < Settings::maxRecordsPerMap);
+
+            recordsTimestamp = Time::Now;
 
             if (Settings::printDurations)
                 trace(logName + "getting records took " + (Time::Now - now) + " ms");
