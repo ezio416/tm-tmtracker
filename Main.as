@@ -182,7 +182,13 @@ void RenderMyMapsTabs() {
                     startnew(CoroutineFunc(map.GetRecordsCoro));
 
                 UI::SameLine();
-                UI::Text(" Last Updated: " + map.recordsTimestamp);
+                UI::Text(
+                    "Last Updated: " + (
+                        map.recordsTimestamp > 0 ?
+                            Time::FormatString(Settings::dateFormat + "Local", map.recordsTimestamp) :
+                            "not yet"
+                    )
+                );
 
                 for (uint j = 0; j < map.records.Length; j++) {
                     UI::Text(
