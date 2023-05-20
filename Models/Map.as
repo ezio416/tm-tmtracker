@@ -84,7 +84,7 @@ namespace Models {
             records.RemoveRange(0, records.Length);
 
             do {
-                auto wait = startnew(CoroutineFunc(Various::WaitToDoNadeoRequest));
+                auto wait = startnew(CoroutineFunc(Various::WaitToDoNadeoRequestCoro));
                 while (wait.IsRunning()) yield();
 
                 auto req = NadeoServices::Get(

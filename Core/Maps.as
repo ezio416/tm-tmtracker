@@ -3,7 +3,7 @@ c 2023-05-16
 m 2023-05-20
 */
 
-// Functions relating to getting/loading data on maps
+// Functions for getting/loading data on maps
 namespace Maps {
     void GetMyMapsCoro() {
         auto now = Time::Now;
@@ -19,7 +19,7 @@ namespace Maps {
         bool tooManyMaps;
 
         do {
-            auto wait = startnew(CoroutineFunc(Various::WaitToDoNadeoRequest));
+            auto wait = startnew(CoroutineFunc(Various::WaitToDoNadeoRequestCoro));
             while (wait.IsRunning()) yield();
 
             auto req = NadeoServices::Get(
