@@ -18,7 +18,81 @@ void RenderMenu() {
 		Settings::windowOpen = !Settings::windowOpen;
 }
 
-void RenderMapListTab() {
+void RenderInterface() {
+    if (Settings::windowOpen) {
+        if (Settings::DetectSortMapsNewest())
+            DB::MyMaps::Load();
+
+        UI::SetNextWindowSize(600, 800, UI::Cond::Once);
+		UI::SetNextWindowPos(100, 100, UI::Cond::Once);
+
+		UI::Begin(Storage::title, Settings::windowOpen);
+            UI::Text("Welcome to TMTracker! Check out these tabs to see what I offer:");
+            RenderTabs();
+		UI::End();
+    }
+}
+
+void RenderTabs() {
+    UI::BeginTabBar("tabs");
+        RenderMapsTab();
+        // RenderRecordsTab();
+        // RenderAccountsTab();
+        // RenderDebugTab();
+    UI::EndTabBar();
+}
+
+void RenderMapsTab() {
+    if (UI::BeginTabItem(Icons::Map + " Maps")) {
+        UI::TextWrapped(
+            "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
+            "Close tabs with the 'X' or with a middle click."
+        );
+
+        if (UI::Button(Icons::Refresh + " Update Map List (" + Storage::myMaps.Length + ")"))
+            startnew(CoroutineFunc(Maps::GetMyMapsCoro));
+
+        if (Storage::myMapsHidden.Length > 0) {
+            UI::SameLine();
+            if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myMapsHidden.Length + ")")) {
+                auto now = Time::Now;
+
+                for (uint i = 0; i < Storage::myMapsHidden.Length;)
+                    DB::MyMaps::UnHide(Storage::myMapsHidden[i]);
+
+                for (uint i = 0; i < Storage::currentMaps.Length; i++)
+                    Storage::currentMaps[i].hidden = false;
+
+                if (Settings::printDurations)
+                    trace("unhiding all maps took " + (Time::Now - now) + " ms");
+
+                DB::MyMaps::Load();
+            }
+        }
+
+        if (Storage::currentMaps.Length > 0) {
+            UI::SameLine();
+            if (UI::Button(Icons::Times + " Clear Current Maps (" + Storage::currentMaps.Length + ")")) {
+                Storage::ClearCurrentMaps();
+                Storage::ClearCurrentMapsUids();
+            }
+        }
+
+        UI::Separator();
+
+        Storage::mapClicked = false;
+
+        UI::BeginTabBar("MyMapsTabs");
+            RenderMyMapListTab();
+            if (Storage::currentMaps.Length > 0)
+                RenderMyMapsTabs();
+        UI::EndTabBar();
+
+        UI::EndTabItem();
+    }
+}
+
+void RenderMyMapListTab() {
     if (UI::BeginTabItem(Icons::Map + " Map List " + Icons::Map)) {
         uint currentX = 0;
         auto size = UI::GetWindowSize();
@@ -57,7 +131,7 @@ void RenderMapListTab() {
     }
 }
 
-void RenderMapsTabs() {
+void RenderMyMapsTabs() {
     for (uint i = 0; i < Storage::currentMaps.Length; i++) {
         auto map = Storage::currentMaps[i];
 
@@ -125,69 +199,23 @@ void RenderMapsTabs() {
     }
 }
 
-void RenderTabs() {
-    UI::BeginTabBar("tabs");
-        if (UI::BeginTabItem("My Maps")) {
-            UI::TextWrapped(
-                "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
-                "Close tabs with the 'X' or with a middle click."
-            );
+void RenderRecordsTab() {
+    if (UI::BeginTabItem(Icons::Trophy + " Records")) {
 
-            if (UI::Button(Icons::Refresh + " Update Map List (" + Storage::myMaps.Length + ")"))
-                startnew(CoroutineFunc(Maps::GetMyMapsCoro));
-
-            if (Storage::myMapsHidden.Length > 0) {
-                UI::SameLine();
-                if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myMapsHidden.Length + ")")) {
-                    auto now = Time::Now;
-
-                    for (uint i = 0; i < Storage::myMapsHidden.Length;)
-                        DB::MyMaps::UnHide(Storage::myMapsHidden[i]);
-
-                    for (uint i = 0; i < Storage::currentMaps.Length; i++)
-                        Storage::currentMaps[i].hidden = false;
-
-                    if (Settings::printDurations)
-                        trace("unhiding all maps took " + (Time::Now - now) + " ms");
-
-                    DB::MyMaps::Load();
-                }
-            }
-
-            if (Storage::currentMaps.Length > 0) {
-                UI::SameLine();
-                if (UI::Button(Icons::Times + " Clear Current Maps (" + Storage::currentMaps.Length + ")")) {
-                    Storage::ClearCurrentMaps();
-                    Storage::ClearCurrentMapsUids();
-                }
-            }
-
-            UI::Separator();
-
-            Storage::mapClicked = false;
-
-            UI::BeginTabBar("MyMapsTabs");
-                RenderMapListTab();
-                if (Storage::currentMaps.Length > 0)
-                    RenderMapsTabs();
-            UI::EndTabBar();
-
-            UI::EndTabItem();
-        }
-        UI::EndTabBar();
+        UI::EndTabItem();
+    }
 }
 
-void RenderInterface() {
-    if (Settings::windowOpen) {
-        if (Settings::DetectSortMapsNewest())
-            DB::MyMaps::Load();
+void RenderAccountsTab() {
+    if (UI::BeginTabItem(Icons::User + " Accounts")) {
 
-        UI::SetNextWindowSize(600, 800, UI::Cond::Once);
-		UI::SetNextWindowPos(100, 100, UI::Cond::Once);
+        UI::EndTabItem();
+    }
+}
 
-		UI::Begin(Storage::title, Settings::windowOpen);
-            UI::Text("Welcome to TMTracker! Check out these tabs to see what I can do:");
-            RenderTabs();
-		UI::End();
+void RenderDebugTab() {
+    if (UI::BeginTabItem(Icons::Cogs + " Debug")) {
+
+        UI::EndTabItem();
     }
 }
