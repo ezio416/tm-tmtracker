@@ -3,6 +3,7 @@ c 2023-05-20
 m 2023-05-20
 */
 
+// Functions that don't fit nicely in other categories
 namespace Various {
     void WaitToDoNadeoRequest() {
         if (Storage::latestNadeoRequest == 0) {

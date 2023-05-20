@@ -3,7 +3,9 @@ c 2023-05-16
 m 2023-05-20
 */
 
+// Functions relating to the TMTracker.db file
 namespace DB {
+    // Functions relating to the user's own uploaded maps
     namespace MyMaps {
         string tableColumns = """ (
             authorId         CHAR(36),
