@@ -27,14 +27,17 @@ namespace Settings {
     [Setting name="Switch to map tab when clicked"]
     bool myMapsSwitchOnClicked = true;
 
-    [Setting name="Show map names in tabs with color"]
+    [Setting name="Show map names with color in map list"]
+    bool myMapsListColor = true;
+
+    [Setting name="Show map names with color in tabs"]
     bool myMapsTabsColor = true;
 
     [Setting name="Thumbnail width (map list)" min=10 max=1000]
     uint myMapsThumbnailWidthList = 200;
 
-    [Setting name="Thumbnail width (map page)" min=10 max=1000]
-    uint myMapsThumbnailWidthPage = 200;
+    [Setting name="Thumbnail width (map tabs)" min=10 max=1000]
+    uint myMapsThumbnailWidthTabs = 200;
 
     [Setting hidden]
     bool windowOpen = true;
