@@ -42,13 +42,29 @@ namespace Maps {
         DB::MyMaps::Load();
     }
 
-    void GetMyMapsThumbnails() {
+    void GetMyMapsThumbnailsCoro() {
         auto now = Time::Now;
+        trace("getting thumbnails");
 
-        for (uint i = 0; i < Storage::myMaps.Length; i++)
-            Storage::myMaps[i].GetThumbnail();
+        for (uint i = 0; i < Storage::myMaps.Length; i++) {
+            auto @coro = startnew(CoroutineFunc(Storage::myMaps[i].GetThumbnailCoro));
+            while (coro.IsRunning()) yield();
+        }
 
         if (Settings::printDurations)
             trace("getting " + Storage::myMaps.Length + " thumbnails took " + (Time::Now - now) + " ms");
+    }
+
+    void LoadMyMapsThumbnailsCoro() {
+        auto now = Time::Now;
+        trace("loading my map thumbnails...");
+
+        for (uint i = 0; i < Storage::myMaps.Length; i++) {
+            auto @coro = startnew(CoroutineFunc(Storage::myMaps[i].LoadThumbnailCoro));
+            while (coro.IsRunning()) yield();
+        }
+
+        if (Settings::printDurations)
+            trace("loading " + Storage::myMaps.Length + " thumbnails took " + (Time::Now - now) + " ms");
     }
 }
