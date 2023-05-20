@@ -25,11 +25,8 @@ void RenderInterface() {
 
         UI::SetNextWindowSize(600, 800, UI::Cond::Once);
 		UI::SetNextWindowPos(100, 100, UI::Cond::Once);
+
 		UI::Begin(Storage::title, Settings::windowOpen);
-
-        auto size = UI::GetWindowSize();
-        // print(size.ToString());
-
         UI::BeginTabBar("tabs");
         if (UI::BeginTabItem("My Maps")) {
             UI::Text(
@@ -45,25 +42,6 @@ void RenderInterface() {
             if (UI::Button(Icons::Refresh + " Refresh Map List (" + Storage::myMaps.Length + ")"))
                 Maps::GetMyMaps();
 
-            UI::SameLine();
-            if (UI::Button(Icons::CloudDownload + " Get All Thumbnails"))
-                startnew(CoroutineFunc(Maps::GetMyMapsThumbnailsCoro));
-
-            UI::SameLine();
-            if (UI::Button(Icons::Upload + " Load All Thumbnails"))
-                startnew(CoroutineFunc(Maps::LoadMyMapsThumbnailsCoro));
-
-            UI::SameLine();
-            if (UI::Button(Icons::Upload))
-                DB::MyMaps::Load();
-
-            UI::SameLine();
-            if (UI::Button(Icons::FloppyO))
-                DB::MyMaps::Save();
-
-            if (UI::Button(Icons::Bomb + " Nuke My Maps"))
-                DB::MyMaps::Nuke();
-
             if (Storage::myMapsHidden.Length > 0) {
                 UI::SameLine();
                 if (UI::Button("Show Hidden (" + Storage::myMapsHidden.Length + ")")) {
@@ -76,16 +54,14 @@ void RenderInterface() {
                 }
             }
 
-            if (Storage::myMapsHiddenUids.GetKeys().Length > 0) {
-                UI::SameLine();
-                if (UI::Button("Clear Hidden UIDs"))
-                    Storage::ClearMyMapsHiddenUIDs();
-            }
+            UI::SameLine();
+            if (UI::Button(Icons::Bomb + " Nuke My Maps"))
+                DB::MyMaps::Nuke();
 
-            if (Storage::currentMap.Length > 0) {
+            if (Storage::currentMaps.Length > 0) {
                 UI::SameLine();
-                if (UI::Button("Clear Current Map"))
-                    Storage::ClearCurrentMap();
+                if (UI::Button("Clear Current Maps"))
+                    Storage::ClearCurrentMaps();
             }
 
             UI::Separator();
@@ -95,84 +71,95 @@ void RenderInterface() {
             UI::BeginTabBar("MyMapsTabs");
             if (UI::BeginTabItem("Map List")) {
                 uint currentX = 0;
-                uint thumbCount = 0;
+                auto size = UI::GetWindowSize();
+
                 for (uint i = 0; i < Storage::myMaps.Length; i++) {
-                    // print(UI::GetCursorPos().ToString());
-                    if (i > 0 && currentX + Settings::myMapsThumbnailWidth < size.x) {
+                    auto map = Storage::myMaps[i];
+
+                    if (i > 0 && currentX + Settings::myMapsThumbnailWidthList < size.x)
                         UI::SameLine();
-                    } else {
-                        currentX = 0;
-                        thumbCount = 0;
-                    }
+
                     UI::BeginGroup();
+                    auto thumbSize = vec2(Settings::myMapsThumbnailWidthList, Settings::myMapsThumbnailWidthList);
+                    auto pos = UI::GetCursorPos();
                     try {
-                        UI::Image(Storage::myMaps[i].thumbnailTexture, vec2(Settings::myMapsThumbnailWidth, Settings::myMapsThumbnailWidth));
+                        UI::Image(map.thumbnailTexture, thumbSize);
                     } catch {
-                        UI::Image(Storage::defaultTexture, vec2(Settings::myMapsThumbnailWidth, Settings::myMapsThumbnailWidth));
+                        UI::Image(Storage::defaultTexture, thumbSize);
                     }
-                    thumbCount++;
-                    currentX = UI::GetCursorPos().x + Settings::myMapsThumbnailWidth + 44;
-                    UI::PushTextWrapPos(currentX - 44);
-                    UI::Text(Storage::myMaps[i].mapNameColor);
+                    UI::SetCursorPos(pos);
+
+                    if (UI::InvisibleButton("invis_" + map.mapUid, thumbSize)) {
+                        if (!Storage::currentMapsUids.Exists(map.mapUid)) {
+                            Storage::currentMapsUids.Set(map.mapUid, "");
+                            Storage::currentMaps.InsertLast(map);
+                        }
+                        mapClicked = true;
+                    }
+
+                    currentX = UI::GetCursorPos().x + Settings::myMapsThumbnailWidthList + 44;
+                    UI::PushTextWrapPos(currentX - 44);  // this wrapping works on 1.5x scaling at 4K
+                    UI::Text(map.mapNameColor);
                     UI::PopTextWrapPos();
                     UI::EndGroup();
-
-                    // try {
-                    //     UI::Image(Storage::myMaps[i].thumbnailTexture, vec2(50, 50));
-                    // } catch {
-                    //     UI::Image(Storage::defaultTexture, vec2(50, 50));
-                    // }
-                    // UI::SameLine();
-                    // if (UI::Button(Storage::myMaps[i].timestamp + " " + Storage::myMaps[i].mapNameText)) {
-                    //     Storage::currentMap.RemoveRange(0, Storage::currentMap.Length);
-                    //     Storage::currentMap.InsertAt(0, Storage::myMaps[i]);
-                    //     startnew(CoroutineFunc(Storage::currentMap[0].LoadThumbnailCoro));
-                    //     mapClicked = true;
-                    // }
                 }
 
                 UI::EndTabItem();
             }
 
-            if (Storage::currentMap.Length > 0) {
-                auto map = Storage::currentMap[0];
+            if (Storage::currentMaps.Length > 0) {
+                for (uint i = 0; i < Storage::currentMaps.Length; i++) {
+                    auto map = Storage::currentMaps[i];
 
-                if (!Storage::mapTabOpen)
-                    Storage::ClearCurrentMap();
-
-                uint flags = UI::TabItemFlags::None;
-                if (mapClicked) {
-                    flags = UI::TabItemFlags::SetSelected;
-                    mapClicked = false;
-                }
-                if (UI::BeginTabItem(Icons::Map + " " + map.mapNameColor, Storage::mapTabOpen, flags)) {
-                    try { UI::Image(map.thumbnailTexture, vec2(300, 300)); } catch { }
-                    if (map.hidden) {
-                        if (UI::Button(Icons::Eye + " Unhide This Map")) {
-                            Storage::currentMap[0].hidden = false;
-                            DB::MyMaps::UnHide(map);
-                        }
-                    } else {
-                        if (UI::Button(Icons::EyeSlash + " Hide This Map")) {
-                            Storage::currentMap[0].hidden = true;
-                            DB::MyMaps::Hide(map);
-                        }
+                    uint flags = UI::TabItemFlags::Trailing;
+                    if (
+                        mapClicked &&
+                        Settings::myMapsSwitchOnClicked &&
+                        i == Storage::currentMaps.Length - 1
+                    ) {
+                        flags |= UI::TabItemFlags::SetSelected;
+                        mapClicked = false;
                     }
 
-                    UI::Text(map.mapNameText);
-                    UI::Text(map.mapNameColor);
-                    UI::Text("" + map.timestamp);
-                    UI::Text("" + map.authorTime);
-                    UI::Text("" + map.goldTime);
-                    UI::Text("" + map.silverTime);
-                    UI::Text("" + map.bronzeTime);
-                    UI::EndTabItem();
+                    if (UI::BeginTabItem(Icons::Map + " " + map.mapNameColor, Storage::currentMaps[i].viewing, flags)) {
+                        auto thumbSize = vec2(Settings::myMapsThumbnailWidthPage, Settings::myMapsThumbnailWidthPage);
+                        try {
+                            UI::Image(map.thumbnailTexture, thumbSize);
+                        } catch {
+                            UI::Image(Storage::defaultTexture, thumbSize);
+                        }
+
+                        if (map.hidden) {
+                            if (UI::Button(Icons::Eye + " Unhide This Map")) {
+                                Storage::currentMaps[0].hidden = false;
+                                DB::MyMaps::UnHide(map);
+                            }
+                        } else {
+                            if (UI::Button(Icons::EyeSlash + " Hide This Map")) {
+                                Storage::currentMaps[0].hidden = true;
+                                DB::MyMaps::Hide(map);
+                            }
+                        }
+
+                        UI::Text(map.mapNameText);
+                        UI::Text(map.mapNameColor);
+                        UI::Text("" + map.timestamp);
+                        UI::Text("" + map.authorTime);
+                        UI::Text("" + map.goldTime);
+                        UI::Text("" + map.silverTime);
+                        UI::Text("" + map.bronzeTime);
+                        UI::EndTabItem();
+                    }
+
+                    if (!Storage::currentMaps[i].viewing) {
+                        Storage::currentMaps.RemoveAt(i);
+                        Storage::currentMapsUids.Delete(map.mapUid);
+                    }
                 }
             }
             UI::EndTabBar();
             UI::EndTabItem();
         }
-
         UI::EndTabBar();
 		UI::End();
     }
