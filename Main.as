@@ -85,6 +85,19 @@ void RenderMapsTabs() {
                 UI::Image(Storage::defaultTexture, thumbSize);
             }
 
+            UI::SameLine();
+            UI::BeginGroup();
+                if (Settings::myMapsTabsColor) UI::Text(map.mapNameColor);
+                else                           UI::Text(map.mapNameText);
+
+                UI::Text(Time::FormatStringUTC("%a \\$F98%Y-%m-%d \\$Z%H:%M:%S \\$F98UTC", map.timestamp));
+                UI::Text(Time::FormatString("%a \\$F98%Y-%m-%d \\$Z%H:%M:%S \\$F98Local", map.timestamp));
+                UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
+                UI::Text("\\$DD1" + Icons::Circle + " " + Time::Format(map.goldTime));
+                UI::Text("\\$AAA" + Icons::Circle + " " + Time::Format(map.silverTime));
+                UI::Text("\\$C80" + Icons::Circle + " " + Time::Format(map.bronzeTime));
+            UI::EndGroup();
+
             if (map.hidden) {
                 if (UI::Button(Icons::Eye + " Show This Map (currently hidden)")) {
                     Storage::currentMaps[i].hidden = false;
@@ -97,13 +110,6 @@ void RenderMapsTabs() {
                 }
             }
 
-            UI::Text(map.mapNameText);
-            UI::Text(map.mapNameColor);
-            UI::Text("" + map.timestamp);
-            UI::Text("" + map.authorTime);
-            UI::Text("" + map.goldTime);
-            UI::Text("" + map.silverTime);
-            UI::Text("" + map.bronzeTime);
             UI::EndTabItem();
         }
 
