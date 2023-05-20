@@ -7,9 +7,9 @@ namespace Models {
     class Account {
         string accountId;
         string accountName;
-        uint   accountNameGottenTimestamp;
+        uint   accountNameTimestamp;
         string clubTagColor;
-        uint   clubTagGottenTimestamp;
+        uint   clubTagTimestamp;
         string clubTagRaw;
         string clubTagText;
         uint   timestamp;
