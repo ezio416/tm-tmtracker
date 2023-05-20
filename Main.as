@@ -27,19 +27,16 @@ void RenderMapListTab() {
             auto map = Storage::myMaps[i];
 
             currentX += Settings::myMapsThumbnailWidthList;
-            if (i > 0 && currentX < size.x)
+            if (i > 0 && currentX < uint(size.x))
                 UI::SameLine();
 
             UI::BeginGroup();
-                auto thumbSize = vec2(Settings::myMapsThumbnailWidthList, Settings::myMapsThumbnailWidthList);
                 auto pos = UI::GetCursorPos();
-                try {
-                    UI::Image(map.thumbnailTexture, thumbSize);
-                } catch {
-                    UI::Image(Storage::defaultTexture, thumbSize);
-                }
-                UI::SetCursorPos(pos);
+                auto thumbSize = vec2(Settings::myMapsThumbnailWidthList, Settings::myMapsThumbnailWidthList);
+                try   { UI::Image(map.thumbnailTexture, thumbSize); }
+                catch { UI::Image(Storage::defaultTexture, thumbSize); }
 
+                UI::SetCursorPos(pos);
                 if (UI::InvisibleButton("invis_" + map.mapUid, thumbSize)) {
                     if (!Storage::currentMapsUids.Exists(map.mapUid)) {
                         Storage::currentMapsUids.Set(map.mapUid, "");
@@ -48,7 +45,7 @@ void RenderMapListTab() {
                     Storage::mapClicked = true;
                 }
 
-                currentX = UI::GetCursorPos().x + Settings::myMapsThumbnailWidthList + 44;
+                currentX = uint(UI::GetCursorPos().x) + Settings::myMapsThumbnailWidthList + 44;
                 UI::PushTextWrapPos(currentX - 44);  // 44 pixels for scrollbar works on 1.5x scaling at 4K
                 UI::Text((Settings::myMapsListColor) ? map.mapNameColor : map.mapNameText);
                 UI::PopTextWrapPos();
@@ -77,11 +74,8 @@ void RenderMapsTabs() {
         string tabTitle = Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText;
         if (UI::BeginTabItem(tabTitle, Storage::currentMaps[i].viewing, flags)) {
             auto thumbSize = vec2(Settings::myMapsThumbnailWidthTabs, Settings::myMapsThumbnailWidthTabs);
-            try {
-                UI::Image(map.thumbnailTexture, thumbSize);
-            } catch {
-                UI::Image(Storage::defaultTexture, thumbSize);
-            }
+            try   { UI::Image(map.thumbnailTexture, thumbSize); }
+            catch { UI::Image(Storage::defaultTexture, thumbSize); }
 
             UI::SameLine();
             UI::BeginGroup();

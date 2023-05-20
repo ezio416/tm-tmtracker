@@ -39,11 +39,11 @@ namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
     // MAP TABS
     ///////////////////////////////////////////////////////////////////////////
-    [Setting name="Show map names with color" category="Map Tabs"]
-    bool myMapsTabsColor = true;
-
     [Setting name="Switch to map tab when clicked" category="Map Tabs"]
     bool myMapsSwitchOnClicked = true;
+
+    [Setting name="Show map name with color on tab" category="Map Tabs"]
+    bool myMapsTabsColor = true;
 
     [Setting name="Thumbnail width" category="Map Tabs" min=10 max=1000]
     uint myMapsThumbnailWidthTabs = 400;
@@ -56,6 +56,9 @@ namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
     [Setting hidden]
     string dateFormat = "%a \\$F98%Y-%m-%d \\$Z%H:%M:%S \\$F98";
+
+    [Setting hidden]
+    uint timeBetweenNadeoRequests = 500;
 
     [Setting hidden]
     bool windowOpen = true;
