@@ -167,10 +167,11 @@ void RenderTabs() {
             Storage::mapClicked = false;
 
             UI::BeginTabBar("MyMapsTabs");
-            RenderMapListTab();
-            if (Storage::currentMaps.Length > 0)
-                RenderMapsTabs();
+                RenderMapListTab();
+                if (Storage::currentMaps.Length > 0)
+                    RenderMapsTabs();
             UI::EndTabBar();
+
             UI::EndTabItem();
         }
         UI::EndTabBar();
