@@ -11,6 +11,7 @@ namespace Models {
         uint         bronzeTime;
         string       downloadUrl;
         uint         goldTime;
+        bool         hidden;
         string       logName;
         string       mapId;
         string       mapNameColor;
@@ -106,7 +107,17 @@ namespace Models {
 
         void LoadThumbnailCoro() {
             auto now = Time::Now;
-            trace(logName + "loading thumbnail...");
+
+            if (Storage::thumbnailTextures.Exists(mapUid)) {
+                UI::Texture@ tex;
+                @tex = cast<UI::Texture@>(Storage::thumbnailTextures[mapUid]);
+                // print(logName + "existing texture");
+                if (@thumbnailTexture == null)
+                    @thumbnailTexture = tex;
+                return;
+            }
+
+            // trace(logName + "loading thumbnail...");
 
             if (!IO::FileExists(thumbnailFile)) {
                 auto @coro = startnew(CoroutineFunc(GetThumbnailCoro));
@@ -116,6 +127,8 @@ namespace Models {
             IO::File file(thumbnailFile, IO::FileMode::Read);
             @thumbnailTexture = UI::LoadTexture(file.Read(file.Size()));
             file.Close();
+
+            Storage::thumbnailTextures.Set(mapUid, @thumbnailTexture);
 
             if (Settings::printDurations)
                 trace(logName + "loading thumbnail took " + (Time::Now - now) + " ms");
