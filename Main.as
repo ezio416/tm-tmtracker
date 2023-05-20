@@ -114,7 +114,7 @@ void RenderMyMapListTab() {
                 if (UI::InvisibleButton("invis_" + map.mapUid, thumbSize)) {
                     if (!Storage::currentMapsUids.Exists(map.mapUid)) {
                         Storage::currentMapsUids.Set(map.mapUid, "");
-                        Storage::currentMaps.InsertLast(map);
+                        Storage::currentMaps.InsertLast(@Storage::myMaps[i]);
                     }
                     Storage::mapClicked = true;
                 }
@@ -147,47 +147,52 @@ void RenderMyMapsTabs() {
 
         string tabTitle = Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText;
         if (UI::BeginTabItem(tabTitle, Storage::currentMaps[i].viewing, flags)) {
-            auto thumbSize = vec2(Settings::myMapsThumbnailWidthTabs, Settings::myMapsThumbnailWidthTabs);
-            try   { UI::Image(map.thumbnailTexture, thumbSize); }
-            catch { UI::Image(Storage::defaultTexture, thumbSize); }
-
-            UI::SameLine();
             UI::BeginGroup();
-                UI::Text(map.mapNameText);
-                UI::Text(Time::FormatStringUTC(Settings::dateFormat + "UTC", map.timestamp));
-                UI::Text(Time::FormatString(Settings::dateFormat + "Local", map.timestamp));
-                UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
-                UI::Text("\\$DD1" + Icons::Circle + " " + Time::Format(map.goldTime));
-                UI::Text("\\$AAA" + Icons::Circle + " " + Time::Format(map.silverTime));
-                UI::Text("\\$C80" + Icons::Circle + " " + Time::Format(map.bronzeTime));
+                auto thumbSize = vec2(Settings::myMapsThumbnailWidthTabs, Settings::myMapsThumbnailWidthTabs);
+                try   { UI::Image(map.thumbnailTexture, thumbSize); }
+                catch { UI::Image(Storage::defaultTexture, thumbSize); }
+
+                UI::SameLine();
+                UI::BeginGroup();
+                    UI::Text(map.mapNameText);
+                    UI::Text(Time::FormatStringUTC(Settings::dateFormat + "UTC", map.timestamp));
+                    UI::Text(Time::FormatString(Settings::dateFormat + "Local", map.timestamp));
+                    UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
+                    UI::Text("\\$DD1" + Icons::Circle + " " + Time::Format(map.goldTime));
+                    UI::Text("\\$AAA" + Icons::Circle + " " + Time::Format(map.silverTime));
+                    UI::Text("\\$C80" + Icons::Circle + " " + Time::Format(map.bronzeTime));
+                UI::EndGroup();
+
+                if (map.hidden) {
+                    if (UI::Button(Icons::Eye + " Show This Map (currently hidden)")) {
+                        Storage::currentMaps[i].hidden = false;
+                        DB::MyMaps::UnHide(map);
+                    }
+                } else {
+                    if (UI::Button(Icons::EyeSlash + " Hide This Map")) {
+                        Storage::currentMaps[i].hidden = true;
+                        DB::MyMaps::Hide(map);
+                    }
+                }
             UI::EndGroup();
 
             UI::SameLine();
             UI::BeginGroup();
+                if (UI::Button(Icons::Download + " Get Records"))
+                    startnew(CoroutineFunc(map.GetRecordsCoro));
+
+                UI::SameLine();
+                UI::Text(" Last Updated: " + map.recordsTimestamp);
+
                 for (uint j = 0; j < map.records.Length; j++) {
                     UI::Text(
-                        map.records[j].position  + " " + Time::Format(map.records[j].time) + "\n" +
-                        map.records[j].accountId + "\n" +
-                        map.records[j].zoneId    + "\n" +
+                        map.records[j].position + " - " +
+                        Time::Format(map.records[j].time) + " - " +
+                        map.records[j].accountName + " - " +
                         map.records[j].zoneName
                     );
                 }
             UI::EndGroup();
-
-            if (map.hidden) {
-                if (UI::Button(Icons::Eye + " Show This Map (currently hidden)")) {
-                    Storage::currentMaps[i].hidden = false;
-                    DB::MyMaps::UnHide(map);
-                }
-            } else {
-                if (UI::Button(Icons::EyeSlash + " Hide This Map")) {
-                    Storage::currentMaps[i].hidden = true;
-                    DB::MyMaps::Hide(map);
-                }
-            }
-
-            if (UI::Button(Icons::Download + " Get Records"))
-                startnew(CoroutineFunc(map.GetRecordsCoro));
 
             UI::EndTabItem();
         }

@@ -7,14 +7,25 @@ m 2023-05-20
 namespace Models {
     // Data on a player profile
     class Account {
-        string   accountId;
-        string   accountName;
-        uint     accountNameTimestamp;
-        string   clubTagColor;
-        uint     clubTagTimestamp;
-        string   clubTagRaw;
-        string   clubTagText;
-        string[] recordUids;
-        uint     timestamp;
+        string     accountId;
+        string     accountName = "";
+        // uint       accountNameTimestamp;
+        // string     clubTagColor;
+        // uint       clubTagTimestamp;
+        // string     clubTagRaw;
+        // string     clubTagText;
+        dictionary recordMapUids;
+        uint       timestamp;
+
+        Account() { }
+
+        Account(const string &in id) {
+            accountId = id;
+        }
+
+        void GetName() {
+            if (accountName != "") return;
+            accountName = NadeoServices::GetDisplayNameAsync(accountId);
+        }
     }
 }
