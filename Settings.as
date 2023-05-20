@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-17
+m 2023-05-19
 */
 
 namespace Settings {
@@ -23,6 +23,9 @@ namespace Settings {
         }
         return false;
     }
+
+    [Setting name="Thumbnail width" min=10 max=1000]
+    uint myMapsThumbnailWidth = 200;
 
     [Setting hidden]
     bool windowOpen = true;
