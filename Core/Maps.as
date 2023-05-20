@@ -1,11 +1,12 @@
 /*
 c 2023-05-16
-m 2023-05-19
+m 2023-05-20
 */
 
 namespace Maps {
-    void GetMyMaps() {
+    void GetMyMapsCoro() {
         auto now = Time::Now;
+        trace("updating my maps...");
 
         string live = "NadeoLiveServices";
         NadeoServices::AddAudience(live);
@@ -23,7 +24,7 @@ namespace Maps {
             );
             offset += 1000;
             req.Start();
-            while (!req.Finished()) continue;
+            while (!req.Finished()) yield();
 
             auto mapList = Json::Parse(req.String())["mapList"];
             tooManyMaps = mapList.Length == 1000;
