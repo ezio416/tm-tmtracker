@@ -10,7 +10,7 @@ namespace Storage {
     SQLite::Database@ db;
     string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");
     UI::Texture@      defaultTexture = UI::LoadTexture("Resources/1x1.png");
-    // bool              mapTabOpen = true;
+    bool              mapClicked = false;
     Models::Map[]     myMaps;
     Models::Map[]     myMapsHidden;
     dictionary        myMapsHiddenUids;
