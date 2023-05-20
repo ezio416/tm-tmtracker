@@ -13,7 +13,7 @@ namespace Zones {
         } catch { }
 
         try {
-            Storage::zones = Json::FromFile('Resources/zones.json');
+            Storage::zones = Json::FromFile("Resources/zones.json");
             Storage::zonesFileMissing = false;
         } catch {
             trace("missing zones file!");
