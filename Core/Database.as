@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-19
+m 2023-05-20
 */
 
 namespace DB {
@@ -163,10 +163,11 @@ namespace DB {
             auto now = Time::Now;
             trace("nuking my map data from program and " + Storage::dbFile);
 
-            Storage::ClearCurrentMap();
+            Storage::ClearCurrentMaps();
+            Storage::ClearCurrentMapsUids();
             Storage::ClearMyMaps();
             Storage::ClearMyMapsHidden();
-            Storage::ClearMyMapsHiddenUIDs();
+            Storage::ClearMyMapsHiddenUids();
 
             try { Storage::db.Execute("DELETE FROM MyMaps");       } catch { }
             try { Storage::db.Execute("DELETE FROM MyMapsHidden"); } catch { }
