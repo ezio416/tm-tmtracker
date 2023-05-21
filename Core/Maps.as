@@ -43,7 +43,7 @@ namespace Maps {
                 Storage::myMaps.RemoveAt(i);
 
         if (Settings::printDurations)
-            trace("refreshing my maps took " + (Time::Now - now) + " ms");
+            trace("updating my maps took " + (Time::Now - now) + " ms");
 
         DB::MyMaps::Save();
         DB::MyMaps::Load();
@@ -51,7 +51,7 @@ namespace Maps {
 
     void GetMyMapsThumbnailsCoro() {
         auto now = Time::Now;
-        trace("getting thumbnails");
+        trace("getting my map thumbnails...");
 
         for (uint i = 0; i < Storage::myMaps.Length; i++) {
             auto @coro = startnew(CoroutineFunc(Storage::myMaps[i].GetThumbnailCoro));
