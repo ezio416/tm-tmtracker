@@ -180,7 +180,7 @@ void RenderMyMapsTabs() {
 
             UI::SameLine();
             UI::BeginGroup();
-                if (UI::Button(Icons::Download + " Get Records"))
+                if (UI::Button(Icons::Download + " Get Records (" + Storage::currentMaps[i].records.Length + ")"))
                     startnew(CoroutineFunc(map.GetRecordsCoro));
 
                 UI::SameLine();
