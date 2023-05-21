@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-05-20
+m 2023-05-21
 */
 
 void Main() {
@@ -231,15 +231,19 @@ void RenderInfoTab() {
     if (UI::BeginTabItem(Icons::Info + " Info")) {
 
         UI::TextWrapped(
-            "TMTracker is a project I started back in December of 2022. "          +
-            "It was first written in Python, then C#, and now Angelscript, "       +
-            "with each iteration having slightly different features. I plan "      +
-            "for this to the final iteration, and there will be more features "    +
-            "to come, such as:\n\n - adding other maps and campaigns\n - adding "  +
-            "maps from TMX\n - tracking recent records for all maps\n - tracking " +
-            "personal records on maps and campaigns\n - probably more!\n\n\nThis " +
-            "is by far my largest coding project with hundreds of hours put in, "  +
-            "and because of this, I hope you at least find it useful! " + Icons::SmileO
+            "TMTracker is a project I started back in December of 2022. It was first written in Python, then C#, "    +
+            "and now Angelscript, with each iteration having slightly different features. I plan for this to be "     +
+            "the final iteration, and there will be more features to come, such as:\n\n - adding other maps and "     +
+            "campaigns, such as the current map or from TMX\n - tracking personal records on maps and campaigns\n - " +
+            "tracking recent records for all maps \n - probably more!\n\nThis is by far my largest coding project "   +
+            "with hundreds of hours put in, so I hope you find it useful! " + Icons::SmileO + "\n\n"
+        );
+
+        UI::Separator();
+
+        UI::TextWrapped(
+            "Plugin files are kept at " + IO::FromStorageFolder("").Replace("\\", "/") +
+            "\nIf you want to look in the database, I recommend DB Browser: sqlitebrowser.org"
         );
 
         UI::EndTabItem();
