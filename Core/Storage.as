@@ -53,6 +53,15 @@ namespace Storage {
         }
     }
 
+    void ClearAccounts() {
+        accounts.RemoveRange(0, accounts.Length);
+        ClearAccountIds();
+    }
+
+    void ClearAccountIds() {
+        accountIds.DeleteAll();
+    }
+
     void ClearCurrentMaps() {
         currentMaps.RemoveRange(0, currentMaps.Length);
         ClearCurrentMapsUids();
