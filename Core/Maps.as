@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-20
+m 2023-05-21
 */
 
 // Functions for getting/loading data on maps
@@ -48,6 +48,19 @@ namespace Maps {
         DB::MyMaps::Save();
         DB::MyMaps::Load();
         DB::Records::Load();
+    }
+
+    void GetMyMapsRecordsCoro() {
+        auto now = Time::Now;
+        trace("getting my map records...");
+
+        for (uint i = 0; i < Storage::myMaps.Length; i++) {
+            auto coro = startnew(CoroutineFunc(Storage::myMaps[i].GetRecordsCoro));
+            while (coro.IsRunning()) yield();
+        }
+
+        if (Settings::printDurations)
+            trace("getting my map records took " + (Time::Now - now) + " ms");
     }
 
     void GetMyMapsThumbnailsCoro() {
