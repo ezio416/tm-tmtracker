@@ -21,6 +21,7 @@ namespace Models {
         string       mapNameText;
         string       mapUid;
         Record[]     records;
+        dictionary   recordAccountIds;
         uint         recordsTimestamp;
         uint         silverTime;
         string       thumbnailFile;
@@ -82,7 +83,9 @@ namespace Models {
 
             uint offset = 0;
             bool tooManyRecords;
+
             records.RemoveRange(0, records.Length);
+            recordAccountIds.DeleteAll();
 
             do {
                 auto wait = startnew(CoroutineFunc(Various::WaitToDoNadeoRequestCoro));
@@ -102,9 +105,10 @@ namespace Models {
                 tooManyRecords = top.Length == 100;
                 for (uint i = 0; i < top.Length; i++) {
                     auto record = Record(top[i]);
-                    record.mapId   = mapId;
-                    record.mapName = mapNameText;
-                    record.mapUid  = mapUid;
+                    record.mapId        = mapId;
+                    record.mapName      = mapNameText;
+                    record.mapUid       = mapUid;
+                    record.recordFakeId = mapId + "-" + record.accountId;
 
                     if (!Storage::accountIds.Exists(record.accountId)) {
                         Storage::accountIds.Set(record.accountId, Storage::accountIds.GetKeys().Length);
@@ -120,7 +124,9 @@ namespace Models {
                         Storage::accounts[ix].recordMapUids.Set(record.mapUid, "");
                     }
 
+                    recordAccountIds.Set(record.accountId, "");
                     records.InsertLast(record);
+                    Storage::AddRecord(record);
                 }
 
                 Storage::requestsInProgress--;
@@ -132,6 +138,7 @@ namespace Models {
                 trace(logName + "getting records took " + (Time::Now - now) + " ms");
 
             DB::MyMaps::Save();
+            DB::Records::Save();
         }
 
         void GetThumbnailCoro() {
