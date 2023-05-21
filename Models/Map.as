@@ -101,7 +101,9 @@ namespace Models {
                 tooManyRecords = top.Length == 100;
                 for (uint i = 0; i < top.Length; i++) {
                     auto record = Record(top[i]);
-                    record.mapUid = mapUid;
+                    record.mapId   = mapId;
+                    record.mapName = mapNameText;
+                    record.mapUid  = mapUid;
 
                     if (!Storage::accountIds.Exists(record.accountId)) {
                         Storage::accountIds.Set(record.accountId, Storage::accountIds.GetKeys().Length);

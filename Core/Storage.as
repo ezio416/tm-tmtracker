@@ -3,7 +3,7 @@ c 2023-05-16
 m 2023-05-20
 */
 
-// Global variables for plugin operation and functions to clear some of them
+// Global variables for plugin operation, as well as functions to add/clear
 namespace Storage {
     Models::Account[] accounts;
     dictionary        accountIds;
@@ -15,6 +15,7 @@ namespace Storage {
     uint64            latestNadeoRequest = 0;
     bool              mapClicked = false;
     Models::Map[]     myMaps;
+    dictionary        myMapsUids;
     Models::Map[]     myMapsHidden;
     dictionary        myMapsHiddenUids;
     int               requestsInProgress = 0;
