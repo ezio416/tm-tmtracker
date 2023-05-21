@@ -25,14 +25,29 @@ namespace DB {
             timestamp        INT
         ); """;
 
+        void Clear() {
+            auto now = Time::Now;
+            trace("clearing my map data from program and " + Storage::dbFile);
+
+            Storage::ClearCurrentMaps();
+            Storage::ClearMyMaps();
+            Storage::ClearMyMapsHidden();
+
+            try { Storage::db.Execute("DELETE FROM MyMaps");       } catch { }
+            try { Storage::db.Execute("DELETE FROM MyMapsHidden"); } catch { }
+
+            if (Settings::printDurations)
+                trace("clearing my map data took " + (Time::Now - now) + " ms");
+        }
+
         void Load() {
             auto now = Time::Now;
             trace("loading my maps from " + Storage::dbFile);
 
+            Storage::ClearMyMaps();
+
             SQLite::Statement@ s;
             @Storage::db = SQLite::Database(Storage::dbFile);
-
-            Storage::ClearMyMaps();
             try {
                 string order = (Settings::sortMapsNewest) ? "DESC" : "ASC";
                 @s = Storage::db.Prepare("SELECT * FROM MyMaps ORDER BY timestamp " + order);
@@ -165,20 +180,99 @@ namespace DB {
 
             Load();
         }
+    }
 
-        void Nuke() {
+    // Functions relating to records driven on any map
+    namespace Records {
+        string tableColumns = """ (
+            accountId    CHAR(36),
+            accountName  TEXT,
+            mapId        CHAR(36),
+            mapName      TEXT,
+            mapUid       VARCHAR(27),
+            position     INT,
+            recordFakeId CHAR(73) PRIMARY KEY,
+            time         INT,
+            zoneId       CHAR(36),
+            zoneName     TEXT
+        ); """;
+
+        void Clear() {
             auto now = Time::Now;
-            trace("nuking my map data from program and " + Storage::dbFile);
+            trace("clearing records from program and " + Storage::dbFile);
 
-            Storage::ClearCurrentMaps();
-            Storage::ClearMyMaps();
-            Storage::ClearMyMapsHidden();
+            Storage::ClearRecords();
 
-            try { Storage::db.Execute("DELETE FROM MyMaps");       } catch { }
-            try { Storage::db.Execute("DELETE FROM MyMapsHidden"); } catch { }
+            try { Storage::db.Execute("DELETE FROM Records"); } catch { }
 
             if (Settings::printDurations)
-                trace("nuking my map data took " + (Time::Now - now) + " ms");
+                trace("clearing records took " + (Time::Now - now) + " ms");
+        }
+
+        void Load() {
+            auto now = Time::Now;
+            trace("loading records from " + Storage::dbFile);
+
+            Storage::ClearRecords();
+
+            SQLite::Statement@ s;
+            @Storage::db = SQLite::Database(Storage::dbFile);
+
+            try {
+                @s = Storage::db.Prepare("SELECT * FROM Records");
+            } catch {
+                trace("no Records table in database, records haven't been gotten yet");
+                if (Settings::printDurations)
+                    trace("returning after " + (Time::Now - now) + " ms");
+                return;
+            }
+            while (true) {
+                if (!s.NextRow()) break;
+                Storage::AddRecord(Models::Record(s));
+            }
+
+            if (Settings::printDurations)
+                trace("loading records took " + (Time::Now - now) + " ms");
+        }
+
+        void Save() {
+            auto now = Time::Now;
+            trace("saving records to " + Storage::dbFile);
+
+            Storage::db.Execute("CREATE TABLE IF NOT EXISTS Records" + tableColumns);
+
+            for (uint i = 0; i < Storage::records.Length; i++) {
+                auto record = Storage::records[i];
+                SQLite::Statement@ s;
+                @s = Storage::db.Prepare("""
+                    INSERT INTO Records (
+                        accountId,
+                        accountName,
+                        mapId,
+                        mapName,
+                        mapUid,
+                        position,
+                        recordFakeId,
+                        time,
+                        zoneId,
+                        zoneName
+                    ) VALUES (?,?,?,?,?,?,?,?,?,?);
+                """);
+                s.Bind(1,  record.accountId);
+                s.Bind(2,  record.accountName);
+                s.Bind(3,  record.mapId);
+                s.Bind(4,  record.mapName);
+                s.Bind(5,  record.mapUid);
+                s.Bind(6,  record.position);
+                s.Bind(7,  record.recordFakeId);
+                s.Bind(8,  record.time);
+                s.Bind(9,  record.zoneId);
+                s.Bind(10, record.zoneName);
+                s.Execute();
+            }
+
+            if (Settings::printDurations)
+                trace("saving records took " + (Time::Now - now) + " ms");
         }
     }
 }

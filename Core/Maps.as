@@ -47,6 +47,7 @@ namespace Maps {
 
         DB::MyMaps::Save();
         DB::MyMaps::Load();
+        DB::Records::Load();
     }
 
     void GetMyMapsThumbnailsCoro() {

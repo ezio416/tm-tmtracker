@@ -18,25 +18,39 @@ namespace Storage {
     dictionary        myMapsUids;
     Models::Map[]     myMapsHidden;
     dictionary        myMapsHiddenUids;
+    Models::Record[]  records;
+    dictionary        recordIds;
     int               requestsInProgress = 0;
     string            thumbnailFolder = IO::FromStorageFolder("thumbnails");
     dictionary        thumbnailTextures;
-    string            title  = "\\$2f3" + Icons::MapO + "\\$z TMTracker";
+    string            title = "\\$2f3" + Icons::MapO + "\\$z TMTracker";
     Json::Value       zones;
     bool              zonesFileMissing = true;
 
     void AddMyMap(Models::Map map) {
-        if (Storage::myMapsUids.Exists(map.mapUid)) return;
-        Storage::myMapsUids.Set(map.mapUid, "");
+        if (myMapsUids.Exists(map.mapUid)) return;
+        myMapsUids.Set(map.mapUid, myMapsUids.GetKeys().Length);
         map.hidden = false;
-        Storage::myMaps.InsertLast(map);
+        myMaps.InsertLast(map);
     }
 
     void AddMyMapHidden(Models::Map map) {
-        if (Storage::myMapsHiddenUids.Exists(map.mapUid)) return;
-        Storage::myMapsHiddenUids.Set(map.mapUid, "");
+        if (myMapsHiddenUids.Exists(map.mapUid)) return;
+        myMapsHiddenUids.Set(map.mapUid, "");
         map.hidden = true;
-        Storage::myMapsHidden.InsertLast(map);
+        myMapsHidden.InsertLast(map);
+    }
+
+    void AddRecord(Models::Record record) {
+        if (recordIds.Exists(record.recordFakeId)) return;
+        recordIds.Set(record.recordFakeId, "");
+        records.InsertLast(record);
+
+        auto ix = uint(myMapsUids[record.mapUid]);
+        if (!myMaps[ix].recordAccountIds.Exists(record.accountId)) {
+            myMaps[ix].recordAccountIds.Set(record.accountId, "");
+            myMaps[ix].records.InsertLast(record);
+        }
     }
 
     void ClearCurrentMaps() {
@@ -64,5 +78,14 @@ namespace Storage {
 
     void ClearMyMapsHiddenUids() {
         myMapsHiddenUids.DeleteAll();
+    }
+
+    void ClearRecords() {
+        records.RemoveRange(0, records.Length);
+        ClearRecordIds();
+    }
+
+    void ClearRecordIds() {
+        recordIds.DeleteAll();
     }
 }
