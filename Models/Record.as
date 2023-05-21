@@ -9,15 +9,12 @@ namespace Models {
     class Record {
         string accountId;
         string accountName;
-        // string ghostUrl;
         string mapId;
         string mapName;
         string mapUid;
-        // uint   medal;
         uint   position;
-        // string recordId;
+        string recordFakeId;
         uint   time;
-        // uint   timestamp;
         string zoneId;
         string zoneName;
 
@@ -32,6 +29,19 @@ namespace Models {
             Zones::Load();
             try   { zoneName = Storage::zones[zoneId]; }
             catch { zoneName = record["zoneName"]; }
+        }
+
+        Record(SQLite::Statement@ s) {
+            accountId    = s.GetColumnString("accountId");
+            accountName  = s.GetColumnString("accountName");
+            mapId        = s.GetColumnString("mapId");
+            mapName      = s.GetColumnString("mapName");
+            mapUid       = s.GetColumnString("mapUid");
+            position     = s.GetColumnInt("position");
+            recordFakeId = s.GetColumnString("recordFakeId");
+            time         = s.GetColumnInt("time");
+            zoneId       = s.GetColumnString("zoneId");
+            zoneName     = s.GetColumnString("zoneName");
         }
     }
 }
