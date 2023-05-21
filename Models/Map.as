@@ -29,7 +29,7 @@ namespace Models {
         uint         timestamp;
         bool         viewing;
 
-        Map() {}
+        Map() { }
 
         Map(Json::Value map) {
             mapUid        = map["uid"];
@@ -54,22 +54,23 @@ namespace Models {
         }
 
         Map(SQLite::Statement@ s) {
-            authorId      = s.GetColumnString("authorId");
-            authorTime    = s.GetColumnInt("authorTime");
-            badUploadTime = s.GetColumnInt("badUploadTime") == 1 ? true : false;
-            bronzeTime    = s.GetColumnInt("bronzeTime");
-            downloadUrl   = s.GetColumnString("downloadUrl");
-            goldTime      = s.GetColumnInt("goldTime");
-            mapId         = s.GetColumnString("mapId");
-            mapNameRaw    = s.GetColumnString("mapNameRaw");
-            mapNameColor  = ColoredString(mapNameRaw);
-            mapNameText   = StripFormatCodes(mapNameRaw);
-            logName       = "MAP[" + mapNameText + "] - ";
-            mapUid        = s.GetColumnString("mapUid");
-            thumbnailFile = Storage::thumbnailFolder + "/" + mapUid + ".jpg";
-            silverTime    = s.GetColumnInt("silverTime");
-            thumbnailUrl  = s.GetColumnString("thumbnailUrl");
-            timestamp     = s.GetColumnInt("timestamp");
+            authorId         = s.GetColumnString("authorId");
+            authorTime       = s.GetColumnInt("authorTime");
+            badUploadTime    = s.GetColumnInt("badUploadTime") == 1 ? true : false;
+            bronzeTime       = s.GetColumnInt("bronzeTime");
+            downloadUrl      = s.GetColumnString("downloadUrl");
+            goldTime         = s.GetColumnInt("goldTime");
+            mapId            = s.GetColumnString("mapId");
+            mapNameRaw       = s.GetColumnString("mapNameRaw");
+            mapNameColor     = ColoredString(mapNameRaw);
+            mapNameText      = StripFormatCodes(mapNameRaw);
+            logName          = "MAP[" + mapNameText + "] - ";
+            mapUid           = s.GetColumnString("mapUid");
+            recordsTimestamp = s.GetColumnInt("recordsTimestamp");
+            thumbnailFile    = Storage::thumbnailFolder + "/" + mapUid + ".jpg";
+            silverTime       = s.GetColumnInt("silverTime");
+            thumbnailUrl     = s.GetColumnString("thumbnailUrl");
+            timestamp        = s.GetColumnInt("timestamp");
         }
 
         int opCmp(int i) { return timestamp - i; }
@@ -129,6 +130,8 @@ namespace Models {
 
             if (Settings::printDurations)
                 trace(logName + "getting records took " + (Time::Now - now) + " ms");
+
+            DB::MyMaps::Save();
         }
 
         void GetThumbnailCoro() {

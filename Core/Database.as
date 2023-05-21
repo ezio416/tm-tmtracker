@@ -75,41 +75,49 @@ namespace DB {
             for (uint i = 0; i < Storage::myMaps.Length; i++) {
                 auto map = Storage::myMaps[i];
                 SQLite::Statement@ s;
-                @s = Storage::db.Prepare("""
-                    INSERT INTO MyMaps (
-                        authorId,
-                        authorTime,
-                        badUploadTime,
-                        bronzeTime,
-                        downloadUrl,
-                        goldTime,
-                        mapId,
-                        mapNameColor,
-                        mapNameRaw,
-                        mapNameText,
-                        mapUid,
-                        recordsTimestamp,
-                        silverTime,
-                        thumbnailUrl,
-                        timestamp
-                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-                """);
-                s.Bind(1,  map.authorId);
-                s.Bind(2,  map.authorTime);
-                s.Bind(3,  map.badUploadTime ? 1 : 0);
-                s.Bind(4,  map.bronzeTime);
-                s.Bind(5,  map.downloadUrl);
-                s.Bind(6,  map.goldTime);
-                s.Bind(7,  map.mapId);
-                s.Bind(8,  map.mapNameColor);
-                s.Bind(9,  map.mapNameRaw);
-                s.Bind(10, map.mapNameText);
-                s.Bind(11, map.mapUid);
-                s.Bind(12, map.recordsTimestamp);
-                s.Bind(13, map.silverTime);
-                s.Bind(14, map.thumbnailUrl);
-                s.Bind(15, map.timestamp);
-                s.Execute();
+                try {
+                    if (map.recordsTimestamp == 0) throw("");
+                    @s = Storage::db.Prepare("UPDATE MyMaps SET recordsTimestamp=? WHERE mapUid=?");
+                    s.Bind(1, map.recordsTimestamp);
+                    s.Bind(2, map.mapUid);
+                    s.Execute();
+                } catch {
+                    @s = Storage::db.Prepare("""
+                        INSERT INTO MyMaps (
+                            authorId,
+                            authorTime,
+                            badUploadTime,
+                            bronzeTime,
+                            downloadUrl,
+                            goldTime,
+                            mapId,
+                            mapNameColor,
+                            mapNameRaw,
+                            mapNameText,
+                            mapUid,
+                            recordsTimestamp,
+                            silverTime,
+                            thumbnailUrl,
+                            timestamp
+                        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+                    """);
+                    s.Bind(1,  map.authorId);
+                    s.Bind(2,  map.authorTime);
+                    s.Bind(3,  map.badUploadTime ? 1 : 0);
+                    s.Bind(4,  map.bronzeTime);
+                    s.Bind(5,  map.downloadUrl);
+                    s.Bind(6,  map.goldTime);
+                    s.Bind(7,  map.mapId);
+                    s.Bind(8,  map.mapNameColor);
+                    s.Bind(9,  map.mapNameRaw);
+                    s.Bind(10, map.mapNameText);
+                    s.Bind(11, map.mapUid);
+                    s.Bind(12, map.recordsTimestamp);
+                    s.Bind(13, map.silverTime);
+                    s.Bind(14, map.thumbnailUrl);
+                    s.Bind(15, map.timestamp);
+                    s.Execute();
+                }
             }
 
             if (Settings::printDurations)

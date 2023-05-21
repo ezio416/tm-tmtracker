@@ -132,7 +132,7 @@ void RenderMyMapListTab() {
 
 void RenderMyMapsTabs() {
     for (uint i = 0; i < Storage::currentMaps.Length; i++) {
-        auto map = Storage::currentMaps[i];
+        auto map = @Storage::currentMaps[i];
 
         uint flags = UI::TabItemFlags::Trailing;
         if (
