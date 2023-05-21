@@ -12,6 +12,8 @@ namespace Zones {
             return;
         } catch { }
 
+        trace("loading zones...");
+
         try {
             Storage::zones = Json::FromFile("Resources/zones.json");
             Storage::zonesFileMissing = false;
