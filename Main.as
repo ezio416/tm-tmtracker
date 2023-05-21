@@ -38,6 +38,7 @@ void RenderTabs() {
         RenderMapsTab();
         // RenderRecordsTab();
         // RenderAccountsTab();
+        RenderInfoTab();
         // RenderDebugTab();
     UI::EndTabBar();
 }
@@ -65,8 +66,6 @@ void RenderMapsTab() {
 
                 if (Settings::printDurations)
                     trace("unhiding all maps took " + (Time::Now - now) + " ms");
-
-                DB::MyMaps::Load();
             }
         }
 
@@ -219,6 +218,23 @@ void RenderRecordsTab() {
 
 void RenderAccountsTab() {
     if (UI::BeginTabItem(Icons::User + " Accounts")) {
+
+        UI::EndTabItem();
+    }
+}
+
+void RenderInfoTab() {
+    if (UI::BeginTabItem(Icons::Info + " Info")) {
+
+        UI::TextWrapped(
+            "TMTracker is a project I started back in December of 2022. " +
+            "It was first written in Python, then C#, and now Angelscript, " +
+            "with each iteration having slightly different features. I plan " +
+            "for this to the final iteration, and there will be more features " +
+            "to come, such as:\n\n - adding other maps and campaigns\n - adding " +
+            "maps from TMX\n - tracking recent records for all maps\n - tracking " +
+            "personal records on maps and campaigns\n - probably more!"
+        );
 
         UI::EndTabItem();
     }
