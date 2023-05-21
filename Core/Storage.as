@@ -25,8 +25,23 @@ namespace Storage {
     Json::Value       zones;
     bool              zonesFileMissing = true;
 
+    void AddMyMap(Models::Map map) {
+        if (Storage::myMapsUids.Exists(map.mapUid)) return;
+        Storage::myMapsUids.Set(map.mapUid, "");
+        map.hidden = false;
+        Storage::myMaps.InsertLast(map);
+    }
+
+    void AddMyMapHidden(Models::Map map) {
+        if (Storage::myMapsHiddenUids.Exists(map.mapUid)) return;
+        Storage::myMapsHiddenUids.Set(map.mapUid, "");
+        map.hidden = true;
+        Storage::myMapsHidden.InsertLast(map);
+    }
+
     void ClearCurrentMaps() {
         currentMaps.RemoveRange(0, currentMaps.Length);
+        ClearCurrentMapsUids();
     }
 
     void ClearCurrentMapsUids() {
@@ -35,10 +50,16 @@ namespace Storage {
 
     void ClearMyMaps() {
         myMaps.RemoveRange(0, myMaps.Length);
+        ClearMyMapsUids();
+    }
+
+    void ClearMyMapsUids() {
+        myMapsUids.DeleteAll();
     }
 
     void ClearMyMapsHidden() {
         myMapsHidden.RemoveRange(0, myMapsHidden.Length);
+        ClearMyMapsHiddenUids();
     }
 
     void ClearMyMapsHiddenUids() {
