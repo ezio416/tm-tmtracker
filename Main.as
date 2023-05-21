@@ -30,7 +30,7 @@ void RenderInterface() {
 		UI::SetNextWindowPos(100, 100, UI::Cond::Once);
 
 		UI::Begin(Storage::title, Settings::windowOpen);
-            UI::Text("Welcome to TMTracker! Check out these tabs to see what I offer:");
+            UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
             RenderTabs();
 		UI::End();
     }
@@ -187,7 +187,8 @@ void RenderMyMapsTabs() {
                 UI::Text(
                     "Last Updated: " + (
                         map.recordsTimestamp > 0 ?
-                            Time::FormatString(Settings::dateFormat + "Local", map.recordsTimestamp) :
+                            Time::FormatString(Settings::dateFormat + "Local\\$Z", map.recordsTimestamp) +
+                                " (" + Various::FormatSeconds(Time::Stamp - map.recordsTimestamp) + " ago)" :
                             "not yet"
                     )
                 );
