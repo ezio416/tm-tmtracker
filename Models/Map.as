@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-20
+m 2023-05-21
 */
 
 // Classes for holding data gathered during plugin operation
@@ -135,7 +135,7 @@ namespace Models {
             recordsTimestamp = Time::Stamp;
 
             if (Settings::printDurations)
-                trace(logName + "getting records took " + (Time::Now - now) + " ms");
+                trace(logName + "getting " + records.Length + " records took " + (Time::Now - now) + " ms");
 
             DB::MyMaps::Save();
             DB::Records::Save();
