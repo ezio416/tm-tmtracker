@@ -13,7 +13,7 @@ namespace Maps {
         NadeoServices::AddAudience(live);
         while (!NadeoServices::IsAuthenticated(live)) yield();
 
-        Storage::myMaps.RemoveRange(0, Storage::myMaps.Length);
+        Storage::ClearMyMaps();
 
         uint offset = 0;
         bool tooManyMaps;
@@ -33,7 +33,7 @@ namespace Maps {
             auto mapList = Json::Parse(req.String())["mapList"];
             tooManyMaps = mapList.Length == 1000;
             for (uint i = 0; i < mapList.Length; i++)
-                Storage::myMaps.InsertLast(Models::Map(mapList[i]));
+                Storage::AddMyMap(Models::Map(mapList[i]));
 
             Storage::requestsInProgress--;
         } while (tooManyMaps);

@@ -32,7 +32,7 @@ namespace DB {
             SQLite::Statement@ s;
             @Storage::db = SQLite::Database(Storage::dbFile);
 
-            Storage::myMaps.RemoveRange(0, Storage::myMaps.Length);
+            Storage::ClearMyMaps();
             try {
                 string order = (Settings::sortMapsNewest) ? "DESC" : "ASC";
                 @s = Storage::db.Prepare("SELECT * FROM MyMaps ORDER BY timestamp " + order);
@@ -44,13 +44,10 @@ namespace DB {
             }
             while (true) {
                 if (!s.NextRow()) break;
-                auto map = Models::Map(s);
-                map.hidden = false;
-                Storage::myMaps.InsertLast(map);
+                Storage::AddMyMap(Models::Map(s));
             }
 
-            Storage::myMapsHidden.RemoveRange(0, Storage::myMapsHidden.Length);
-            Storage::myMapsHiddenUids.DeleteAll();
+            Storage::ClearMyMapsHidden();
             bool anyHidden = false;
             try {
                 @s = Storage::db.Prepare("SELECT * FROM MyMapsHidden");
@@ -60,10 +57,7 @@ namespace DB {
             if (anyHidden)
                 while (true) {
                     if (!s.NextRow()) break;
-                    auto map = Models::Map(s);
-                    map.hidden = true;
-                    Storage::myMapsHidden.InsertLast(map);
-                    Storage::myMapsHiddenUids.Set(map.mapUid, "");
+                    Storage::AddMyMapHidden(Models::Map(s));
                 }
 
             if (Settings::printDurations)
@@ -169,10 +163,8 @@ namespace DB {
             trace("nuking my map data from program and " + Storage::dbFile);
 
             Storage::ClearCurrentMaps();
-            Storage::ClearCurrentMapsUids();
             Storage::ClearMyMaps();
             Storage::ClearMyMapsHidden();
-            Storage::ClearMyMapsHiddenUids();
 
             try { Storage::db.Execute("DELETE FROM MyMaps");       } catch { }
             try { Storage::db.Execute("DELETE FROM MyMapsHidden"); } catch { }
