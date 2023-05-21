@@ -11,6 +11,9 @@ namespace Settings {
     [Setting name="Load my maps from file on boot" category="General"]
     bool loadMyMapsOnBoot = true;
 
+    [Setting name="Load records from file on boot" category="General"]
+    bool loadRecordsOnBoot = true;
+
     [Setting name="Load zones from file on boot" category="General"]
     bool loadZonesOnBoot = true;
 

@@ -7,6 +7,9 @@ void Main() {
     if (Settings::loadMyMapsOnBoot)
         DB::MyMaps::Load();
 
+    if (Settings::loadRecordsOnBoot)
+        DB::Records::Load();
+
     if (Settings::loadZonesOnBoot)
         Zones::Load();
 
@@ -227,13 +230,15 @@ void RenderInfoTab() {
     if (UI::BeginTabItem(Icons::Info + " Info")) {
 
         UI::TextWrapped(
-            "TMTracker is a project I started back in December of 2022. " +
-            "It was first written in Python, then C#, and now Angelscript, " +
-            "with each iteration having slightly different features. I plan " +
-            "for this to the final iteration, and there will be more features " +
-            "to come, such as:\n\n - adding other maps and campaigns\n - adding " +
+            "TMTracker is a project I started back in December of 2022. "          +
+            "It was first written in Python, then C#, and now Angelscript, "       +
+            "with each iteration having slightly different features. I plan "      +
+            "for this to the final iteration, and there will be more features "    +
+            "to come, such as:\n\n - adding other maps and campaigns\n - adding "  +
             "maps from TMX\n - tracking recent records for all maps\n - tracking " +
-            "personal records on maps and campaigns\n - probably more!"
+            "personal records on maps and campaigns\n - probably more!\n\n\nThis " +
+            "is by far my largest coding project with hundreds of hours put in, "  +
+            "and because of this, I hope you at least find it useful! " + Icons::SmileO
         );
 
         UI::EndTabItem();
