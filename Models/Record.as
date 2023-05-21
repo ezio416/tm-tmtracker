@@ -9,16 +9,15 @@ namespace Models {
     class Record {
         string accountId;
         string accountName;
-        string ghostUrl;
+        // string ghostUrl;
         string mapId;
         string mapName;
         string mapUid;
-        uint   medal;
+        // uint   medal;
         uint   position;
-        string recordId;
+        // string recordId;
         uint   time;
-        string timeFormatted;
-        uint   timestamp;
+        // uint   timestamp;
         string zoneId;
         string zoneName;
 
