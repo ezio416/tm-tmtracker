@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-05-20
+m 2023-05-21
 */
 
 // Functions that don't fit nicely in other categories
@@ -14,12 +14,12 @@ namespace Various {
         hours %= 24;
 
         if (days > 0)
-            return days + ":" + Zpad2(hours) + ":" + Zpad2(minutes) + ":" + Zpad2(seconds);
+            return Zpad2(days) + ":" + Zpad2(hours) + ":" + Zpad2(minutes) + ":" + Zpad2(seconds);
         if (hours > 0)
-            return hours + ":" + Zpad2(minutes) + ":" + Zpad2(seconds);
+            return "00:" + Zpad2(hours) + ":" + Zpad2(minutes) + ":" + Zpad2(seconds);
         if (minutes > 0)
-            return minutes + ":" + Zpad2(seconds);
-        return "00:" + Zpad2(seconds);
+            return "00:00:" + Zpad2(minutes) + ":" + Zpad2(seconds);
+        return "00:00:00:" + Zpad2(seconds);
     }
 
     void WaitToDoNadeoRequestCoro() {
