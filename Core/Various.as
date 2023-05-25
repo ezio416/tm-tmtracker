@@ -24,7 +24,7 @@ namespace Various {
 
     string LogTimerStart(const string &in text, bool logNow = true) {
         auto now = Time::Now;
-        if (Settings::logEnabled && logNow) trace(text + "...");
+        if (logNow) Trace(text + "...");
         string timerId = Storage::logTimerIndex + "_LogTimer_" + text;
         Storage::logTimerIndex++;
         Storage::logTimers.Set(timerId, now);
@@ -36,17 +36,22 @@ namespace Various {
     }
 
     void LogTimerEnd(const string &in timerId, bool logNow = true) {
-        if (Settings::logEnabled && Settings::logDurations && logNow) {
+        if (Settings::logDurations && logNow) {
             string text = timerId.Split("_LogTimer_")[1];
             try {
                 uint64 dur = Time::Now - uint64(Storage::logTimers[timerId]);
-                if (dur == 0) trace(text + " took 0s");
-                else          trace(text + " took " + (dur / 1000) + "." + (dur % 1000) + "s");
+                if (dur == 0) Trace(text + " took 0s");
+                else          Trace(text + " took " + (dur / 1000) + "." + (dur % 1000) + "s");
             } catch {
-                trace("timerId not found: " + timerId);
+                Trace("timerId not found: " + timerId);
             }
         }
         LogTimerDelete(timerId);
+    }
+
+    void Trace(const string &in text) {
+        if (!Settings::logEnabled) return;
+        trace(text);
     }
 
     void WaitToDoNadeoRequestCoro() {

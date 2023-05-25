@@ -82,8 +82,7 @@ namespace DB {
             try {
                 @s = Storage::db.Prepare("SELECT * FROM MyMaps ORDER BY timestamp " + order);
             } catch {
-                if (Settings::logEnabled)
-                    trace("no MyMaps table in database, plugin hasn't been run yet");
+                Various::Trace("no MyMaps table in database, plugin hasn't been run yet");
                 Various::LogTimerEnd(timerId);
                 return;
             }
@@ -98,8 +97,7 @@ namespace DB {
                 @s = Storage::db.Prepare("SELECT * FROM MyHiddenMaps");
                 anyHidden = true;
             } catch {
-                if (Settings::logEnabled)
-                    trace("no MyHiddenMaps table in database, no maps are hidden yet");
+                Various::Trace("no MyHiddenMaps table in database, no maps are hidden yet");
             }
 
             if (anyHidden)
@@ -244,8 +242,7 @@ namespace DB {
             try {
                 @s = Storage::db.Prepare("SELECT * FROM Records");
             } catch {
-                if (Settings::logEnabled)
-                    trace("no Records table in database, no records gotten yet");
+                Various::Trace("no Records table in database, no records gotten yet");
                 Various::LogTimerEnd(timerId);
                 return;
             }
