@@ -40,8 +40,8 @@ namespace Various {
         if (Settings::logEnabled && Settings::logDurations) {
             try {
                 uint64 dur = Time::Now - uint64(Storage::logTimers[timerId]);
-                if (dur == 0) throw("divByZero");
-                trace(text + " took " + (dur / 1000) + "." + (dur % 1000) + "s");
+                if (dur == 0) trace(text + " took 0s");
+                else          trace(text + " took " + (dur / 1000) + "." + (dur % 1000) + "s");
             } catch {
                 trace("timerId not found: " + timerId);
             }
