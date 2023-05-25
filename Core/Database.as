@@ -8,21 +8,9 @@ namespace DB {
     // Functions relating to drivers of any map
     namespace Accounts {
         string tableColumns = """ (
-            authorId         CHAR(36),
-            authorTime       INT,
-            badUploadTime    BOOL,
-            bronzeTime       INT,
-            downloadUrl      CHAR(93),
-            goldTime         INT,
-            mapId            CHAR(36),
-            mapNameColor     TEXT,
-            mapNameRaw       TEXT,
-            mapNameText      TEXT,
-            mapUid           VARCHAR(27) PRIMARY KEY,
-            nameExpire       INT,
-            recordsTimestamp INT,
-            silverTime       INT,
-            thumbnailUrl     CHAR(97)
+            accountId   CHAR(36) PRIMARY KEY,
+            accountName TEXT,
+            nameExpire  INT
         ); """;
 
         void Clear() {
