@@ -5,13 +5,12 @@ m 2023-05-25
 
 namespace Zones {
     void Load() {
-        string timerId = Various::LogTimerStart("loading zones from file");
-
         try {
             Storage::zones.Length;
-            Various::LogTimerEnd(timerId);
             return;
         } catch { }
+
+        string timerId = Various::LogTimerStart("loading zones from file");
 
         try {
             Storage::zones = Json::FromFile("Resources/zones.json");
@@ -19,7 +18,7 @@ namespace Zones {
         } catch {
             if (Settings::logEnabled)
                 trace("missing zones file!");
-            Various::LogTimerDelete(timerId);
+            Various::LogTimerEnd(timerId, false);
             return;
         }
 
