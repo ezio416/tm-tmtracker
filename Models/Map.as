@@ -172,7 +172,7 @@ namespace Models {
         }
 
         void LoadThumbnailCoro() {
-            string timerId = Various::LogTimerStart("loading thumbnail", false);
+            string timerId = Various::LogTimerStart(logName + "loading thumbnail", false);
 
             if (Storage::thumbnailTextures.Exists(mapUid)) {
                 UI::Texture@ tex;
