@@ -44,7 +44,7 @@ void RenderTabs() {
         // RenderRecordsTab();
         // RenderAccountsTab();
         RenderInfoTab();
-        // RenderDebugTab();
+        if (Storage::dev) RenderDevTab();
     UI::EndTabBar();
 }
 
@@ -243,15 +243,36 @@ void RenderInfoTab() {
 
     UI::TextWrapped(
         "Plugin files are kept at " + IO::FromStorageFolder("").Replace("\\", "/") +
-        "\nIf you want to look in the database, I recommend DB Browser: sqlitebrowser.org"
+        "\nIf you want to look in the database, I recommend DB Browser: sqlitebrowser.org\n"
     );
+
+    UI::Separator();
+
+    if (Storage::dev) {
+        if (UI::Button("Lock Dev Tab")) {
+            Various::Trace("dev tab locked");
+            Storage::dev = false;
+        }
+    } else {
+        string input = UI::InputText("Unlock Dev Tab", "");
+        if (input.Length > 0)
+            if (Crypto::MD5(input) == "417e4705aee1415f8583243b8c403af3") {
+                Various::Trace("dev tab unlocked");
+                Storage::dev = true;
+            }
+    }
 
     UI::EndTabItem();
 }
 
-void RenderDebugTab() {
-    if (UI::BeginTabItem(Icons::Cogs + " Debug")) {
+void RenderDevTab() {
+    if (!UI::BeginTabItem(Icons::Cogs + " Dev")) return;
 
-        UI::EndTabItem();
-    }
+    if (UI::Button(Icons::Download + " Get All Records"))
+        startnew(CoroutineFunc(Maps::GetMyMapsRecordsCoro));
+
+    UI::Text("total accounts: " + Storage::accounts.Length);
+    UI::Text("account IDs: " + Storage::accountIds.GetKeys().Length);
+
+    UI::EndTabItem();
 }

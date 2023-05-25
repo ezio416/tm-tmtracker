@@ -74,7 +74,7 @@ namespace Settings {
     uint timeBetweenNadeoRequests = 500;
 
     [Setting hidden]
-    bool windowOpen = true;
+    bool windowOpen = false;
 
     ///////////////////////////////////////////////////////////////////////////
     [Setting name="Account name expiration time (days)" min=0 max=90]
