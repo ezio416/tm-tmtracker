@@ -62,7 +62,7 @@ void RenderMapsTab() {
             UI::SameLine();
             if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myHiddenMaps.Length + ")")) {
                 auto now = Time::Now;
-                if (Settings::loggingEnabled)
+                if (Settings::logEnabled)
                     trace("unhiding all maps...");
 
                 for (uint i = 0; i < Storage::myHiddenMaps.Length;)
@@ -71,7 +71,7 @@ void RenderMapsTab() {
                 for (uint i = 0; i < Storage::currentMaps.Length; i++)
                     Storage::currentMaps[i].hidden = false;
 
-                if (Settings::loggingEnabled && Settings::logDurations)
+                if (Settings::logEnabled && Settings::logDurations)
                     trace("unhiding all maps took " + (Time::Now - now) + " ms");
             }
         }

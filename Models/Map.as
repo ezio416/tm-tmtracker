@@ -79,7 +79,7 @@ namespace Models {
 
         void GetRecordsCoro() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace(logName + "getting records...");
 
             uint offset = 0;
@@ -135,7 +135,7 @@ namespace Models {
 
             recordsTimestamp = Time::Stamp;
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace(logName + "getting " + records.Length + " records took " + (Time::Now - now) + " ms");
 
             DB::MyMaps::Save();
@@ -147,7 +147,7 @@ namespace Models {
 
             if (IO::FileExists(thumbnailFile)) return;
 
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace(logName + "downloading thumbnail...");
 
             uint max_timeout = 3000;
@@ -174,7 +174,7 @@ namespace Models {
                 break;
             }
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace(logName + "downloading thumbnail took " + (Time::Now - now) + " ms");
         }
 
@@ -200,7 +200,7 @@ namespace Models {
 
             Storage::thumbnailTextures.Set(mapUid, @thumbnailTexture);
 
-            if (Settings::loggingEnabled && Settings::logDurations && Settings::logThumbnailTimes)
+            if (Settings::logEnabled && Settings::logDurations && Settings::logThumbnailTimes)
                 trace(logName + "loading thumbnail took " + (Time::Now - now) + " ms");
         }
     }
