@@ -12,6 +12,7 @@ namespace Storage {
     SQLite::Database@ db;
     string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");
     UI::Texture@      defaultTexture = UI::LoadTexture("Resources/1x1.png");
+    bool              dev = false;
     uint64            latestNadeoRequest = 0;
     uint64            logTimerIndex = 0;
     dictionary        logTimers;
