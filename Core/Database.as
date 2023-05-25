@@ -1,9 +1,9 @@
 /*
 c 2023-05-16
-m 2023-05-20
+m 2023-05-25
 */
 
-// Functions relating to the TMTracker.db file
+// Functions for the TMTracker.db file
 namespace DB {
     // Functions relating to the user's own uploaded maps
     namespace MyMaps {
@@ -30,11 +30,11 @@ namespace DB {
             trace("clearing my map data from program and " + Storage::dbFile);
 
             Storage::ClearCurrentMaps();
+            Storage::ClearMyHiddenMaps();
             Storage::ClearMyMaps();
-            Storage::ClearMyMapsHidden();
 
             try { Storage::db.Execute("DELETE FROM MyMaps");       } catch { }
-            try { Storage::db.Execute("DELETE FROM MyMapsHidden"); } catch { }
+            try { Storage::db.Execute("DELETE FROM MyHiddenMaps"); } catch { }
 
             if (Settings::printDurations)
                 trace("clearing my map data took " + (Time::Now - now) + " ms");
@@ -62,17 +62,17 @@ namespace DB {
                 Storage::AddMyMap(Models::Map(s));
             }
 
-            Storage::ClearMyMapsHidden();
+            Storage::ClearMyHiddenMaps();
             bool anyHidden = false;
             try {
-                @s = Storage::db.Prepare("SELECT * FROM MyMapsHidden");
+                @s = Storage::db.Prepare("SELECT * FROM MyHiddenMaps");
                 anyHidden = true;
-            } catch { trace("no MyMapsHidden table in database, maps haven't been hidden yet"); }
+            } catch { trace("no MyHiddenMaps table in database, maps haven't been hidden yet"); }
 
             if (anyHidden)
                 while (true) {
                     if (!s.NextRow()) break;
-                    Storage::AddMyMapHidden(Models::Map(s));
+                    Storage::AddMyHiddenMap(Models::Map(s));
                 }
 
             if (Settings::printDurations)
@@ -143,11 +143,11 @@ namespace DB {
             auto now = Time::Now;
             trace(map.logName + "hiding in " + Storage::dbFile);
 
-            Storage::db.Execute("CREATE TABLE IF NOT EXISTS MyMapsHidden" + tableColumns);
+            Storage::db.Execute("CREATE TABLE IF NOT EXISTS MyHiddenMaps" + tableColumns);
 
             SQLite::Statement@ s;
 
-            @s = Storage::db.Prepare("INSERT INTO MyMapsHidden SELECT * FROM MyMaps WHERE mapUid=?");
+            @s = Storage::db.Prepare("INSERT INTO MyHiddenMaps SELECT * FROM MyMaps WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
 
@@ -167,11 +167,11 @@ namespace DB {
 
             SQLite::Statement@ s;
 
-            @s = Storage::db.Prepare("INSERT INTO MyMaps SELECT * FROM MyMapsHidden WHERE mapUid=?");
+            @s = Storage::db.Prepare("INSERT INTO MyMaps SELECT * FROM MyHiddenMaps WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
 
-            @s = Storage::db.Prepare("DELETE FROM MyMapsHidden WHERE mapUid=?");
+            @s = Storage::db.Prepare("DELETE FROM MyHiddenMaps WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
 

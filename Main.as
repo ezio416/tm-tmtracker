@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-05-21
+m 2023-05-25
 */
 
 void Main() {
@@ -14,6 +14,8 @@ void Main() {
         Zones::Load();
 
     IO::CreateFolder(Storage::thumbnailFolder);
+
+    NadeoServices::AddAudience("NadeoLiveServices");
 }
 
 void RenderMenu() {
@@ -56,13 +58,13 @@ void RenderMapsTab() {
         if (UI::Button(Icons::Refresh + " Update Map List (" + Storage::myMaps.Length + ")"))
             startnew(CoroutineFunc(Maps::GetMyMapsCoro));
 
-        if (Storage::myMapsHidden.Length > 0) {
+        if (Storage::myHiddenMaps.Length > 0) {
             UI::SameLine();
-            if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myMapsHidden.Length + ")")) {
+            if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myHiddenMaps.Length + ")")) {
                 auto now = Time::Now;
 
-                for (uint i = 0; i < Storage::myMapsHidden.Length;)
-                    DB::MyMaps::UnHide(Storage::myMapsHidden[i]);
+                for (uint i = 0; i < Storage::myHiddenMaps.Length;)
+                    DB::MyMaps::UnHide(Storage::myHiddenMaps[i]);
 
                 for (uint i = 0; i < Storage::currentMaps.Length; i++)
                     Storage::currentMaps[i].hidden = false;
@@ -74,10 +76,8 @@ void RenderMapsTab() {
 
         if (Storage::currentMaps.Length > 0) {
             UI::SameLine();
-            if (UI::Button(Icons::Times + " Clear Current Maps (" + Storage::currentMaps.Length + ")")) {
+            if (UI::Button(Icons::Times + " Clear Current Maps (" + Storage::currentMaps.Length + ")"))
                 Storage::ClearCurrentMaps();
-                Storage::ClearCurrentMapsUids();
-            }
         }
 
         UI::Separator();
@@ -86,8 +86,7 @@ void RenderMapsTab() {
 
         UI::BeginTabBar("MyMapsTabs");
             RenderMyMapListTab();
-            if (Storage::currentMaps.Length > 0)
-                RenderMyMapsTabs();
+            RenderMyMapsTabs();
         UI::EndTabBar();
 
         UI::EndTabItem();
@@ -114,8 +113,8 @@ void RenderMyMapListTab() {
 
                 UI::SetCursorPos(pos);
                 if (UI::InvisibleButton("invis_" + map.mapUid, thumbSize)) {
-                    if (!Storage::currentMapsUids.Exists(map.mapUid)) {
-                        Storage::currentMapsUids.Set(map.mapUid, "");
+                    if (!Storage::currentMapUids.Exists(map.mapUid)) {
+                        Storage::currentMapUids.Set(map.mapUid, "");
                         Storage::currentMaps.InsertLast(@Storage::myMaps[i]);
                     }
                     Storage::mapClicked = true;
@@ -208,7 +207,7 @@ void RenderMyMapsTabs() {
 
         if (!Storage::currentMaps[i].viewing) {
             Storage::currentMaps.RemoveAt(i);
-            Storage::currentMapsUids.Delete(map.mapUid);
+            Storage::currentMapUids.Delete(map.mapUid);
         }
     }
 }
