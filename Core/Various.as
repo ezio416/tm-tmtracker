@@ -35,9 +35,9 @@ namespace Various {
         try { Storage::logTimers.Delete(timerId); } catch { }
     }
 
-    void LogTimerEnd(const string &in timerId) {
-        string text = timerId.Split("_LogTimer_")[1];
-        if (Settings::logEnabled && Settings::logDurations) {
+    void LogTimerEnd(const string &in timerId, bool logNow = true) {
+        if (Settings::logEnabled && Settings::logDurations && logNow) {
+            string text = timerId.Split("_LogTimer_")[1];
             try {
                 uint64 dur = Time::Now - uint64(Storage::logTimers[timerId]);
                 if (dur == 0) trace(text + " took 0s");
