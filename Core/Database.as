@@ -15,34 +15,34 @@ namespace DB {
 
         void Clear() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace("clearing accounts from program and file...");
 
 
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace("clearing accounts took " + (Time::Now - now) + " ms");
         }
 
         void Load() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace("loading accounts from file...");
 
 
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace("loading accounts took " + (Time::Now - now) + " ms");
         }
 
         void Save() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace("saving accounts to file...");
 
 
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace("saving accounts took " + (Time::Now - now) + " ms");
         }
     }
@@ -69,7 +69,7 @@ namespace DB {
 
         void Clear() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace("clearing my maps from program and file...");
 
             Storage::ClearCurrentMaps();
@@ -79,13 +79,13 @@ namespace DB {
             try { Storage::db.Execute("DELETE FROM MyMaps");       } catch { }
             try { Storage::db.Execute("DELETE FROM MyHiddenMaps"); } catch { }
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace("clearing my maps took " + (Time::Now - now) + " ms");
         }
 
         void Load() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace("loading my maps from file...");
 
             Storage::ClearMyMaps();
@@ -96,7 +96,7 @@ namespace DB {
                 string order = (Settings::sortMapsNewest) ? "DESC" : "ASC";
                 @s = Storage::db.Prepare("SELECT * FROM MyMaps ORDER BY timestamp " + order);
             } catch {
-                if (Settings::loggingEnabled) {
+                if (Settings::logEnabled) {
                     trace("no MyMaps table in database, plugin hasn't been run yet");
                     if (Settings::logDurations)
                         trace("returning after " + (Time::Now - now) + " ms");
@@ -114,7 +114,7 @@ namespace DB {
                 @s = Storage::db.Prepare("SELECT * FROM MyHiddenMaps");
                 anyHidden = true;
             } catch {
-                if (Settings::loggingEnabled)
+                if (Settings::logEnabled)
                     trace("no MyHiddenMaps table in database, no maps are hidden yet");
             }
 
@@ -124,7 +124,7 @@ namespace DB {
                     Storage::AddMyHiddenMap(Models::Map(s));
                 }
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace("loading my maps took " + (Time::Now - now) + " ms");
 
             startnew(CoroutineFunc(Maps::LoadMyMapsThumbnailsCoro));
@@ -132,7 +132,7 @@ namespace DB {
 
         void Save() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace("saving my maps to file...");
 
             Storage::db.Execute("CREATE TABLE IF NOT EXISTS MyMaps" + tableColumns);
@@ -185,13 +185,13 @@ namespace DB {
                 }
             }
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace("saving my maps took " + (Time::Now - now) + " ms");
         }
 
         void Hide(Models::Map map) {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace(map.logName + "hiding...");
 
             Storage::db.Execute("CREATE TABLE IF NOT EXISTS MyHiddenMaps" + tableColumns);
@@ -206,7 +206,7 @@ namespace DB {
             s.Bind(1, map.mapUid);
             s.Execute();
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace(map.logName + "hiding took " + (Time::Now - now) + " ms");
 
             Load();
@@ -214,7 +214,7 @@ namespace DB {
 
         void UnHide(Models::Map map) {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace(map.logName + "unhiding...");
 
             SQLite::Statement@ s;
@@ -227,7 +227,7 @@ namespace DB {
             s.Bind(1, map.mapUid);
             s.Execute();
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace(map.logName + "unhiding took " + (Time::Now - now) + " ms");
 
             Load();
@@ -251,20 +251,20 @@ namespace DB {
 
         void Clear() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace("clearing records from program and file...");
 
             Storage::ClearRecords();
 
             try { Storage::db.Execute("DELETE FROM Records"); } catch { }
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace("clearing records took " + (Time::Now - now) + " ms");
         }
 
         void Load() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace("loading records from file...");
 
             Storage::ClearRecords();
@@ -285,13 +285,13 @@ namespace DB {
                 Storage::AddRecord(Models::Record(s));
             }
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace("loading records took " + (Time::Now - now) + " ms");
         }
 
         void Save() {
             auto now = Time::Now;
-            if (Settings::loggingEnabled)
+            if (Settings::logEnabled)
                 trace("saving records to file...");
 
             Storage::db.Execute("CREATE TABLE IF NOT EXISTS Records" + tableColumns);
@@ -326,7 +326,7 @@ namespace DB {
                 s.Execute();
             }
 
-            if (Settings::loggingEnabled && Settings::logDurations)
+            if (Settings::logEnabled && Settings::logDurations)
                 trace("saving records took " + (Time::Now - now) + " ms");
         }
     }

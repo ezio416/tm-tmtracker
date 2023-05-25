@@ -7,7 +7,7 @@ m 2023-05-25
 namespace Maps {
     void GetMyMapsCoro() {
         auto now = Time::Now;
-        if (Settings::loggingEnabled)
+        if (Settings::logEnabled)
             trace("updating my maps...");
 
         Storage::ClearMyMaps();
@@ -41,7 +41,7 @@ namespace Maps {
             if (Storage::myHiddenMapUids.Exists(Storage::myMaps[i].mapUid))
                 Storage::myMaps.RemoveAt(i);
 
-        if (Settings::loggingEnabled && Settings::logDurations)
+        if (Settings::logEnabled && Settings::logDurations)
             trace("updating my maps took " + (Time::Now - now) + " ms");
 
         DB::MyMaps::Save();
@@ -51,7 +51,7 @@ namespace Maps {
 
     void GetMyMapsRecordsCoro() {
         auto now = Time::Now;
-        if (Settings::loggingEnabled)
+        if (Settings::logEnabled)
             trace("getting my map records...");
 
         for (uint i = 0; i < Storage::myMaps.Length; i++) {
@@ -59,13 +59,13 @@ namespace Maps {
             while (coro.IsRunning()) yield();
         }
 
-        if (Settings::loggingEnabled && Settings::logDurations)
+        if (Settings::logEnabled && Settings::logDurations)
             trace("getting my map records took " + (Time::Now - now) + " ms");
     }
 
     void GetMyMapsThumbnailsCoro() {
         auto now = Time::Now;
-        if (Settings::loggingEnabled)
+        if (Settings::logEnabled)
             trace("getting my map thumbnails...");
 
         for (uint i = 0; i < Storage::myMaps.Length; i++) {
@@ -73,13 +73,13 @@ namespace Maps {
             while (coro.IsRunning()) yield();
         }
 
-        if (Settings::loggingEnabled && Settings::logDurations)
+        if (Settings::logEnabled && Settings::logDurations)
             trace("getting " + Storage::myMaps.Length + " thumbnails took " + (Time::Now - now) + " ms");
     }
 
     void LoadMyMapsThumbnailsCoro() {
         auto now = Time::Now;
-        if (Settings::loggingEnabled)
+        if (Settings::logEnabled)
             trace("loading my map thumbnails...");
 
         for (uint i = 0; i < Storage::myMaps.Length; i++) {
@@ -87,7 +87,7 @@ namespace Maps {
             while (coro.IsRunning()) yield();
         }
 
-        if (Settings::loggingEnabled && Settings::logDurations)
+        if (Settings::logEnabled && Settings::logDurations)
             trace("loading " + Storage::myMaps.Length + " thumbnails took " + (Time::Now - now) + " ms");
     }
 }

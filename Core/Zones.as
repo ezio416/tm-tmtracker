@@ -12,7 +12,7 @@ namespace Zones {
             return;
         } catch { }
 
-        if (Settings::loggingEnabled)
+        if (Settings::logEnabled)
             trace("loading zones from file...");
 
         try {
@@ -23,7 +23,7 @@ namespace Zones {
             return;
         }
 
-        if (Settings::loggingEnabled && Settings::logDurations)
+        if (Settings::logEnabled && Settings::logDurations)
             trace("loading zones took " + (Time::Now - now) + " ms");
     }
 }

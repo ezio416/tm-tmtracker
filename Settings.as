@@ -21,7 +21,7 @@ namespace Settings {
     // LOGGING
     ///////////////////////////////////////////////////////////////////////////
     [Setting name="Enabled" category="Logging" description="only Openplanet log, no file yet"]
-    bool loggingEnabled = true;
+    bool logEnabled = true;
 
     [Setting name="Task durations" category="Logging"]
     bool logDurations = false;
