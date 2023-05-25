@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-21
+m 2023-05-25
 */
 
 // Classes for holding data gathered during plugin operation
@@ -197,7 +197,7 @@ namespace Models {
 
             Storage::thumbnailTextures.Set(mapUid, @thumbnailTexture);
 
-            if (Settings::printDurations)
+            if (Settings::printDurations && Settings::printThumbnailTimes)
                 trace(logName + "loading thumbnail took " + (Time::Now - now) + " ms");
         }
     }

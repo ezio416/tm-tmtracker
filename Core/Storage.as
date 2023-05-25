@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-20
+m 2023-05-25
 */
 
 // Global variables for plugin operation, as well as functions to add/clear
@@ -8,16 +8,16 @@ namespace Storage {
     Models::Account[] accounts;
     dictionary        accountIds;
     Models::Map@[]    currentMaps;
-    dictionary        currentMapsUids;
+    dictionary        currentMapUids;
     SQLite::Database@ db;
     string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");
     UI::Texture@      defaultTexture = UI::LoadTexture("Resources/1x1.png");
     uint64            latestNadeoRequest = 0;
     bool              mapClicked = false;
+    Models::Map[]     myHiddenMaps;
+    dictionary        myHiddenMapUids;
     Models::Map[]     myMaps;
-    dictionary        myMapsUids;
-    Models::Map[]     myMapsHidden;
-    dictionary        myMapsHiddenUids;
+    dictionary        myMapUids;
     Models::Record[]  records;
     dictionary        recordIds;
     int               requestsInProgress = 0;
@@ -28,17 +28,17 @@ namespace Storage {
     bool              zonesFileMissing = true;
 
     void AddMyMap(Models::Map map) {
-        if (myMapsUids.Exists(map.mapUid)) return;
-        myMapsUids.Set(map.mapUid, myMapsUids.GetKeys().Length);
+        if (myMapUids.Exists(map.mapUid)) return;
+        myMapUids.Set(map.mapUid, myMapUids.GetKeys().Length);
         map.hidden = false;
         myMaps.InsertLast(map);
     }
 
-    void AddMyMapHidden(Models::Map map) {
-        if (myMapsHiddenUids.Exists(map.mapUid)) return;
-        myMapsHiddenUids.Set(map.mapUid, "");
+    void AddMyHiddenMap(Models::Map map) {
+        if (myHiddenMapUids.Exists(map.mapUid)) return;
+        myHiddenMapUids.Set(map.mapUid, "");
         map.hidden = true;
-        myMapsHidden.InsertLast(map);
+        myHiddenMaps.InsertLast(map);
     }
 
     void AddRecord(Models::Record record) {
@@ -46,7 +46,7 @@ namespace Storage {
         recordIds.Set(record.recordFakeId, "");
         records.InsertLast(record);
 
-        auto ix = uint(myMapsUids[record.mapUid]);
+        auto ix = uint(myMapUids[record.mapUid]);
         if (!myMaps[ix].recordAccountIds.Exists(record.accountId)) {
             myMaps[ix].recordAccountIds.Set(record.accountId, "");
             myMaps[ix].records.InsertLast(record);
@@ -64,29 +64,29 @@ namespace Storage {
 
     void ClearCurrentMaps() {
         currentMaps.RemoveRange(0, currentMaps.Length);
-        ClearCurrentMapsUids();
+        ClearCurrentMapUids();
     }
 
-    void ClearCurrentMapsUids() {
-        currentMapsUids.DeleteAll();
+    void ClearCurrentMapUids() {
+        currentMapUids.DeleteAll();
     }
 
     void ClearMyMaps() {
         myMaps.RemoveRange(0, myMaps.Length);
-        ClearMyMapsUids();
+        ClearMyMapUids();
     }
 
-    void ClearMyMapsUids() {
-        myMapsUids.DeleteAll();
+    void ClearMyMapUids() {
+        myMapUids.DeleteAll();
     }
 
-    void ClearMyMapsHidden() {
-        myMapsHidden.RemoveRange(0, myMapsHidden.Length);
-        ClearMyMapsHiddenUids();
+    void ClearMyHiddenMaps() {
+        myHiddenMaps.RemoveRange(0, myHiddenMaps.Length);
+        ClearMyHiddenMapUids();
     }
 
-    void ClearMyMapsHiddenUids() {
-        myMapsHiddenUids.DeleteAll();
+    void ClearMyHiddenMapUids() {
+        myHiddenMapUids.DeleteAll();
     }
 
     void ClearRecords() {

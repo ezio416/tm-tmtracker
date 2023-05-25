@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-21
+m 2023-05-24
 */
 
 // Functions for getting/loading data on maps
@@ -9,11 +9,9 @@ namespace Maps {
         auto now = Time::Now;
         trace("updating my maps...");
 
-        string live = "NadeoLiveServices";
-        NadeoServices::AddAudience(live);
-        while (!NadeoServices::IsAuthenticated(live)) yield();
-
         Storage::ClearMyMaps();
+
+        while (!NadeoServices::IsAuthenticated("NadeoLiveServices")) yield();
 
         uint offset = 0;
         bool tooManyMaps;
@@ -23,7 +21,7 @@ namespace Maps {
             while (wait.IsRunning()) yield();
 
             auto req = NadeoServices::Get(
-                live,
+                "NadeoLiveServices",
                 NadeoServices::BaseURL() + "/api/token/map?length=1000&offset=" + offset
             );
             offset += 1000;
@@ -39,7 +37,7 @@ namespace Maps {
         } while (tooManyMaps);
 
         for (int i = Storage::myMaps.Length - 1; i >= 0; i--)
-            if (Storage::myMapsHiddenUids.Exists(Storage::myMaps[i].mapUid))
+            if (Storage::myHiddenMapUids.Exists(Storage::myMaps[i].mapUid))
                 Storage::myMaps.RemoveAt(i);
 
         if (Settings::printDurations)
