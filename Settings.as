@@ -17,11 +17,17 @@ namespace Settings {
     [Setting name="Load zones from file on boot" category="General"]
     bool loadZonesOnBoot = true;
 
-    [Setting name="Print task durations to the log" category="General"]
-    bool printDurations = false;
+    ///////////////////////////////////////////////////////////////////////////
+    // LOGGING
+    ///////////////////////////////////////////////////////////////////////////
+    [Setting name="Enabled" category="Logging" description="only Openplanet log, no file yet"]
+    bool loggingEnabled = true;
 
-    [Setting name="    Also print thumbnail load times" category="General"]
-    bool printThumbnailTimes = false;
+    [Setting name="Task durations" category="Logging"]
+    bool logDurations = false;
+
+    [Setting name="    + thumbnail load times" category="Logging"]
+    bool logThumbnailTimes = false;
 
     ///////////////////////////////////////////////////////////////////////////
     // MAP LIST
