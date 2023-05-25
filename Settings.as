@@ -8,31 +8,31 @@ namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
     // GENERAL
     ///////////////////////////////////////////////////////////////////////////
-    [Setting name="Load my maps from file on boot" category="General"]
+    [Setting category="General" name="Load my maps from file on boot"]
     bool loadMyMapsOnBoot = true;
 
-    [Setting name="Load records from file on boot" category="General"]
+    [Setting category="General" name="Load records from file on boot"]
     bool loadRecordsOnBoot = true;
 
-    [Setting name="Load zones from file on boot" category="General"]
+    [Setting category="General" name="Load zones from file on boot"]
     bool loadZonesOnBoot = true;
 
     ///////////////////////////////////////////////////////////////////////////
     // LOGGING
     ///////////////////////////////////////////////////////////////////////////
-    [Setting name="Enabled" category="Logging" description="only Openplanet log, no file yet"]
+    [Setting category="Logging" name="Enabled" description="only Openplanet log, no file yet"]
     bool logEnabled = true;
 
-    [Setting name="Task durations" category="Logging"]
+    [Setting category="Logging" name="Task durations"]
     bool logDurations = false;
 
-    [Setting name="    + thumbnail load times" category="Logging"]
+    [Setting category="Logging" name="    + thumbnail load times"]
     bool logThumbnailTimes = false;
 
     ///////////////////////////////////////////////////////////////////////////
     // MAP LIST
     ///////////////////////////////////////////////////////////////////////////
-    [Setting name="Sort maps by newest first" category="Map List"]
+    [Setting category="Map List" name="Sort maps by newest first"]
     bool sortMapsNewest = true;
     bool sortMapsNewestTemp = sortMapsNewest;
     bool DetectSortMapsNewest() {
@@ -43,25 +43,25 @@ namespace Settings {
         return false;
     }
 
-    [Setting name="Show map names with color" category="Map List"]
+    [Setting category="Map List" name="Show map names with color"]
     bool myMapsListColor = true;
 
-    [Setting name="Thumbnail width" category="Map List" min=10 max=1000]
+    [Setting category="Map List" name="Thumbnail width" min=10 max=1000]
     uint myMapsThumbnailWidthList = 200;
 
     ///////////////////////////////////////////////////////////////////////////
     // MAP TABS
     ///////////////////////////////////////////////////////////////////////////
-    [Setting name="Switch to map tab when clicked" category="Map Tabs"]
+    [Setting category="Map Tabs" name="Switch to map tab when clicked"]
     bool myMapsSwitchOnClicked = true;
 
-    [Setting name="Show map name with color on tab" category="Map Tabs"]
+    [Setting category="Map Tabs" name="Show map name with color on tab"]
     bool myMapsTabsColor = true;
 
-    [Setting name="Thumbnail width" category="Map Tabs" min=10 max=1000]
+    [Setting category="Map Tabs" name="Thumbnail width" min=10 max=1000]
     uint myMapsThumbnailWidthTabs = 400;
 
-    [Setting name="Max records to get per map" category="Map Tabs" min=100 max=1000 description="records are fetched in batches of 100 until this limit"]
+    [Setting category="Map Tabs" name="Max records to get per map" min=100 max=1000 description="records are fetched in batches of 100 until this limit"]
     uint maxRecordsPerMap = 100;
 
     ///////////////////////////////////////////////////////////////////////////
