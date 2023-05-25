@@ -24,18 +24,18 @@ void RenderMenu() {
 }
 
 void RenderInterface() {
-    if (Settings::windowOpen) {
-        if (Settings::DetectSortMapsNewest())
-            DB::MyMaps::Load();
+    if (!Settings::windowOpen) return;
+
+    if (Settings::DetectSortMapsNewest())
+        DB::MyMaps::Load();
 
         UI::SetNextWindowSize(600, 800, UI::Cond::Once);
 		UI::SetNextWindowPos(100, 100, UI::Cond::Once);
 
-		UI::Begin(Storage::title, Settings::windowOpen);
-            UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
-            RenderTabs();
-		UI::End();
-    }
+    UI::Begin(Storage::title, Settings::windowOpen);
+        UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
+        RenderTabs();
+    UI::End();
 }
 
 void RenderTabs() {
@@ -49,86 +49,86 @@ void RenderTabs() {
 }
 
 void RenderMapsTab() {
-    if (UI::BeginTabItem(Icons::Map + " Maps")) {
-        UI::TextWrapped(
-            "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
-            "Close tabs with the 'X' or with a middle click."
-        );
+    if (!UI::BeginTabItem(Icons::Map + " Maps")) return;
 
-        if (UI::Button(Icons::Refresh + " Update Map List (" + Storage::myMaps.Length + ")"))
-            startnew(CoroutineFunc(Maps::GetMyMapsCoro));
+    UI::TextWrapped(
+        "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
+        "Close tabs with the 'X' or with a middle click."
+    );
 
-        if (Storage::myHiddenMaps.Length > 0) {
-            UI::SameLine();
-            if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myHiddenMaps.Length + ")")) {
-                string timerId = Various::LogTimerStart("unhiding all maps");
+    if (UI::Button(Icons::Refresh + " Update Map List (" + Storage::myMaps.Length + ")"))
+        startnew(CoroutineFunc(Maps::GetMyMapsCoro));
 
-                for (uint i = 0; i < Storage::myHiddenMaps.Length;)
-                    DB::MyMaps::UnHide(Storage::myHiddenMaps[i]);
+    if (Storage::myHiddenMaps.Length > 0) {
+        UI::SameLine();
+        if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myHiddenMaps.Length + ")")) {
+            string timerId = Various::LogTimerStart("unhiding all maps");
 
-                for (uint i = 0; i < Storage::currentMaps.Length; i++)
-                    Storage::currentMaps[i].hidden = false;
+            for (uint i = 0; i < Storage::myHiddenMaps.Length;)
+                DB::MyMaps::UnHide(Storage::myHiddenMaps[i]);
 
-                Various::LogTimerEnd(timerId);
-            }
+            for (uint i = 0; i < Storage::currentMaps.Length; i++)
+                Storage::currentMaps[i].hidden = false;
+
+            Various::LogTimerEnd(timerId);
         }
-
-        if (Storage::currentMaps.Length > 0) {
-            UI::SameLine();
-            if (UI::Button(Icons::Times + " Clear Current Maps (" + Storage::currentMaps.Length + ")"))
-                Storage::ClearCurrentMaps();
-        }
-
-        UI::Separator();
-
-        Storage::mapClicked = false;
-
-        UI::BeginTabBar("MyMapsTabs");
-            RenderMyMapListTab();
-            RenderMyMapsTabs();
-        UI::EndTabBar();
-
-        UI::EndTabItem();
     }
+
+    if (Storage::currentMaps.Length > 0) {
+        UI::SameLine();
+        if (UI::Button(Icons::Times + " Clear Current Maps (" + Storage::currentMaps.Length + ")"))
+            Storage::ClearCurrentMaps();
+    }
+
+    UI::Separator();
+
+    Storage::mapClicked = false;
+
+    UI::BeginTabBar("MyMapsTabs");
+        RenderMyMapListTab();
+        RenderMyMapsTabs();
+    UI::EndTabBar();
+
+    UI::EndTabItem();
 }
 
 void RenderMyMapListTab() {
-    if (UI::BeginTabItem(Icons::Map + " Map List " + Icons::Map)) {
-        uint currentX = 0;
-        auto size = UI::GetWindowSize();
+    if (!UI::BeginTabItem(Icons::Map + " Map List " + Icons::Map)) return;
 
-        for (uint i = 0; i < Storage::myMaps.Length; i++) {
-            auto map = Storage::myMaps[i];
+    uint currentX = 0;
+    auto size = UI::GetWindowSize();
 
-            currentX += Settings::myMapsThumbnailWidthList;
-            if (i > 0 && currentX < uint(size.x))
-                UI::SameLine();
+    for (uint i = 0; i < Storage::myMaps.Length; i++) {
+        auto map = Storage::myMaps[i];
 
-            UI::BeginGroup();
-                auto pos = UI::GetCursorPos();
-                auto thumbSize = vec2(Settings::myMapsThumbnailWidthList, Settings::myMapsThumbnailWidthList);
-                try   { UI::Image(map.thumbnailTexture, thumbSize); }
-                catch { UI::Image(Storage::defaultTexture, thumbSize); }
+        currentX += Settings::myMapsThumbnailWidthList;
+        if (i > 0 && currentX < uint(size.x))
+            UI::SameLine();
 
-                UI::SetCursorPos(pos);
-                if (UI::InvisibleButton("invis_" + map.mapUid, thumbSize)) {
-                    if (!Storage::currentMapUids.Exists(map.mapUid)) {
-                        Storage::currentMapUids.Set(map.mapUid, "");
-                        Storage::currentMaps.InsertLast(@Storage::myMaps[i]);
-                    }
-                    Storage::mapClicked = true;
+        UI::BeginGroup();
+            auto pos = UI::GetCursorPos();
+            auto thumbSize = vec2(Settings::myMapsThumbnailWidthList, Settings::myMapsThumbnailWidthList);
+            try   { UI::Image(map.thumbnailTexture, thumbSize); }
+            catch { UI::Image(Storage::defaultTexture, thumbSize); }
+
+            UI::SetCursorPos(pos);
+            if (UI::InvisibleButton("invis_" + map.mapUid, thumbSize)) {
+                if (!Storage::currentMapUids.Exists(map.mapUid)) {
+                    Storage::currentMapUids.Set(map.mapUid, "");
+                    Storage::currentMaps.InsertLast(@Storage::myMaps[i]);
                 }
+                Storage::mapClicked = true;
+            }
 
-                currentX = uint(UI::GetCursorPos().x) + Settings::myMapsThumbnailWidthList + 44;
-                UI::PushTextWrapPos(currentX - 44);  // 44 pixels for scrollbar works on 1.5x scaling at 4K
-                UI::Text((Settings::myMapsListColor) ? map.mapNameColor : map.mapNameText);
-                UI::PopTextWrapPos();
-                UI::Text("\n");
-            UI::EndGroup();
-        }
-
-        UI::EndTabItem();
+            currentX = uint(UI::GetCursorPos().x) + Settings::myMapsThumbnailWidthList + 44;
+            UI::PushTextWrapPos(currentX - 44);  // 44 pixels for scrollbar works on 1.5x scaling at 4K
+            UI::Text((Settings::myMapsListColor) ? map.mapNameColor : map.mapNameText);
+            UI::PopTextWrapPos();
+            UI::Text("\n");
+        UI::EndGroup();
     }
+
+    UI::EndTabItem();
 }
 
 void RenderMyMapsTabs() {
@@ -212,40 +212,41 @@ void RenderMyMapsTabs() {
 }
 
 void RenderRecordsTab() {
-    if (UI::BeginTabItem(Icons::Trophy + " Records")) {
+    if (!UI::BeginTabItem(Icons::Trophy + " Records")) return;
 
-        UI::EndTabItem();
-    }
+
+
+    UI::EndTabItem();
 }
 
 void RenderAccountsTab() {
-    if (UI::BeginTabItem(Icons::User + " Accounts")) {
+    if (!UI::BeginTabItem(Icons::User + " Accounts")) return;
 
-        UI::EndTabItem();
-    }
+
+
+    UI::EndTabItem();
 }
 
 void RenderInfoTab() {
-    if (UI::BeginTabItem(Icons::Info + " Info")) {
+    if (!UI::BeginTabItem(Icons::Info + " Info")) return;
 
-        UI::TextWrapped(
-            "TMTracker is a project I started back in December of 2022. It was first written in Python, then C#, "    +
-            "and now Angelscript, with each iteration having slightly different features. I plan for this to be "     +
-            "the final iteration, and there will be more features to come, such as:\n\n - adding other maps and "     +
-            "campaigns, such as the current map or from TMX\n - tracking personal records on maps and campaigns\n - " +
-            "tracking recent records for all maps \n - probably more!\n\nThis is by far my largest coding project "   +
-            "with hundreds of hours put in, so I hope you find it useful! " + Icons::SmileO + "\n\n"
-        );
+    UI::TextWrapped(
+        "TMTracker is a project I started back in December of 2022. It was first written in Python, then C#, "    +
+        "and now Angelscript, with each iteration having slightly different features. I plan for this to be "     +
+        "the final iteration, and there will be more features to come, such as:\n\n - adding other maps and "     +
+        "campaigns, such as the current map or from TMX\n - tracking personal records on maps and campaigns\n - " +
+        "tracking recent records for all maps \n - probably more!\n\nThis is by far my largest coding project "   +
+        "with hundreds of hours put in, so I hope you find it useful! " + Icons::SmileO + "\n\n"
+    );
 
-        UI::Separator();
+    UI::Separator();
 
-        UI::TextWrapped(
-            "Plugin files are kept at " + IO::FromStorageFolder("").Replace("\\", "/") +
-            "\nIf you want to look in the database, I recommend DB Browser: sqlitebrowser.org"
-        );
+    UI::TextWrapped(
+        "Plugin files are kept at " + IO::FromStorageFolder("").Replace("\\", "/") +
+        "\nIf you want to look in the database, I recommend DB Browser: sqlitebrowser.org"
+    );
 
-        UI::EndTabItem();
-    }
+    UI::EndTabItem();
 }
 
 void RenderDebugTab() {
