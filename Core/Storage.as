@@ -13,6 +13,8 @@ namespace Storage {
     string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");
     UI::Texture@      defaultTexture = UI::LoadTexture("Resources/1x1.png");
     uint64            latestNadeoRequest = 0;
+    uint64            logTimerIndex = 0;
+    dictionary        logTimers;
     bool              mapClicked = false;
     Models::Map[]     myHiddenMaps;
     dictionary        myHiddenMapUids;
