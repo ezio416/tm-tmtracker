@@ -20,9 +20,6 @@ namespace Settings {
     [Setting name="Print task durations to the log" category="General"]
     bool printDurations = false;
 
-    [Setting name="Account name expiration time (days)" category="General" min=0 max=90]
-    uint accountNameExpirationDays = 7;
-
     ///////////////////////////////////////////////////////////////////////////
     // MAP LIST
     ///////////////////////////////////////////////////////////////////////////
@@ -69,4 +66,8 @@ namespace Settings {
 
     [Setting hidden]
     bool windowOpen = true;
+
+    ///////////////////////////////////////////////////////////////////////////
+    [Setting name="Account name expiration time (days)" min=0 max=90]
+    uint accountNameExpirationDays = 7;
 }
