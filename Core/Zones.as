@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-20
+m 2023-05-25
 */
 
 namespace Zones {
@@ -12,7 +12,8 @@ namespace Zones {
             return;
         } catch { }
 
-        trace("loading zones...");
+        if (Settings::loggingEnabled)
+            trace("loading zones...");
 
         try {
             Storage::zones = Json::FromFile("Resources/zones.json");
@@ -22,7 +23,7 @@ namespace Zones {
             return;
         }
 
-        if (Settings::printDurations)
+        if (Settings::loggingEnabled && Settings::logDurations)
             trace("loading zones took " + (Time::Now - now) + " ms");
     }
 }
