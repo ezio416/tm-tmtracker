@@ -78,9 +78,7 @@ namespace Models {
         int opCmp(Map m) { return timestamp - m.timestamp; }
 
         void GetRecordsCoro() {
-            auto now = Time::Now;
-            if (Settings::logEnabled)
-                trace(logName + "getting records...");
+            string timerId = Various::LogTimerStart(logName + "getting records");
 
             uint offset = 0;
             bool tooManyRecords;
@@ -135,20 +133,16 @@ namespace Models {
 
             recordsTimestamp = Time::Stamp;
 
-            if (Settings::logEnabled && Settings::logDurations)
-                trace(logName + "getting " + records.Length + " records took " + (Time::Now - now) + " ms");
-
             DB::MyMaps::Save();
             DB::Records::Save();
+
+            Various::LogTimerEnd(timerId);
         }
 
         void GetThumbnailCoro() {
-            auto now = Time::Now;
-
             if (IO::FileExists(thumbnailFile)) return;
 
-            if (Settings::logEnabled)
-                trace(logName + "downloading thumbnail...");
+            string timerId = Various::LogTimerStart(logName + "downloading thumbnail");
 
             uint max_timeout = 3000;
             uint max_wait = 2000;
@@ -174,23 +168,23 @@ namespace Models {
                 break;
             }
 
-            if (Settings::logEnabled && Settings::logDurations)
-                trace(logName + "downloading thumbnail took " + (Time::Now - now) + " ms");
+            Various::LogTimerEnd(timerId);
         }
 
         void LoadThumbnailCoro() {
-            auto now = Time::Now;
+            string timerId = Various::LogTimerStart("loading thumbnail", false);
 
             if (Storage::thumbnailTextures.Exists(mapUid)) {
                 UI::Texture@ tex;
                 @tex = cast<UI::Texture@>(Storage::thumbnailTextures[mapUid]);
                 if (@thumbnailTexture == null)
                     @thumbnailTexture = tex;
+                Various::LogTimerEnd(timerId);
                 return;
             }
 
             if (!IO::FileExists(thumbnailFile)) {
-                auto @coro = startnew(CoroutineFunc(GetThumbnailCoro));
+                auto coro = startnew(CoroutineFunc(GetThumbnailCoro));
                 while (coro.IsRunning()) yield();
             }
 
@@ -200,8 +194,7 @@ namespace Models {
 
             Storage::thumbnailTextures.Set(mapUid, @thumbnailTexture);
 
-            if (Settings::logEnabled && Settings::logDurations && Settings::logThumbnailTimes)
-                trace(logName + "loading thumbnail took " + (Time::Now - now) + " ms");
+            Various::LogTimerEnd(timerId);
         }
     }
 }

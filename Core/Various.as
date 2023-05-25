@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-05-21
+m 2023-05-25
 */
 
 // Functions that don't fit nicely in other categories
@@ -20,6 +20,33 @@ namespace Various {
         if (minutes > 0)
             return "00:00:" + Zpad2(minutes) + ":" + Zpad2(seconds);
         return "00:00:00:" + Zpad2(seconds);
+    }
+
+    string LogTimerStart(const string &in text, bool logNow = true) {
+        auto now = Time::Now;
+        if (Settings::logEnabled && logNow) trace(text + "...");
+        string timerId = Storage::logTimerIndex + "_LogTimer_" + text;
+        Storage::logTimerIndex++;
+        Storage::logTimers.Set(timerId, now);
+        return timerId;
+    }
+
+    void LogTimerDelete(const string &in timerId) {
+        try { Storage::logTimers.Delete(timerId); } catch { }
+    }
+
+    void LogTimerEnd(const string &in timerId) {
+        string text = timerId.Split("_LogTimer_")[1];
+        if (Settings::logEnabled && Settings::logDurations) {
+            try {
+                uint64 dur = Time::Now - uint64(Storage::logTimers[timerId]);
+                if (dur == 0) throw("divByZero");
+                trace(text + " took " + (dur / 1000) + "." + (dur % 1000) + "s");
+            } catch {
+                trace("timerId not found: " + timerId);
+            }
+        }
+        LogTimerDelete(timerId);
     }
 
     void WaitToDoNadeoRequestCoro() {
