@@ -254,12 +254,10 @@ void RenderInfoTab() {
             Storage::dev = false;
         }
     } else {
-        string input = UI::InputText("Unlock Dev Tab", "");
-        if (input.Length > 0)
-            if (Crypto::MD5(input) == "417e4705aee1415f8583243b8c403af3") {
-                Various::Trace("dev tab unlocked");
-                Storage::dev = true;
-            }
+        if (UI::InputText("Unlock Dev Tab", "") == "balls") {
+            Various::Trace("dev tab unlocked");
+            Storage::dev = true;
+        }
     }
 
     UI::EndTabItem();
