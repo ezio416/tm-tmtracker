@@ -20,6 +20,9 @@ namespace Settings {
     [Setting name="Print task durations to the log" category="General"]
     bool printDurations = false;
 
+    [Setting name="    Also print thumbnail load times" category="General"]
+    bool printThumbnailTimes = false;
+
     ///////////////////////////////////////////////////////////////////////////
     // MAP LIST
     ///////////////////////////////////////////////////////////////////////////
