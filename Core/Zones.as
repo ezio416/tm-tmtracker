@@ -13,7 +13,7 @@ namespace Zones {
         } catch { }
 
         if (Settings::loggingEnabled)
-            trace("loading zones...");
+            trace("loading zones from file...");
 
         try {
             Storage::zones = Json::FromFile("Resources/zones.json");
