@@ -5,6 +5,57 @@ m 2023-05-25
 
 // Functions for the TMTracker.db file
 namespace DB {
+    // Functions relating to drivers of any map
+    namespace Accounts {
+        string tableColumns = """ (
+            authorId         CHAR(36),
+            authorTime       INT,
+            badUploadTime    BOOL,
+            bronzeTime       INT,
+            downloadUrl      CHAR(93),
+            goldTime         INT,
+            mapId            CHAR(36),
+            mapNameColor     TEXT,
+            mapNameRaw       TEXT,
+            mapNameText      TEXT,
+            mapUid           VARCHAR(27) PRIMARY KEY,
+            nameExpire       INT,
+            recordsTimestamp INT,
+            silverTime       INT,
+            thumbnailUrl     CHAR(97)
+        ); """;
+
+        void Clear() {
+            auto now = Time::Now;
+            trace("clearing accounts from program and file...");
+
+
+
+            if (Settings::printDurations)
+                trace("clearing accounts took " + (Time::Now - now) + " ms");
+        }
+
+        void Load() {
+            auto now = Time::Now;
+            trace("loading accounts from file...");
+
+
+
+            if (Settings::printDurations)
+                trace("loading accounts took " + (Time::Now - now) + " ms");
+        }
+
+        void Save() {
+            auto now = Time::Now;
+            trace("saving accounts to file...");
+
+
+
+            if (Settings::printDurations)
+                trace("saving accounts took " + (Time::Now - now) + " ms");
+        }
+    }
+
     // Functions relating to the user's own uploaded maps
     namespace MyMaps {
         string tableColumns = """ (
