@@ -179,7 +179,7 @@ namespace Models {
                 @tex = cast<UI::Texture@>(Storage::thumbnailTextures[mapUid]);
                 if (@thumbnailTexture == null)
                     @thumbnailTexture = tex;
-                Various::LogTimerEnd(timerId);
+                Various::LogTimerEnd(timerId, Settings::logThumbnailTimes);
                 return;
             }
 
@@ -194,7 +194,7 @@ namespace Models {
 
             Storage::thumbnailTextures.Set(mapUid, @thumbnailTexture);
 
-            Various::LogTimerEnd(timerId);
+            Various::LogTimerEnd(timerId, Settings::logThumbnailTimes);
         }
     }
 }
