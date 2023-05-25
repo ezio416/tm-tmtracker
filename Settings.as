@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-20
+m 2023-05-25
 */
 
 // Settings in the native Openplanet menu
@@ -19,6 +19,9 @@ namespace Settings {
 
     [Setting name="Print task durations to the log" category="General"]
     bool printDurations = false;
+
+    [Setting name="Account name expiration time (days)" category="General" min=0 max=90]
+    uint accountNameExpirationDays = 7;
 
     ///////////////////////////////////////////////////////////////////////////
     // MAP LIST
