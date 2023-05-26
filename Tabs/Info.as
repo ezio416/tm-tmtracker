@@ -9,20 +9,32 @@ namespace Tabs {
         if (!UI::BeginTabItem(Icons::Info + " Info")) return;
 
         UI::TextWrapped(
-            "TMTracker is a project I started back in December of 2022. It was first written in Python, then C#, "    +
-            "and now Angelscript, with each iteration having slightly different features. I plan for this to be "     +
-            "the final iteration, and there will be more features to come, such as:\n\n - adding other maps and "     +
-            "campaigns, such as the current map or from TMX\n - tracking personal records on maps and campaigns\n - " +
-            "tracking recent records for all maps \n - probably more!\n\nThis is by far my largest coding project "   +
-            "with hundreds of hours put in, so I hope you find it useful! " + Icons::SmileO + "\n\n"
+            "TMTracker is a project I started back in December of 2022.\nIt has moved from Python "    +
+            "\uF061 C# \uF061 Angelscript, which will probably be the final version.\nThere are "      +
+            "more features planned, like:\n\n - adding other maps and campaigns, such as the current " +
+            "map or from TMX\n - tracking personal records on maps and campaigns\n - tracking recent " +
+            "records for all maps \n - more, please suggest what you'd like!\n\nThis is by far my "    +
+            "largest coding project with hundreds of hours put in, so I hope you find it useful! "     +
+            "\n\nAlso check the Openplanet settings, there's quite a lot you can customize \uF118\n\n"
         );
 
         UI::Separator();
 
         UI::TextWrapped(
-            "Plugin files are kept at " + Globals::storageFolder +
-            "\nIf you want to look in the database, I recommend DB Browser: sqlitebrowser.org\n"
+            "If you do have suggestions or problems, please submit an issue below.\n" +
+            "It's very easy to add a setting, and probably easy to add a small feature."
         );
+        string ghLink = "https://github.com/ezio416/TMTracker-Openplanet/issues";
+        if (UI::Button(Icons::Github + " Issues")) OpenBrowserURL(ghLink);
+
+        UI::Separator();
+
+        UI::TextWrapped(
+            "Files are kept at " + Globals::storageFolder +
+            "\n\nIf you want to look in the database, I recommend DB Browser:"
+        );
+        string sqlLink = "sqlitebrowser.org";
+        if (UI::Button(Icons::Database + " " + sqlLink)) OpenBrowserURL("https://" + sqlLink);
 
         UI::Separator();
 
