@@ -216,17 +216,11 @@ void RenderMyMapsTabs() {
 
 void RenderRecordsTab() {
     if (!UI::BeginTabItem(Icons::Trophy + " Records")) return;
-
-
-
     UI::EndTabItem();
 }
 
 void RenderAccountsTab() {
     if (!UI::BeginTabItem(Icons::User + " Accounts")) return;
-
-
-
     UI::EndTabItem();
 }
 
