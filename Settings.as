@@ -6,16 +6,19 @@ m 2023-05-25
 // Settings in the native Openplanet menu
 namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
-    // GENERAL
+    // STARTUP
     ///////////////////////////////////////////////////////////////////////////
-    [Setting category="General" name="Load my maps from file on boot"]
+    [Setting category="Startup" name="Load my maps from file"]
     bool loadMyMapsOnBoot = true;
 
-    [Setting category="General" name="Load records from file on boot"]
+    [Setting category="Startup" name="Load records from file"]
     bool loadRecordsOnBoot = true;
 
-    [Setting category="General" name="Load zones from file on boot"]
+    [Setting category="Startup" name="Load zones from file"]
     bool loadZonesOnBoot = true;
+
+    [Setting category="Startup" name="Remember window open state"]
+    bool rememberOpen = false;
 
     ///////////////////////////////////////////////////////////////////////////
     // LOGGING
