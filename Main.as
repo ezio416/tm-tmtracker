@@ -13,6 +13,9 @@ void Main() {
     if (Settings::loadZonesOnBoot)
         Zones::Load();
 
+    if (!Settings::rememberOpen)
+        Settings::windowOpen = false;
+
     IO::CreateFolder(Storage::thumbnailFolder);
 
     NadeoServices::AddAudience("NadeoLiveServices");
