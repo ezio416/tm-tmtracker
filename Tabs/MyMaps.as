@@ -25,9 +25,6 @@ namespace Tabs {
                 for (uint i = 0; i < Globals::myHiddenMaps.Length;)
                     DB::MyMaps::UnHide(Globals::myHiddenMaps[i]);
 
-                for (uint i = 0; i < Globals::currentMaps.Length; i++)
-                    Globals::currentMaps[i].hidden = false;
-
                 Various::LogTimerEnd(timerId);
             }
         }
@@ -44,7 +41,7 @@ namespace Tabs {
 
         UI::BeginTabBar("MyMapsTabs");
             MyMapsList();
-            MyMapsTabs();
+            MyMapsCurrent();
         UI::EndTabBar();
 
         UI::EndTabItem();

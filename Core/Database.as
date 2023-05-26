@@ -158,11 +158,12 @@ namespace DB {
             Various::LogTimerEnd(timerId);
         }
 
-        void Hide(Models::Map map) {
+        void Hide(Models::Map@ map) {
             string timerId = Various::LogTimerStart(map.logName + "hiding");
 
-            Globals::db.Execute("CREATE TABLE IF NOT EXISTS MyHiddenMaps" + tableColumns);
+            map.hidden = true;
 
+            Globals::db.Execute("CREATE TABLE IF NOT EXISTS MyHiddenMaps" + tableColumns);
             SQLite::Statement@ s;
 
             @s = Globals::db.Prepare("INSERT INTO MyHiddenMaps SELECT * FROM MyMaps WHERE mapUid=?");
@@ -178,8 +179,10 @@ namespace DB {
             Load();
         }
 
-        void UnHide(Models::Map map) {
+        void UnHide(Models::Map@ map) {
             string timerId = Various::LogTimerStart(map.logName + "unhiding");
+
+            map.hidden = false;
 
             SQLite::Statement@ s;
 

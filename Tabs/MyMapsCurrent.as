@@ -5,10 +5,8 @@ m 2023-05-26
 
 // Functions for rendering tabs in the interface
 namespace Tabs {
-    void MyMapsTabs() {
+    void MyMapsCurrent() {
         for (uint i = 0; i < Globals::currentMaps.Length; i++) {
-            auto map = @Globals::currentMaps[i];
-
             uint flags = UI::TabItemFlags::Trailing;
             if (
                 Globals::mapClicked &&
@@ -19,8 +17,9 @@ namespace Tabs {
                 Globals::mapClicked = false;
             }
 
-            string tabTitle = Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText;
-            if (UI::BeginTabItem(tabTitle, Globals::currentMaps[i].viewing, flags)) {
+            auto map = Globals::currentMaps[i];
+
+            if (UI::BeginTabItem(Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText, map.viewing, flags)) {
                 UI::BeginGroup();
                     auto thumbSize = vec2(Settings::myMapsThumbnailWidthTabs, Settings::myMapsThumbnailWidthTabs);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
@@ -38,21 +37,17 @@ namespace Tabs {
                     UI::EndGroup();
 
                     if (map.hidden) {
-                        if (UI::Button(Icons::Eye + " Show This Map (currently hidden)")) {
-                            Globals::currentMaps[i].hidden = false;
+                        if (UI::Button(Icons::Eye + " Show This Map (currently hidden)"))
                             DB::MyMaps::UnHide(map);
-                        }
                     } else {
-                        if (UI::Button(Icons::EyeSlash + " Hide This Map")) {
-                            Globals::currentMaps[i].hidden = true;
+                        if (UI::Button(Icons::EyeSlash + " Hide This Map"))
                             DB::MyMaps::Hide(map);
-                        }
                     }
                 UI::EndGroup();
 
                 UI::SameLine();
                 UI::BeginGroup();
-                    if (UI::Button(Icons::Download + " Get Records (" + Globals::currentMaps[i].records.Length + ")"))
+                    if (UI::Button(Icons::Download + " Get Records (" + map.records.Length + ")"))
                         startnew(CoroutineFunc(map.GetRecordsCoro));
 
                     UI::SameLine();
@@ -78,7 +73,7 @@ namespace Tabs {
                 UI::EndTabItem();
             }
 
-            if (!Globals::currentMaps[i].viewing) {
+            if (!map.viewing) {
                 Globals::currentMaps.RemoveAt(i);
                 Globals::currentMapUids.Delete(map.mapUid);
             }
