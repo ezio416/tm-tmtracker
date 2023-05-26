@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-25
+m 2023-05-26
 */
 
 // Classes for holding data gathered during plugin operation
@@ -21,7 +21,7 @@ namespace Models {
 
         string NameExpireFormatted() {
             if (IsNameExpired()) return "expired";
-            return Time::FormatString(Settings::dateFormat + "Local", nameExpire);
+            return Time::FormatString(Settings::dateFormat + "Local\\$Z", nameExpire);
         }
 
         void SetNameExpire(uint64 now = 0, int64 timestamp = 0) {

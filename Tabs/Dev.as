@@ -15,20 +15,6 @@ namespace Tabs {
         if (UI::Button(Icons::Download + " Get All Records"))
             startnew(CoroutineFunc(Maps::GetMyMapsRecordsCoro));
 
-        if (UI::Button(Icons::Download + " Get Account Names"))
-            startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
-
-        UI::Text("total accounts: " + Globals::accounts.Length);
-        UI::Text("account IDs: " + Globals::accountIds.GetKeys().Length);
-
-        for (uint i = 0; i < Globals::accounts.Length; i++) {
-            UI::Text(
-                Globals::accounts[i].accountId   + " _ " +
-                Globals::accounts[i].accountName + " _ " +
-                Globals::accounts[i].NameExpireFormatted()
-            );
-        }
-
         UI::EndTabItem();
     }
 }
