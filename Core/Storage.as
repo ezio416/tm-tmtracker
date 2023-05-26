@@ -10,7 +10,6 @@ namespace Storage {
     Models::Map@[]    currentMaps;
     dictionary        currentMapUids;
     SQLite::Database@ db;
-    string            dbFile = IO::FromStorageFolder("TMTracker.db").Replace("\\", "/");
     UI::Texture@      defaultTexture = UI::LoadTexture("Resources/1x1.png");
     bool              dev = false;
     uint64            latestNadeoRequest = 0;
@@ -21,10 +20,12 @@ namespace Storage {
     dictionary        myHiddenMapUids;
     Models::Map[]     myMaps;
     dictionary        myMapUids;
-    Models::Record[]  records;
     dictionary        recordIds;
+    Models::Record[]  records;
     int               requestsInProgress = 0;
-    string            thumbnailFolder = IO::FromStorageFolder("thumbnails");
+    string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
+    string            dbFile = storageFolder + "/TMTracker.db";
+    string            thumbnailFolder = storageFolder + "/thumbnails";
     dictionary        thumbnailTextures;
     string            title = "\\$2f3" + Icons::MapO + "\\$z TMTracker";
     Json::Value       zones;

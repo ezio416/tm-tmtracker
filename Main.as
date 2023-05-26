@@ -245,7 +245,7 @@ void RenderInfoTab() {
     UI::Separator();
 
     UI::TextWrapped(
-        "Plugin files are kept at " + IO::FromStorageFolder("").Replace("\\", "/") +
+        "Plugin files are kept at " + Storage::storageFolder +
         "\nIf you want to look in the database, I recommend DB Browser: sqlitebrowser.org\n"
     );
 
