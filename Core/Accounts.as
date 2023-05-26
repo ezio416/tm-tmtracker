@@ -6,7 +6,7 @@ m 2023-05-26
 // Functions for getting/loading data on player profiles
 namespace Accounts {
     void GetAccountNamesCoro() {
-        string timerId = Various::LogTimerStart("getting account names");
+        string timerId = Various::LogTimerBegin("getting account names");
 
         uint idLimit = 209;
         string[] missing;

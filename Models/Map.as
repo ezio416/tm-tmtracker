@@ -78,7 +78,7 @@ namespace Models {
         int opCmp(Map m) { return timestamp - m.timestamp; }
 
         void GetRecordsCoro() {
-            string timerId = Various::LogTimerStart(logName + "getting records");
+            string timerId = Various::LogTimerBegin(logName + "getting records");
 
             uint offset = 0;
             bool tooManyRecords;
@@ -135,7 +135,7 @@ namespace Models {
         void GetThumbnailCoro() {
             if (IO::FileExists(thumbnailFile)) return;
 
-            string timerId = Various::LogTimerStart(logName + "downloading thumbnail");
+            string timerId = Various::LogTimerBegin(logName + "downloading thumbnail");
 
             uint max_timeout = 3000;
             uint max_wait = 2000;
@@ -165,7 +165,7 @@ namespace Models {
         }
 
         void LoadThumbnailCoro() {
-            string timerId = Various::LogTimerStart(logName + "loading thumbnail", false);
+            string timerId = Various::LogTimerBegin(logName + "loading thumbnail", false);
 
             if (Globals::thumbnailTextures.Exists(mapUid)) {
                 UI::Texture@ tex;
