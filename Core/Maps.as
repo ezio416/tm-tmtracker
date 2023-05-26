@@ -49,10 +49,15 @@ namespace Maps {
     void GetMyMapsRecordsCoro() {
         string timerId = Various::LogTimerStart("getting my map records");
 
+        Storage::getAccountNames = false;
         for (uint i = 0; i < Storage::myMaps.Length; i++) {
             auto coro = startnew(CoroutineFunc(Storage::myMaps[i].GetRecordsCoro));
             while (coro.IsRunning()) yield();
         }
+        Storage::getAccountNames = true;
+
+        auto coro = startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
+        while (coro.IsRunning()) yield();
 
         Various::LogTimerEnd(timerId);
     }
