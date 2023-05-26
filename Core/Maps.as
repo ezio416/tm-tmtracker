@@ -6,7 +6,7 @@ m 2023-05-26
 // Functions for getting/loading data on maps
 namespace Maps {
     void GetMyMapsCoro() {
-        string timerId = Various::LogTimerStart("updating my maps");
+        string timerId = Various::LogTimerBegin("updating my maps");
 
         Globals::ClearMyMaps();
 
@@ -47,7 +47,7 @@ namespace Maps {
     }
 
     void GetMyMapsRecordsCoro() {
-        string timerId = Various::LogTimerStart("getting my map records");
+        string timerId = Various::LogTimerBegin("getting my map records");
 
         Globals::getAccountNames = false;
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
@@ -63,7 +63,7 @@ namespace Maps {
     }
 
     void GetMyMapsThumbnailsCoro() {
-        string timerId = Various::LogTimerStart("getting my map thumbnails");
+        string timerId = Various::LogTimerBegin("getting my map thumbnails");
 
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
             auto @coro = startnew(CoroutineFunc(Globals::myMaps[i].GetThumbnailCoro));
@@ -74,7 +74,7 @@ namespace Maps {
     }
 
     void LoadMyMapsThumbnailsCoro() {
-        string timerId = Various::LogTimerStart("loading my map thumbnails");
+        string timerId = Various::LogTimerBegin("loading my map thumbnails");
 
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
             auto @coro = startnew(CoroutineFunc(Globals::myMaps[i].LoadThumbnailCoro));

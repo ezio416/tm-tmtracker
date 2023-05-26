@@ -22,7 +22,7 @@ namespace Various {
         return "00:00:00:" + Zpad2(seconds);
     }
 
-    string LogTimerStart(const string &in text, bool logNow = true) {
+    string LogTimerBegin(const string &in text, bool logNow = true) {
         if (logNow) Trace(text + "...");
         string timerId = Globals::logTimerIndex + "_LogTimer_" + text;
         Globals::logTimerIndex++;

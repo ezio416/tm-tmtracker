@@ -11,7 +11,7 @@ namespace Zones {
             return;
         } catch { }
 
-        string timerId = Various::LogTimerStart("loading zones from file");
+        string timerId = Various::LogTimerBegin("loading zones from file");
 
         try {
             Globals::zones = Json::FromFile("Assets/zones.json");
