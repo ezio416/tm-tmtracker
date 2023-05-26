@@ -20,8 +20,8 @@ namespace Models {
         string       mapNameRaw;
         string       mapNameText;
         string       mapUid;
-        Record[]     records;
         dictionary   recordAccountIds;
+        Record@[]    records;
         uint         recordsTimestamp;
         uint         silverTime;
         string       thumbnailFile;
