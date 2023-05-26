@@ -23,11 +23,10 @@ namespace Various {
     }
 
     string LogTimerStart(const string &in text, bool logNow = true) {
-        auto now = Time::Now;
         if (logNow) Trace(text + "...");
         string timerId = Storage::logTimerIndex + "_LogTimer_" + text;
         Storage::logTimerIndex++;
-        Storage::logTimers.Set(timerId, now);
+        Storage::logTimers.Set(timerId, Time::Now);
         return timerId;
     }
 
@@ -38,11 +37,14 @@ namespace Various {
     void LogTimerEnd(const string &in timerId, bool logNow = true) {
         if (Settings::logDurations && logNow) {
             string text = timerId.Split("_LogTimer_")[1];
-            try {
-                uint64 dur = Time::Now - uint64(Storage::logTimers[timerId]);
-                if (dur == 0) Trace(text + " took 0s");
-                else          Trace(text + " took " + (dur / 1000) + "." + (dur % 1000) + "s");
-            } catch {
+            uint64 start;
+            if (Storage::logTimers.Get(timerId, start)) {
+                uint64 dur = Time::Now - start;
+                if (dur == 0)
+                    Trace(text + " took 0s");
+                else
+                    Trace(text + " took " + (dur / 1000) + "." + (dur % 1000) + "s");
+            } else {
                 Trace("timerId not found: " + timerId);
             }
         }
