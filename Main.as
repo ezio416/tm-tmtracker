@@ -32,8 +32,8 @@ void RenderInterface() {
     if (Settings::DetectSortMapsNewest())
         DB::MyMaps::Load();
 
-    UI::SetNextWindowSize(600, 540, UI::Cond::Once);
-    UI::SetNextWindowPos(100, 100, UI::Cond::Once);
+    UI::SetNextWindowSize(600, 540, UI::Cond::FirstUseEver);
+    UI::SetNextWindowPos(100, 100, UI::Cond::FirstUseEver);
 
     UI::Begin(Storage::title, Settings::windowOpen);
         UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
