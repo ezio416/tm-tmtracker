@@ -18,6 +18,8 @@ namespace DB {
 
             Globals::ClearAccounts();
 
+            try { Globals::db.Execute("DELETE FROM Accounts"); } catch { }
+
             Various::LogTimerEnd(timerId);
         }
 
