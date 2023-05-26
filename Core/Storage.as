@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-25
+m 2023-05-26
 */
 
 // Global variables for plugin operation, as well as functions to add/clear
@@ -10,7 +10,7 @@ namespace Storage {
     Models::Map@[]    currentMaps;
     dictionary        currentMapUids;
     SQLite::Database@ db;
-    UI::Texture@      defaultTexture = UI::LoadTexture("Resources/1x1.png");
+    UI::Texture@      defaultTexture = UI::LoadTexture("Assets/1x1.png");
     bool              dev = false;
     bool              getAccountNames = true;
     uint64            latestNadeoRequest = 0;
