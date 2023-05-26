@@ -24,8 +24,8 @@ namespace Storage {
     Models::Record[]  records;
     int               requestsInProgress = 0;
     string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
-    string            dbFile = storageFolder + "/TMTracker.db";
-    string            thumbnailFolder = storageFolder + "/thumbnails";
+    string            dbFile = storageFolder + "TMTracker.db";
+    string            thumbnailFolder = storageFolder + "thumbnails";
     dictionary        thumbnailTextures;
     string            title = "\\$2f3" + Icons::MapO + "\\$z TMTracker";
     Json::Value       zones;
