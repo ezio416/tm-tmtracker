@@ -121,6 +121,11 @@ namespace Models {
 
             recordsTimestamp = Time::Stamp;
 
+            if (Storage::getAccountNames) {
+                auto coro = startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
+                while (coro.IsRunning()) yield();
+            }
+
             DB::MyMaps::Save();
             DB::Records::Save();
 
