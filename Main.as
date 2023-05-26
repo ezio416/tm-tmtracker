@@ -4,6 +4,9 @@ m 2023-05-26
 */
 
 void Main() {
+    if (Settings::loadAccountsOnBoot)
+        DB::Accounts::Load();
+
     if (Settings::loadMyMapsOnBoot)
         DB::MyMaps::Load();
 

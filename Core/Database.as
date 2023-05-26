@@ -14,17 +14,40 @@ namespace DB {
         ); """;
 
         void Clear() {
-            string timerId = Various::LogTimerStart("clearing accounts from program and file");
+            string timerId = Various::LogTimerBegin("clearing accounts from program and file");
+
+            Globals::ClearAccounts();
+
             Various::LogTimerEnd(timerId);
         }
 
         void Load() {
-            string timerId = Various::LogTimerStart("loading accounts from file");
+            string timerId = Various::LogTimerBegin("loading accounts from file");
+
+            Globals::loadedAccounts = true;
+
+            Globals::ClearAccounts();
+
+            SQLite::Statement@ s;
+            @Globals::db = SQLite::Database(Globals::dbFile);
+
+            try {
+                @s = Globals::db.Prepare("SELECT * FROM Accounts ORDER BY accountName ASC");
+            } catch {
+                Various::Trace("no Accounts table in database, plugin (likely) hasn't been run yet");
+                Various::LogTimerEnd(timerId);
+                return;
+            }
+            while (true) {
+                if (!s.NextRow()) break;
+                Globals::AddAccount(Models::Account(s));
+            }
+
             Various::LogTimerEnd(timerId);
         }
 
         void Save() {
-            string timerId = Various::LogTimerStart("saving accounts to file");
+            string timerId = Various::LogTimerBegin("saving accounts to file");
             Various::LogTimerEnd(timerId);
         }
     }
@@ -38,11 +61,11 @@ namespace DB {
             bronzeTime       INT,
             downloadUrl      CHAR(93),
             goldTime         INT,
-            mapId            CHAR(36),
+            mapId            CHAR(36) PRIMARY KEY,
             mapNameColor     TEXT,
             mapNameRaw       TEXT,
             mapNameText      TEXT,
-            mapUid           VARCHAR(27) PRIMARY KEY,
+            mapUid           VARCHAR(27),
             recordsTimestamp INT,
             silverTime       INT,
             thumbnailUrl     CHAR(97),
@@ -50,7 +73,7 @@ namespace DB {
         ); """;
 
         void Clear() {
-            string timerId = Various::LogTimerStart("clearing my maps from program and file");
+            string timerId = Various::LogTimerBegin("clearing my maps from program and file");
 
             Globals::ClearCurrentMaps();
             Globals::ClearMyHiddenMaps();
@@ -63,7 +86,9 @@ namespace DB {
         }
 
         void Load() {
-            string timerId = Various::LogTimerStart("loading my maps from file");
+            string timerId = Various::LogTimerBegin("loading my maps from file");
+
+            Globals::loadedMyMaps = true;
 
             Globals::ClearMyMaps();
 
@@ -103,7 +128,7 @@ namespace DB {
         }
 
         void Save() {
-            string timerId = Various::LogTimerStart("saving my maps to file");
+            string timerId = Various::LogTimerBegin("saving my maps to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS MyMaps" + tableColumns);
 
@@ -159,7 +184,7 @@ namespace DB {
         }
 
         void Hide(Models::Map@ map) {
-            string timerId = Various::LogTimerStart(map.logName + "hiding");
+            string timerId = Various::LogTimerBegin(map.logName + "hiding");
 
             map.hidden = true;
 
@@ -180,7 +205,7 @@ namespace DB {
         }
 
         void UnHide(Models::Map@ map) {
-            string timerId = Various::LogTimerStart(map.logName + "unhiding");
+            string timerId = Various::LogTimerBegin(map.logName + "unhiding");
 
             map.hidden = false;
 
@@ -216,7 +241,7 @@ namespace DB {
         ); """;
 
         void Clear() {
-            string timerId = Various::LogTimerStart("clearing records from program and file");
+            string timerId = Various::LogTimerBegin("clearing records from program and file");
 
             Globals::ClearRecords();
 
@@ -226,7 +251,13 @@ namespace DB {
         }
 
         void Load() {
-            string timerId = Various::LogTimerStart("loading records from file");
+            string timerId = Various::LogTimerBegin("loading records from file");
+
+            if (!Globals::loadedAccounts || !Globals::loadedMyMaps) {
+                Various::Trace("attempted to load records before accounts and maps!");
+                Various::LogTimerEnd(timerId, false);
+                return;
+            }
 
             Globals::ClearRecords();
 
@@ -249,7 +280,7 @@ namespace DB {
         }
 
         void Save() {
-            string timerId = Various::LogTimerStart("saving records to file");
+            string timerId = Various::LogTimerBegin("saving records to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS Records" + tableColumns);
 
