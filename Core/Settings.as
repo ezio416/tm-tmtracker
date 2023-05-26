@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-25
+m 2023-05-26
 */
 
 // Settings in the native Openplanet menu
@@ -20,8 +20,8 @@ namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
     // STARTUP
     ///////////////////////////////////////////////////////////////////////////
-    // [Setting category="Startup" name="load accounts from file"]
-    // bool loadAccountsOnBoot = true;
+    [Setting category="Startup" name="load accounts from file"]
+    bool loadAccountsOnBoot = true;
 
     [Setting category="Startup" name="Load my maps from file"]
     bool loadMyMapsOnBoot = true;

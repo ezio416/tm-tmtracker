@@ -15,6 +15,11 @@ namespace Models {
 
         Account() { }
         Account(const string &in id) { accountId = id; }
+        Account(SQLite::Statement@ s) {
+            accountId   = s.GetColumnString("accountId");
+            accountName = s.GetColumnString("accountName");
+            nameExpire  = s.GetColumnInt("nameExpire");
+        }
 
         bool IsNameExpired() {
             return (nameExpire - Time::Stamp < 0);
