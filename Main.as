@@ -45,7 +45,7 @@ void RenderInterface() {
 void RenderTabs() {
     UI::BeginTabBar("tabs");
         Tabs::MyMaps();
-        // Tabs::AllAccounts();
+        Tabs::AllAccounts();
         // Tabs::MyRecords();
         if (Settings::infoTab) Tabs::Info();
         if (Globals::dev)      Tabs::Dev();
