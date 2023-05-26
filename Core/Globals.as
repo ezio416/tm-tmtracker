@@ -4,7 +4,7 @@ m 2023-05-26
 */
 
 // Global variables for plugin operation, as well as functions to add/clear
-namespace Storage {
+namespace Globals {
     Models::Account[] accounts;
     dictionary        accountIds;
     Models::Map@[]    currentMaps;

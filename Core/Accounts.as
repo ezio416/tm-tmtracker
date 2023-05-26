@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-05-25
+m 2023-05-26
 */
 
 // Functions for getting/loading data on player profiles
@@ -12,13 +12,13 @@ namespace Accounts {
         string[] missing;
         dictionary names;
 
-        for (uint i = 0; i < Storage::accounts.Length; i++)
-            if (Storage::accounts[i].IsNameExpired())
-                Storage::accounts[i].accountName = "";
+        for (uint i = 0; i < Globals::accounts.Length; i++)
+            if (Globals::accounts[i].IsNameExpired())
+                Globals::accounts[i].accountName = "";
 
-        auto ids = Storage::accountIds.GetKeys();
+        auto ids = Globals::accountIds.GetKeys();
         for (uint i = 0; i < ids.Length; i++)
-            if (string(Storage::accountIds[ids[i]]) == "")
+            if (string(Globals::accountIds[ids[i]]) == "")
                 missing.InsertLast(ids[i]);
 
         if (missing.Length > 0) {
@@ -38,12 +38,12 @@ namespace Accounts {
             }
         }
 
-        for (uint i = 0; i < Storage::accounts.Length; i++) {
-            auto account = @Storage::accounts[i];
+        for (uint i = 0; i < Globals::accounts.Length; i++) {
+            auto account = @Globals::accounts[i];
             if (account.accountName != "") continue;
             account.accountName = string(names[account.accountId]);
             account.SetNameExpire();
-            Storage::accountIds.Set(account.accountId, account.accountName);
+            Globals::accountIds.Set(account.accountId, account.accountName);
         }
 
         Various::LogTimerEnd(timerId);

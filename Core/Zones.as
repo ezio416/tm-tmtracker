@@ -3,18 +3,19 @@ c 2023-05-16
 m 2023-05-26
 */
 
+// Functions for player regions
 namespace Zones {
     void Load() {
         try {
-            Storage::zones.Length;
+            Globals::zones.Length;
             return;
         } catch { }
 
         string timerId = Various::LogTimerStart("loading zones from file");
 
         try {
-            Storage::zones = Json::FromFile("Assets/zones.json");
-            Storage::zonesFileMissing = false;
+            Globals::zones = Json::FromFile("Assets/zones.json");
+            Globals::zonesFileMissing = false;
         } catch {
             if (Settings::logEnabled)
                 trace("missing zones file!");

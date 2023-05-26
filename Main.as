@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-05-25
+m 2023-05-26
 */
 
 void Main() {
@@ -16,13 +16,13 @@ void Main() {
     if (!Settings::rememberOpen)
         Settings::windowOpen = false;
 
-    IO::CreateFolder(Storage::thumbnailFolder);
+    IO::CreateFolder(Globals::thumbnailFolder);
 
     NadeoServices::AddAudience("NadeoLiveServices");
 }
 
 void RenderMenu() {
-	if (UI::MenuItem(Storage::title, "", Settings::windowOpen))
+	if (UI::MenuItem(Globals::title, "", Settings::windowOpen))
 		Settings::windowOpen = !Settings::windowOpen;
 }
 
@@ -35,7 +35,7 @@ void RenderInterface() {
     UI::SetNextWindowSize(600, 540, UI::Cond::FirstUseEver);
     UI::SetNextWindowPos(100, 100, UI::Cond::FirstUseEver);
 
-    UI::Begin(Storage::title, Settings::windowOpen);
+    UI::Begin(Globals::title, Settings::windowOpen);
         if (Settings::welcomeText)
             UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
         RenderTabs();
@@ -48,7 +48,7 @@ void RenderTabs() {
         // RenderRecordsTab();
         // RenderAccountsTab();
         if (Settings::infoTab) RenderInfoTab();
-        if (Storage::dev) RenderDevTab();
+        if (Globals::dev) RenderDevTab();
     UI::EndTabBar();
 }
 
@@ -61,33 +61,33 @@ void RenderMapsTab() {
             "Close tabs with the 'X' or with a middle click."
         );
 
-    if (UI::Button(Icons::Refresh + " Update Map List (" + Storage::myMaps.Length + ")"))
+    if (UI::Button(Icons::Refresh + " Update Map List (" + Globals::myMaps.Length + ")"))
         startnew(CoroutineFunc(Maps::GetMyMapsCoro));
 
-    if (Storage::myHiddenMaps.Length > 0) {
+    if (Globals::myHiddenMaps.Length > 0) {
         UI::SameLine();
-        if (UI::Button(Icons::Eye + " Show Hidden (" + Storage::myHiddenMaps.Length + ")")) {
+        if (UI::Button(Icons::Eye + " Show Hidden (" + Globals::myHiddenMaps.Length + ")")) {
             string timerId = Various::LogTimerStart("unhiding all maps");
 
-            for (uint i = 0; i < Storage::myHiddenMaps.Length;)
-                DB::MyMaps::UnHide(Storage::myHiddenMaps[i]);
+            for (uint i = 0; i < Globals::myHiddenMaps.Length;)
+                DB::MyMaps::UnHide(Globals::myHiddenMaps[i]);
 
-            for (uint i = 0; i < Storage::currentMaps.Length; i++)
-                Storage::currentMaps[i].hidden = false;
+            for (uint i = 0; i < Globals::currentMaps.Length; i++)
+                Globals::currentMaps[i].hidden = false;
 
             Various::LogTimerEnd(timerId);
         }
     }
 
-    if (Storage::currentMaps.Length > 0) {
+    if (Globals::currentMaps.Length > 0) {
         UI::SameLine();
-        if (UI::Button(Icons::Times + " Clear Current Maps (" + Storage::currentMaps.Length + ")"))
-            Storage::ClearCurrentMaps();
+        if (UI::Button(Icons::Times + " Clear Current Maps (" + Globals::currentMaps.Length + ")"))
+            Globals::ClearCurrentMaps();
     }
 
     UI::Separator();
 
-    Storage::mapClicked = false;
+    Globals::mapClicked = false;
 
     UI::BeginTabBar("MyMapsTabs");
         RenderMyMapListTab();
@@ -103,8 +103,8 @@ void RenderMyMapListTab() {
     uint currentX = 0;
     auto size = UI::GetWindowSize();
 
-    for (uint i = 0; i < Storage::myMaps.Length; i++) {
-        auto map = Storage::myMaps[i];
+    for (uint i = 0; i < Globals::myMaps.Length; i++) {
+        auto map = Globals::myMaps[i];
 
         currentX += Settings::myMapsThumbnailWidthList;
         if (i > 0 && currentX < uint(size.x))
@@ -114,15 +114,15 @@ void RenderMyMapListTab() {
             auto pos = UI::GetCursorPos();
             auto thumbSize = vec2(Settings::myMapsThumbnailWidthList, Settings::myMapsThumbnailWidthList);
             try   { UI::Image(map.thumbnailTexture, thumbSize); }
-            catch { UI::Image(Storage::defaultTexture, thumbSize); }
+            catch { UI::Image(Globals::defaultTexture, thumbSize); }
 
             UI::SetCursorPos(pos);
             if (UI::InvisibleButton("invis_" + map.mapUid, thumbSize)) {
-                if (!Storage::currentMapUids.Exists(map.mapUid)) {
-                    Storage::currentMapUids.Set(map.mapUid, "");
-                    Storage::currentMaps.InsertLast(@Storage::myMaps[i]);
+                if (!Globals::currentMapUids.Exists(map.mapUid)) {
+                    Globals::currentMapUids.Set(map.mapUid, "");
+                    Globals::currentMaps.InsertLast(@Globals::myMaps[i]);
                 }
-                Storage::mapClicked = true;
+                Globals::mapClicked = true;
             }
 
             currentX = uint(UI::GetCursorPos().x) + Settings::myMapsThumbnailWidthList + 44;
@@ -137,25 +137,25 @@ void RenderMyMapListTab() {
 }
 
 void RenderMyMapsTabs() {
-    for (uint i = 0; i < Storage::currentMaps.Length; i++) {
-        auto map = @Storage::currentMaps[i];
+    for (uint i = 0; i < Globals::currentMaps.Length; i++) {
+        auto map = @Globals::currentMaps[i];
 
         uint flags = UI::TabItemFlags::Trailing;
         if (
-            Storage::mapClicked &&
+            Globals::mapClicked &&
             Settings::myMapsSwitchOnClicked &&
-            i == Storage::currentMaps.Length - 1
+            i == Globals::currentMaps.Length - 1
         ) {
             flags |= UI::TabItemFlags::SetSelected;
-            Storage::mapClicked = false;
+            Globals::mapClicked = false;
         }
 
         string tabTitle = Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText;
-        if (UI::BeginTabItem(tabTitle, Storage::currentMaps[i].viewing, flags)) {
+        if (UI::BeginTabItem(tabTitle, Globals::currentMaps[i].viewing, flags)) {
             UI::BeginGroup();
                 auto thumbSize = vec2(Settings::myMapsThumbnailWidthTabs, Settings::myMapsThumbnailWidthTabs);
                 try   { UI::Image(map.thumbnailTexture, thumbSize); }
-                catch { UI::Image(Storage::defaultTexture, thumbSize); }
+                catch { UI::Image(Globals::defaultTexture, thumbSize); }
 
                 UI::SameLine();
                 UI::BeginGroup();
@@ -170,12 +170,12 @@ void RenderMyMapsTabs() {
 
                 if (map.hidden) {
                     if (UI::Button(Icons::Eye + " Show This Map (currently hidden)")) {
-                        Storage::currentMaps[i].hidden = false;
+                        Globals::currentMaps[i].hidden = false;
                         DB::MyMaps::UnHide(map);
                     }
                 } else {
                     if (UI::Button(Icons::EyeSlash + " Hide This Map")) {
-                        Storage::currentMaps[i].hidden = true;
+                        Globals::currentMaps[i].hidden = true;
                         DB::MyMaps::Hide(map);
                     }
                 }
@@ -183,7 +183,7 @@ void RenderMyMapsTabs() {
 
             UI::SameLine();
             UI::BeginGroup();
-                if (UI::Button(Icons::Download + " Get Records (" + Storage::currentMaps[i].records.Length + ")"))
+                if (UI::Button(Icons::Download + " Get Records (" + Globals::currentMaps[i].records.Length + ")"))
                     startnew(CoroutineFunc(map.GetRecordsCoro));
 
                 UI::SameLine();
@@ -198,7 +198,7 @@ void RenderMyMapsTabs() {
 
                 for (uint j = 0; j < map.records.Length; j++) {
                     string name;
-                    Storage::accountIds.Get(map.records[j].accountId, name);
+                    Globals::accountIds.Get(map.records[j].accountId, name);
                     UI::Text(
                         map.records[j].position + " - " + Time::Format(map.records[j].time) +
                         " - " + name + " - " + map.records[j].zoneName
@@ -209,9 +209,9 @@ void RenderMyMapsTabs() {
             UI::EndTabItem();
         }
 
-        if (!Storage::currentMaps[i].viewing) {
-            Storage::currentMaps.RemoveAt(i);
-            Storage::currentMapUids.Delete(map.mapUid);
+        if (!Globals::currentMaps[i].viewing) {
+            Globals::currentMaps.RemoveAt(i);
+            Globals::currentMapUids.Delete(map.mapUid);
         }
     }
 }
@@ -241,21 +241,21 @@ void RenderInfoTab() {
     UI::Separator();
 
     UI::TextWrapped(
-        "Plugin files are kept at " + Storage::storageFolder +
+        "Plugin files are kept at " + Globals::storageFolder +
         "\nIf you want to look in the database, I recommend DB Browser: sqlitebrowser.org\n"
     );
 
     UI::Separator();
 
-    if (Storage::dev) {
+    if (Globals::dev) {
         if (UI::Button("Lock Dev Tab")) {
             Various::Trace("dev tab locked");
-            Storage::dev = false;
+            Globals::dev = false;
         }
     } else {
         if (UI::InputText("Unlock Dev Tab", "") == "balls") {
             Various::Trace("dev tab unlocked");
-            Storage::dev = true;
+            Globals::dev = true;
         }
     }
 
@@ -275,14 +275,14 @@ void RenderDevTab() {
     if (UI::Button(Icons::Download + " Get Account Names"))
         startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
 
-    UI::Text("total accounts: " + Storage::accounts.Length);
-    UI::Text("account IDs: " + Storage::accountIds.GetKeys().Length);
+    UI::Text("total accounts: " + Globals::accounts.Length);
+    UI::Text("account IDs: " + Globals::accountIds.GetKeys().Length);
 
-    for (uint i = 0; i < Storage::accounts.Length; i++) {
+    for (uint i = 0; i < Globals::accounts.Length; i++) {
         UI::Text(
-            Storage::accounts[i].accountId   + " _ " +
-            Storage::accounts[i].accountName + " _ " +
-            Storage::accounts[i].NameExpireFormatted()
+            Globals::accounts[i].accountId   + " _ " +
+            Globals::accounts[i].accountName + " _ " +
+            Globals::accounts[i].NameExpireFormatted()
         );
     }
 

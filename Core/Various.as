@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-05-25
+m 2023-05-26
 */
 
 // Functions that don't fit nicely in other categories
@@ -24,21 +24,21 @@ namespace Various {
 
     string LogTimerStart(const string &in text, bool logNow = true) {
         if (logNow) Trace(text + "...");
-        string timerId = Storage::logTimerIndex + "_LogTimer_" + text;
-        Storage::logTimerIndex++;
-        Storage::logTimers.Set(timerId, Time::Now);
+        string timerId = Globals::logTimerIndex + "_LogTimer_" + text;
+        Globals::logTimerIndex++;
+        Globals::logTimers.Set(timerId, Time::Now);
         return timerId;
     }
 
     void LogTimerDelete(const string &in timerId) {
-        try { Storage::logTimers.Delete(timerId); } catch { }
+        try { Globals::logTimers.Delete(timerId); } catch { }
     }
 
     void LogTimerEnd(const string &in timerId, bool logNow = true) {
         if (Settings::logDurations && logNow) {
             string text = timerId.Split("_LogTimer_")[1];
             uint64 start;
-            if (Storage::logTimers.Get(timerId, start)) {
+            if (Globals::logTimers.Get(timerId, start)) {
                 uint64 dur = Time::Now - start;
                 if (dur == 0)
                     Trace(text + " took 0s");
@@ -57,21 +57,21 @@ namespace Various {
     }
 
     void WaitToDoNadeoRequestCoro() {
-        if (Storage::latestNadeoRequest == 0) {
-            Storage::latestNadeoRequest = Time::Now;
+        if (Globals::latestNadeoRequest == 0) {
+            Globals::latestNadeoRequest = Time::Now;
             return;
         }
 
-        while (Storage::requestsInProgress > 0)
+        while (Globals::requestsInProgress > 0)
             yield();
-        if (Storage::requestsInProgress < 0)  // hopefully won't happen
-            Storage::requestsInProgress = 0;
-        Storage::requestsInProgress++;
+        if (Globals::requestsInProgress < 0)  // hopefully won't happen
+            Globals::requestsInProgress = 0;
+        Globals::requestsInProgress++;
 
-        while (Time::Now - Storage::latestNadeoRequest < Settings::timeBetweenNadeoRequests)
+        while (Time::Now - Globals::latestNadeoRequest < Settings::timeBetweenNadeoRequests)
             yield();
 
-        Storage::latestNadeoRequest = Time::Now;
+        Globals::latestNadeoRequest = Time::Now;
     }
 
     string Zpad2(int num) {
