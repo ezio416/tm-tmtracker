@@ -15,25 +15,16 @@ namespace DB {
 
         void Clear() {
             string timerId = Various::LogTimerStart("clearing accounts from program and file");
-
-
-
             Various::LogTimerEnd(timerId);
         }
 
         void Load() {
             string timerId = Various::LogTimerStart("loading accounts from file");
-
-
-
             Various::LogTimerEnd(timerId);
         }
 
         void Save() {
             string timerId = Various::LogTimerStart("saving accounts to file");
-
-
-
             Various::LogTimerEnd(timerId);
         }
     }
