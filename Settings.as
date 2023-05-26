@@ -14,7 +14,7 @@ namespace Settings {
     [Setting category="General" name="Display info tab"]
     bool infoTab = true;
 
-    [Setting category="General" name="Account name expiration time (days)" min=0 max=90 description="time after which the name will be retrieved again"]
+    [Setting category="General" name="Account name valid time (days)" min=0 max=90 description="time after which the name will be retrieved again"]
     uint accountNameExpirationDays = 7;
 
     ///////////////////////////////////////////////////////////////////////////
