@@ -195,11 +195,11 @@ void RenderMyMapsTabs() {
                 );
 
                 for (uint j = 0; j < map.records.Length; j++) {
+                    string name;
+                    Storage::accountIds.Get(map.records[j].accountId, name);
                     UI::Text(
-                        map.records[j].position + " - " +
-                        Time::Format(map.records[j].time) + " - " +
-                        map.records[j].accountName + " - " +
-                        map.records[j].zoneName
+                        map.records[j].position + " - " + Time::Format(map.records[j].time) +
+                        " - " + name + " - " + map.records[j].zoneName
                     );
                 }
             UI::EndGroup();
@@ -266,8 +266,19 @@ void RenderDevTab() {
     if (UI::Button(Icons::Download + " Get All Records"))
         startnew(CoroutineFunc(Maps::GetMyMapsRecordsCoro));
 
+    if (UI::Button(Icons::Download + " Get Account Names"))
+        startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
+
     UI::Text("total accounts: " + Storage::accounts.Length);
     UI::Text("account IDs: " + Storage::accountIds.GetKeys().Length);
+
+    for (uint i = 0; i < Storage::accounts.Length; i++) {
+        UI::Text(
+            Storage::accounts[i].accountId   + " _ " +
+            Storage::accounts[i].accountName + " _ " +
+            Storage::accounts[i].NameExpireFormatted()
+        );
+    }
 
     UI::EndTabItem();
 }
