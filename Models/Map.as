@@ -109,19 +109,7 @@ namespace Models {
                     record.mapUid       = mapUid;
                     record.recordFakeId = mapId + "-" + record.accountId;
 
-                    if (!Storage::accountIds.Exists(record.accountId)) {
-                        Storage::accountIds.Set(record.accountId, Storage::accountIds.GetKeys().Length);
-                        auto account = Account(record.accountId);
-                        account.GetName();
-                        record.accountName = account.accountName;
-                        account.recordMapUids.Set(record.mapUid, "");
-                        Storage::accounts.InsertLast(account);
-                    } else {
-                        auto ix = int(Storage::accountIds[record.accountId]);
-                        Storage::accounts[ix].GetName();
-                        record.accountName = Storage::accounts[ix].accountName;
-                        Storage::accounts[ix].recordMapUids.Set(record.mapUid, "");
-                    }
+                    Storage::AddAccount(Models::Account(record.accountId));
 
                     recordAccountIds.Set(record.accountId, "");
                     records.InsertLast(record);

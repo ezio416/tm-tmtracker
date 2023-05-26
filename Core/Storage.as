@@ -31,6 +31,12 @@ namespace Storage {
     Json::Value       zones;
     bool              zonesFileMissing = true;
 
+    void AddAccount(Models::Account account) {
+        if (accountIds.Exists(account.accountId)) return;
+        accountIds.Set(account.accountId, accountIds.GetKeys().Length);
+        accounts.InsertLast(account);
+    }
+
     void AddMyMap(Models::Map map) {
         if (myMapUids.Exists(map.mapUid)) return;
         myMapUids.Set(map.mapUid, myMapUids.GetKeys().Length);
