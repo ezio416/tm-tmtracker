@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-25
+m 2023-05-26
 */
 
 // Functions for the TMTracker.db file
@@ -52,12 +52,12 @@ namespace DB {
         void Clear() {
             string timerId = Various::LogTimerStart("clearing my maps from program and file");
 
-            Storage::ClearCurrentMaps();
-            Storage::ClearMyHiddenMaps();
-            Storage::ClearMyMaps();
+            Globals::ClearCurrentMaps();
+            Globals::ClearMyHiddenMaps();
+            Globals::ClearMyMaps();
 
-            try { Storage::db.Execute("DELETE FROM MyMaps");       } catch { }
-            try { Storage::db.Execute("DELETE FROM MyHiddenMaps"); } catch { }
+            try { Globals::db.Execute("DELETE FROM MyMaps");       } catch { }
+            try { Globals::db.Execute("DELETE FROM MyHiddenMaps"); } catch { }
 
             Various::LogTimerEnd(timerId);
         }
@@ -65,13 +65,13 @@ namespace DB {
         void Load() {
             string timerId = Various::LogTimerStart("loading my maps from file");
 
-            Storage::ClearMyMaps();
+            Globals::ClearMyMaps();
 
             SQLite::Statement@ s;
-            @Storage::db = SQLite::Database(Storage::dbFile);
+            @Globals::db = SQLite::Database(Globals::dbFile);
             string order = (Settings::sortMapsNewest) ? "DESC" : "ASC";
             try {
-                @s = Storage::db.Prepare("SELECT * FROM MyMaps ORDER BY timestamp " + order);
+                @s = Globals::db.Prepare("SELECT * FROM MyMaps ORDER BY timestamp " + order);
             } catch {
                 Various::Trace("no MyMaps table in database, plugin hasn't been run yet");
                 Various::LogTimerEnd(timerId);
@@ -79,13 +79,13 @@ namespace DB {
             }
             while (true) {
                 if (!s.NextRow()) break;
-                Storage::AddMyMap(Models::Map(s));
+                Globals::AddMyMap(Models::Map(s));
             }
 
-            Storage::ClearMyHiddenMaps();
+            Globals::ClearMyHiddenMaps();
             bool anyHidden = false;
             try {
-                @s = Storage::db.Prepare("SELECT * FROM MyHiddenMaps");
+                @s = Globals::db.Prepare("SELECT * FROM MyHiddenMaps");
                 anyHidden = true;
             } catch {
                 Various::Trace("no MyHiddenMaps table in database, no maps are hidden yet");
@@ -94,7 +94,7 @@ namespace DB {
             if (anyHidden)
                 while (true) {
                     if (!s.NextRow()) break;
-                    Storage::AddMyHiddenMap(Models::Map(s));
+                    Globals::AddMyHiddenMap(Models::Map(s));
                 }
 
             Various::LogTimerEnd(timerId);
@@ -105,19 +105,19 @@ namespace DB {
         void Save() {
             string timerId = Various::LogTimerStart("saving my maps to file");
 
-            Storage::db.Execute("CREATE TABLE IF NOT EXISTS MyMaps" + tableColumns);
+            Globals::db.Execute("CREATE TABLE IF NOT EXISTS MyMaps" + tableColumns);
 
-            for (uint i = 0; i < Storage::myMaps.Length; i++) {
-                auto map = Storage::myMaps[i];
+            for (uint i = 0; i < Globals::myMaps.Length; i++) {
+                auto map = Globals::myMaps[i];
                 SQLite::Statement@ s;
                 try {
                     if (map.recordsTimestamp == 0) throw("");
-                    @s = Storage::db.Prepare("UPDATE MyMaps SET recordsTimestamp=? WHERE mapUid=?");
+                    @s = Globals::db.Prepare("UPDATE MyMaps SET recordsTimestamp=? WHERE mapUid=?");
                     s.Bind(1, map.recordsTimestamp);
                     s.Bind(2, map.mapUid);
                     s.Execute();
                 } catch {
-                    @s = Storage::db.Prepare("""
+                    @s = Globals::db.Prepare("""
                         INSERT INTO MyMaps (
                             authorId,
                             authorTime,
@@ -161,15 +161,15 @@ namespace DB {
         void Hide(Models::Map map) {
             string timerId = Various::LogTimerStart(map.logName + "hiding");
 
-            Storage::db.Execute("CREATE TABLE IF NOT EXISTS MyHiddenMaps" + tableColumns);
+            Globals::db.Execute("CREATE TABLE IF NOT EXISTS MyHiddenMaps" + tableColumns);
 
             SQLite::Statement@ s;
 
-            @s = Storage::db.Prepare("INSERT INTO MyHiddenMaps SELECT * FROM MyMaps WHERE mapUid=?");
+            @s = Globals::db.Prepare("INSERT INTO MyHiddenMaps SELECT * FROM MyMaps WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
 
-            @s = Storage::db.Prepare("DELETE FROM MyMaps WHERE mapUid=?");
+            @s = Globals::db.Prepare("DELETE FROM MyMaps WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
 
@@ -183,11 +183,11 @@ namespace DB {
 
             SQLite::Statement@ s;
 
-            @s = Storage::db.Prepare("INSERT INTO MyMaps SELECT * FROM MyHiddenMaps WHERE mapUid=?");
+            @s = Globals::db.Prepare("INSERT INTO MyMaps SELECT * FROM MyHiddenMaps WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
 
-            @s = Storage::db.Prepare("DELETE FROM MyHiddenMaps WHERE mapUid=?");
+            @s = Globals::db.Prepare("DELETE FROM MyHiddenMaps WHERE mapUid=?");
             s.Bind(1, map.mapUid);
             s.Execute();
 
@@ -215,9 +215,9 @@ namespace DB {
         void Clear() {
             string timerId = Various::LogTimerStart("clearing records from program and file");
 
-            Storage::ClearRecords();
+            Globals::ClearRecords();
 
-            try { Storage::db.Execute("DELETE FROM Records"); } catch { }
+            try { Globals::db.Execute("DELETE FROM Records"); } catch { }
 
             Various::LogTimerEnd(timerId);
         }
@@ -225,13 +225,13 @@ namespace DB {
         void Load() {
             string timerId = Various::LogTimerStart("loading records from file");
 
-            Storage::ClearRecords();
+            Globals::ClearRecords();
 
             SQLite::Statement@ s;
-            @Storage::db = SQLite::Database(Storage::dbFile);
+            @Globals::db = SQLite::Database(Globals::dbFile);
 
             try {
-                @s = Storage::db.Prepare("SELECT * FROM Records");
+                @s = Globals::db.Prepare("SELECT * FROM Records");
             } catch {
                 Various::Trace("no Records table in database, no records gotten yet");
                 Various::LogTimerEnd(timerId);
@@ -239,7 +239,7 @@ namespace DB {
             }
             while (true) {
                 if (!s.NextRow()) break;
-                Storage::AddRecord(Models::Record(s));
+                Globals::AddRecord(Models::Record(s));
             }
 
             Various::LogTimerEnd(timerId);
@@ -248,12 +248,12 @@ namespace DB {
         void Save() {
             string timerId = Various::LogTimerStart("saving records to file");
 
-            Storage::db.Execute("CREATE TABLE IF NOT EXISTS Records" + tableColumns);
+            Globals::db.Execute("CREATE TABLE IF NOT EXISTS Records" + tableColumns);
 
-            for (uint i = 0; i < Storage::records.Length; i++) {
-                auto record = Storage::records[i];
+            for (uint i = 0; i < Globals::records.Length; i++) {
+                auto record = Globals::records[i];
                 SQLite::Statement@ s;
-                @s = Storage::db.Prepare("""
+                @s = Globals::db.Prepare("""
                     INSERT INTO Records (
                         accountId,
                         accountName,

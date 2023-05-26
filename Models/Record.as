@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-20
+m 2023-05-26
 */
 
 // Classes for holding data gathered during plugin operation
@@ -27,7 +27,7 @@ namespace Models {
             time      = record["score"];
 
             Zones::Load();
-            try   { zoneName = Storage::zones[zoneId]; }
+            try   { zoneName = Globals::zones[zoneId]; }
             catch { zoneName = record["zoneName"]; }
         }
 

@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-25
+m 2023-05-26
 */
 
 // Functions for getting/loading data on maps
@@ -8,7 +8,7 @@ namespace Maps {
     void GetMyMapsCoro() {
         string timerId = Various::LogTimerStart("updating my maps");
 
-        Storage::ClearMyMaps();
+        Globals::ClearMyMaps();
 
         while (!NadeoServices::IsAuthenticated("NadeoLiveServices")) yield();
 
@@ -30,14 +30,14 @@ namespace Maps {
             auto mapList = Json::Parse(req.String())["mapList"];
             tooManyMaps = mapList.Length == 1000;
             for (uint i = 0; i < mapList.Length; i++)
-                Storage::AddMyMap(Models::Map(mapList[i]));
+                Globals::AddMyMap(Models::Map(mapList[i]));
 
-            Storage::requestsInProgress--;
+            Globals::requestsInProgress--;
         } while (tooManyMaps);
 
-        for (int i = Storage::myMaps.Length - 1; i >= 0; i--)
-            if (Storage::myHiddenMapUids.Exists(Storage::myMaps[i].mapUid))
-                Storage::myMaps.RemoveAt(i);
+        for (int i = Globals::myMaps.Length - 1; i >= 0; i--)
+            if (Globals::myHiddenMapUids.Exists(Globals::myMaps[i].mapUid))
+                Globals::myMaps.RemoveAt(i);
 
         Various::LogTimerEnd(timerId);
 
@@ -49,12 +49,12 @@ namespace Maps {
     void GetMyMapsRecordsCoro() {
         string timerId = Various::LogTimerStart("getting my map records");
 
-        Storage::getAccountNames = false;
-        for (uint i = 0; i < Storage::myMaps.Length; i++) {
-            auto coro = startnew(CoroutineFunc(Storage::myMaps[i].GetRecordsCoro));
+        Globals::getAccountNames = false;
+        for (uint i = 0; i < Globals::myMaps.Length; i++) {
+            auto coro = startnew(CoroutineFunc(Globals::myMaps[i].GetRecordsCoro));
             while (coro.IsRunning()) yield();
         }
-        Storage::getAccountNames = true;
+        Globals::getAccountNames = true;
 
         auto coro = startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
         while (coro.IsRunning()) yield();
@@ -65,8 +65,8 @@ namespace Maps {
     void GetMyMapsThumbnailsCoro() {
         string timerId = Various::LogTimerStart("getting my map thumbnails");
 
-        for (uint i = 0; i < Storage::myMaps.Length; i++) {
-            auto @coro = startnew(CoroutineFunc(Storage::myMaps[i].GetThumbnailCoro));
+        for (uint i = 0; i < Globals::myMaps.Length; i++) {
+            auto @coro = startnew(CoroutineFunc(Globals::myMaps[i].GetThumbnailCoro));
             while (coro.IsRunning()) yield();
         }
 
@@ -76,8 +76,8 @@ namespace Maps {
     void LoadMyMapsThumbnailsCoro() {
         string timerId = Various::LogTimerStart("loading my map thumbnails");
 
-        for (uint i = 0; i < Storage::myMaps.Length; i++) {
-            auto @coro = startnew(CoroutineFunc(Storage::myMaps[i].LoadThumbnailCoro));
+        for (uint i = 0; i < Globals::myMaps.Length; i++) {
+            auto @coro = startnew(CoroutineFunc(Globals::myMaps[i].LoadThumbnailCoro));
             while (coro.IsRunning()) yield();
         }
 

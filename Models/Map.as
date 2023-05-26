@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-25
+m 2023-05-26
 */
 
 // Classes for holding data gathered during plugin operation
@@ -34,7 +34,7 @@ namespace Models {
 
         Map(Json::Value map) {
             mapUid        = map["uid"];
-            thumbnailFile = Storage::thumbnailFolder + "/" + mapUid + ".jpg";
+            thumbnailFile = Globals::thumbnailFolder + "/" + mapUid + ".jpg";
             mapId         = map["mapId"];
             mapNameRaw    = map["name"];
             mapNameColor  = ColoredString(mapNameRaw);
@@ -68,7 +68,7 @@ namespace Models {
             logName          = "MAP[" + mapNameText + "] - ";
             mapUid           = s.GetColumnString("mapUid");
             recordsTimestamp = s.GetColumnInt("recordsTimestamp");
-            thumbnailFile    = Storage::thumbnailFolder + "/" + mapUid + ".jpg";
+            thumbnailFile    = Globals::thumbnailFolder + "/" + mapUid + ".jpg";
             silverTime       = s.GetColumnInt("silverTime");
             thumbnailUrl     = s.GetColumnString("thumbnailUrl");
             timestamp        = s.GetColumnInt("timestamp");
@@ -109,19 +109,19 @@ namespace Models {
                     record.mapUid       = mapUid;
                     record.recordFakeId = mapId + "-" + record.accountId;
 
-                    Storage::AddAccount(Models::Account(record.accountId));
+                    Globals::AddAccount(Models::Account(record.accountId));
 
                     recordAccountIds.Set(record.accountId, "");
                     records.InsertLast(record);
-                    Storage::AddRecord(record);
+                    Globals::AddRecord(record);
                 }
 
-                Storage::requestsInProgress--;
+                Globals::requestsInProgress--;
             } while (tooManyRecords && records.Length < Settings::maxRecordsPerMap);
 
             recordsTimestamp = Time::Stamp;
 
-            if (Storage::getAccountNames) {
+            if (Globals::getAccountNames) {
                 auto coro = startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
                 while (coro.IsRunning()) yield();
             }
@@ -167,9 +167,9 @@ namespace Models {
         void LoadThumbnailCoro() {
             string timerId = Various::LogTimerStart(logName + "loading thumbnail", false);
 
-            if (Storage::thumbnailTextures.Exists(mapUid)) {
+            if (Globals::thumbnailTextures.Exists(mapUid)) {
                 UI::Texture@ tex;
-                @tex = cast<UI::Texture@>(Storage::thumbnailTextures[mapUid]);
+                @tex = cast<UI::Texture@>(Globals::thumbnailTextures[mapUid]);
                 if (@thumbnailTexture == null)
                     @thumbnailTexture = tex;
                 Various::LogTimerEnd(timerId, Settings::logThumbnailTimes);
@@ -185,7 +185,7 @@ namespace Models {
             @thumbnailTexture = UI::LoadTexture(file.Read(file.Size()));
             file.Close();
 
-            Storage::thumbnailTextures.Set(mapUid, @thumbnailTexture);
+            Globals::thumbnailTextures.Set(mapUid, @thumbnailTexture);
 
             Various::LogTimerEnd(timerId, Settings::logThumbnailTimes);
         }
