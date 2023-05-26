@@ -36,7 +36,8 @@ void RenderInterface() {
     UI::SetNextWindowPos(100, 100, UI::Cond::FirstUseEver);
 
     UI::Begin(Storage::title, Settings::windowOpen);
-        UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
+        if (Settings::welcomeText)
+            UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
         RenderTabs();
     UI::End();
 }
@@ -46,7 +47,7 @@ void RenderTabs() {
         RenderMapsTab();
         // RenderRecordsTab();
         // RenderAccountsTab();
-        RenderInfoTab();
+        if (Settings::infoTab) RenderInfoTab();
         if (Storage::dev) RenderDevTab();
     UI::EndTabBar();
 }
@@ -54,10 +55,11 @@ void RenderTabs() {
 void RenderMapsTab() {
     if (!UI::BeginTabItem(Icons::Map + " Maps")) return;
 
-    UI::TextWrapped(
-        "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
-        "Close tabs with the 'X' or with a middle click."
-    );
+    if (Settings::welcomeText)
+        UI::TextWrapped(
+            "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
+            "Close tabs with the 'X' or with a middle click."
+        );
 
     if (UI::Button(Icons::Refresh + " Update Map List (" + Storage::myMaps.Length + ")"))
         startnew(CoroutineFunc(Maps::GetMyMapsCoro));
@@ -262,6 +264,10 @@ void RenderInfoTab() {
 
 void RenderDevTab() {
     if (!UI::BeginTabItem(Icons::Cogs + " Dev")) return;
+
+    UI::Text("I take no responsibility if you break shit in here!");
+
+    UI::Separator();
 
     if (UI::Button(Icons::Download + " Get All Records"))
         startnew(CoroutineFunc(Maps::GetMyMapsRecordsCoro));

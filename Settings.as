@@ -6,8 +6,23 @@ m 2023-05-25
 // Settings in the native Openplanet menu
 namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
+    // GENERAL
+    ///////////////////////////////////////////////////////////////////////////
+    [Setting category="General" name="Display welcome text"]
+    bool welcomeText = true;
+
+    [Setting category="General" name="Display info tab"]
+    bool infoTab = true;
+
+    [Setting category="General" name="Account name expiration time (days)" min=0 max=90 description="time after which the name will be retrieved again"]
+    uint accountNameExpirationDays = 7;
+
+    ///////////////////////////////////////////////////////////////////////////
     // STARTUP
     ///////////////////////////////////////////////////////////////////////////
+    // [Setting category="Startup" name="load accounts from file"]
+    // bool loadAccountsOnBoot = true;
+
     [Setting category="Startup" name="Load my maps from file"]
     bool loadMyMapsOnBoot = true;
 
@@ -78,8 +93,4 @@ namespace Settings {
 
     [Setting hidden]
     bool windowOpen = false;
-
-    ///////////////////////////////////////////////////////////////////////////
-    [Setting name="Account name expiration time (days)" min=0 max=90]
-    uint accountNameExpirationDays = 7;
 }
