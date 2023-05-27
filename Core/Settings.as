@@ -20,17 +20,8 @@ namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
     // STARTUP
     ///////////////////////////////////////////////////////////////////////////
-    [Setting category="Startup" name="load accounts from file"]
-    bool loadAccountsOnBoot = true;
-
-    [Setting category="Startup" name="Load my maps from file"]
-    bool loadMyMapsOnBoot = true;
-
     [Setting category="Startup" name="Load records from file"]
     bool loadRecordsOnBoot = true;
-
-    [Setting category="Startup" name="Load zones from file"]
-    bool loadZonesOnBoot = true;
 
     [Setting category="Startup" name="Remember window open state"]
     bool rememberOpen = false;
