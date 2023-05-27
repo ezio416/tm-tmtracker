@@ -20,9 +20,6 @@ namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
     // STARTUP
     ///////////////////////////////////////////////////////////////////////////
-    [Setting category="Startup" name="Load records from file"]
-    bool loadRecordsOnBoot = true;
-
     [Setting category="Startup" name="Remember window open state"]
     bool rememberOpen = false;
 
