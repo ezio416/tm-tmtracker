@@ -6,11 +6,13 @@ m 2023-05-26
 // Functions for the TMTracker.db file
 namespace DB {
     // Functions relating to drivers of any map
-    namespace Accounts {
+    namespace AllAccounts {
         string tableColumns = """ (
             accountId   CHAR(36) PRIMARY KEY,
             accountName TEXT,
-            nameExpire  INT
+            nameExpire  INT,
+            zoneId      CHAR(36),
+            zoneName    TEXT
         ); """;
 
         void Clear() {
@@ -50,6 +52,41 @@ namespace DB {
 
         void Save() {
             string timerId = Various::LogTimerBegin("saving accounts to file");
+
+            Globals::db.Execute("CREATE TABLE IF NOT EXISTS Accounts" + tableColumns);
+
+            for (uint i = 0; i < Globals::accounts.Length; i++) {
+                auto account = Globals::accounts[i];
+                SQLite::Statement@ s;
+                try {
+                    @s = Globals::db.Prepare(
+                        "UPDATE Accounts SET accountName=? nameExpire=? zoneId=? zoneName=? WHERE accountId=?"
+                    );
+                    s.Bind(1, account.accountName);
+                    s.Bind(2, account.nameExpire);
+                    s.Bind(3, account.zoneId);
+                    s.Bind(4, account.zoneName);
+                    s.Bind(5, account.accountId);
+                    s.Execute();
+                } catch {
+                    @s = Globals::db.Prepare("""
+                        INSERT INTO Accounts (
+                            accountId,
+                            accountName,
+                            nameExpire,
+                            zoneId,
+                            zoneName
+                        ) VALUES (?,?,?,?,?);
+                    """);
+                    s.Bind(1, account.accountId);
+                    s.Bind(2, account.accountName);
+                    s.Bind(3, account.nameExpire);
+                    s.Bind(4, account.zoneId);
+                    s.Bind(5, account.zoneName);
+                    s.Execute();
+                }
+            }
+
             Various::LogTimerEnd(timerId);
         }
     }
