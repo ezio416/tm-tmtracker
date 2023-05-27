@@ -46,6 +46,9 @@ namespace Accounts {
             Globals::accountIds.Set(account.accountId, account.accountName);
         }
 
+        // DB::AllAccounts::Save();
+        // DB::AllAccounts::Load();
+
         Various::LogTimerEnd(timerId);
     }
 }
