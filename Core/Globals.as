@@ -14,9 +14,6 @@ namespace Globals {
     bool              dev = false;
     bool              getAccountNames = true;
     uint64            latestNadeoRequest = 0;
-    bool              loadedAccounts = false;
-    bool              loadedMyMaps = false;
-    bool              loadedRecords = false;
     uint64            logTimerIndex = 0;
     dictionary        logTimers;
     bool              mapClicked = false;
