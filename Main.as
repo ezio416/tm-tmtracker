@@ -4,20 +4,13 @@ m 2023-05-26
 */
 
 void Main() {
-    if (Settings::loadAccountsOnBoot)
-        DB::Accounts::Load();
-
-    if (Settings::loadMyMapsOnBoot)
-        DB::MyMaps::Load();
-
     if (Settings::loadRecordsOnBoot)
         DB::Records::Load();
 
-    if (Settings::loadZonesOnBoot)
-        Zones::Load();
-
     if (!Settings::rememberOpen)
         Settings::windowOpen = false;
+
+    Zones::Load();
 
     IO::CreateFolder(Globals::thumbnailFolder);
 
