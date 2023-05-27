@@ -28,8 +28,6 @@ namespace DB {
         void Load() {
             string timerId = Various::LogTimerBegin("loading accounts from file");
 
-            Globals::loadedAccounts = true;
-
             Globals::ClearAccounts();
 
             SQLite::Statement@ s;
@@ -126,8 +124,6 @@ namespace DB {
 
         void Load() {
             string timerId = Various::LogTimerBegin("loading my maps from file");
-
-            Globals::loadedMyMaps = true;
 
             Globals::ClearMyMaps();
 
@@ -291,12 +287,6 @@ namespace DB {
 
         void Load() {
             string timerId = Various::LogTimerBegin("loading records from file");
-
-            if (!Globals::loadedAccounts || !Globals::loadedMyMaps) {
-                Various::Trace("attempted to load records before accounts and maps!");
-                Various::LogTimerEnd(timerId, false);
-                return;
-            }
 
             Globals::ClearRecords();
 

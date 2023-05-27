@@ -12,6 +12,8 @@ namespace Models {
         uint64     nameExpire = 0;
         dictionary recordMapIds;
         Record@[]  records;
+        string     zoneId;
+        string     zoneName;
 
         Account() { }
         Account(const string &in id) { accountId = id; }

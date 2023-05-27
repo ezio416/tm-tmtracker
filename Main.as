@@ -9,6 +9,8 @@ void Main() {
 
     Zones::Load();
 
+    DB::AllAccounts::Load();
+    DB::MyMaps::Load();
     DB::Records::Load();
 
     IO::CreateFolder(Globals::thumbnailFolder);
