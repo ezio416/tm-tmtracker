@@ -4,13 +4,12 @@ m 2023-05-26
 */
 
 void Main() {
-    if (Settings::loadRecordsOnBoot)
-        DB::Records::Load();
-
     if (!Settings::rememberOpen)
         Settings::windowOpen = false;
 
     Zones::Load();
+
+    DB::Records::Load();
 
     IO::CreateFolder(Globals::thumbnailFolder);
 
