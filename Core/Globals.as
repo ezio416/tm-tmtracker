@@ -59,8 +59,8 @@ namespace Globals {
 
         auto ix = uint(myMapUids[record.mapUid]);
         if (!myMaps[ix].recordAccountIds.Exists(record.accountId)) {
-            myMaps[ix].recordAccountIds.Set(record.accountId, "");
-            myMaps[ix].records.InsertLast(record);
+            myMaps[ix].recordAccountIds.Set(record.accountId, records.Length);
+            myMaps[ix].records.InsertLast(records[records.Length - 1]);
         }
     }
 
