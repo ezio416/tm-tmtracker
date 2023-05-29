@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-05-26
+m 2023-05-29
 */
 
 // Functions for rendering tabs in the interface
@@ -14,6 +14,12 @@ namespace Tabs {
 
         if (UI::Button(Icons::Download + " Get All Records"))
             startnew(CoroutineFunc(Maps::GetMyMapsRecordsCoro));
+
+        if (UI::Button(Icons::FloppyO + " save accounts"))
+            DB::AllAccounts::Save();
+
+        if (UI::Button(Icons::Times + " clear accounts"))
+            DB::AllAccounts::Clear();
 
         UI::EndTabItem();
     }
