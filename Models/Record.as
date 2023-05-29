@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-26
+m 2023-05-29
 */
 
 // Classes for holding data gathered during plugin operation
@@ -8,7 +8,6 @@ namespace Models {
     // Data on a record driven on a map
     class Record {
         string accountId;
-        string accountName;
         string mapId;
         string mapName;
         string mapUid;
@@ -33,7 +32,6 @@ namespace Models {
 
         Record(SQLite::Statement@ s) {
             accountId    = s.GetColumnString("accountId");
-            accountName  = s.GetColumnString("accountName");
             mapId        = s.GetColumnString("mapId");
             mapName      = s.GetColumnString("mapName");
             mapUid       = s.GetColumnString("mapUid");

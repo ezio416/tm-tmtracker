@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-26
+m 2023-05-29
 */
 
 // Functions for the TMTracker.db file
@@ -264,7 +264,6 @@ namespace DB {
     namespace Records {
         string tableColumns = """ (
             accountId    CHAR(36),
-            accountName  TEXT,
             mapId        CHAR(36),
             mapName      TEXT,
             mapUid       VARCHAR(27),
@@ -319,7 +318,6 @@ namespace DB {
                 @s = Globals::db.Prepare("""
                     INSERT INTO Records (
                         accountId,
-                        accountName,
                         mapId,
                         mapName,
                         mapUid,
@@ -328,18 +326,17 @@ namespace DB {
                         time,
                         zoneId,
                         zoneName
-                    ) VALUES (?,?,?,?,?,?,?,?,?,?);
+                    ) VALUES (?,?,?,?,?,?,?,?,?);
                 """);
                 s.Bind(1,  record.accountId);
-                s.Bind(2,  record.accountName);
-                s.Bind(3,  record.mapId);
-                s.Bind(4,  record.mapName);
-                s.Bind(5,  record.mapUid);
-                s.Bind(6,  record.position);
-                s.Bind(7,  record.recordFakeId);
-                s.Bind(8,  record.time);
-                s.Bind(9,  record.zoneId);
-                s.Bind(10, record.zoneName);
+                s.Bind(2,  record.mapId);
+                s.Bind(3,  record.mapName);
+                s.Bind(4,  record.mapUid);
+                s.Bind(5,  record.position);
+                s.Bind(6,  record.recordFakeId);
+                s.Bind(7,  record.time);
+                s.Bind(8,  record.zoneId);
+                s.Bind(9, record.zoneName);
                 s.Execute();
             }
 
