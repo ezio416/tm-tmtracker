@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-26
+m 2023-05-29
 */
 
 // Classes for holding data gathered during plugin operation
@@ -109,7 +109,10 @@ namespace Models {
                     record.mapUid       = mapUid;
                     record.recordFakeId = mapId + "-" + record.accountId;
 
-                    Globals::AddAccount(Models::Account(record.accountId));
+                    auto account = Models::Account(record.accountId);
+                    account.zoneId = record.zoneId;
+                    account.zoneName = record.zoneName;
+                    Globals::AddAccount(account);
 
                     recordAccountIds.Set(record.accountId, "");
                     records.InsertLast(record);
