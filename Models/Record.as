@@ -24,8 +24,8 @@ namespace Models {
             position  = record["position"];
             time      = record["score"];
             zoneId    = record["zoneId"];
-            if (!Globals::zones.Get(zoneId, zoneName))
-                zoneName = record["zoneName"];
+            try   { zoneName = string(Globals::zones.Get(zoneId)); }
+            catch { zoneName = record["zoneName"]; }
         }
 
         Record(SQLite::Statement@ s) {
