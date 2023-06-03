@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-05-26
+m 2023-05-29
 */
 
 // Functions for rendering tabs in the interface
@@ -75,7 +75,7 @@ namespace Tabs {
 
             if (!map.viewing) {
                 Globals::currentMaps.RemoveAt(i);
-                Globals::currentMapUids.Delete(map.mapUid);
+                Globals::currentMapIds.Delete(map.mapId);
             }
         }
     }

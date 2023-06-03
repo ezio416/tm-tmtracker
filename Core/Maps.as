@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-26
+m 2023-05-29
 */
 
 // Functions for getting/loading data on maps
@@ -36,7 +36,7 @@ namespace Maps {
         } while (tooManyMaps);
 
         for (int i = Globals::myMaps.Length - 1; i >= 0; i--)
-            if (Globals::myHiddenMapUids.Exists(Globals::myMaps[i].mapUid))
+            if (Globals::myHiddenMapIds.Exists(Globals::myMaps[i].mapId))
                 Globals::myMaps.RemoveAt(i);
 
         Various::LogTimerEnd(timerId);

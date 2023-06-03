@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-05-26
+m 2023-05-29
 */
 
 // Functions for rendering tabs in the interface
@@ -24,7 +24,8 @@ namespace Tabs {
             UI::Text(
                 Globals::accounts[i].accountId + "        " +
                 Globals::accounts[i].NameExpireFormatted() + "        " +
-                Globals::accounts[i].accountName
+                Globals::accounts[i].accountName + "        " +
+                Globals::accounts[i].zoneName
             );
         }
 

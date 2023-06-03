@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-29
+m 2023-06-03
 */
 
 // Classes for holding data gathered during plugin operation
@@ -21,13 +21,11 @@ namespace Models {
 
         Record(Json::Value record) {
             accountId = record["accountId"];
-            zoneId    = record["zoneId"];
             position  = record["position"];
             time      = record["score"];
-
-            Zones::Load();
-            try   { zoneName = Globals::zones[zoneId]; }
-            catch { zoneName = record["zoneName"]; }
+            zoneId    = record["zoneId"];
+            if (!Globals::zones.Get(zoneId, zoneName))
+                zoneName = record["zoneName"];
         }
 
         Record(SQLite::Statement@ s) {
