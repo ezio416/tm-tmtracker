@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-05-26
+m 2023-05-29
 */
 
 // Functions for rendering tabs in the interface
@@ -25,9 +25,9 @@ namespace Tabs {
                 catch { UI::Image(Globals::defaultTexture, thumbSize); }
 
                 UI::SetCursorPos(pos);
-                if (UI::InvisibleButton("invis_" + map.mapUid, thumbSize)) {
-                    if (!Globals::currentMapUids.Exists(map.mapUid)) {
-                        Globals::currentMapUids.Set(map.mapUid, "");
+                if (UI::InvisibleButton("invis_" + map.mapId, thumbSize)) {
+                    if (!Globals::currentMapIds.Exists(map.mapId)) {
+                        Globals::currentMapIds.Set(map.mapId, "");
                         Globals::currentMaps.InsertLast(@Globals::myMaps[i]);
                     }
                     Globals::mapClicked = true;

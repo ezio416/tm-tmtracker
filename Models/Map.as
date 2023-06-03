@@ -68,7 +68,7 @@ namespace Models {
             logName          = "MAP[" + mapNameText + "] - ";
             mapUid           = s.GetColumnString("mapUid");
             recordsTimestamp = s.GetColumnInt("recordsTimestamp");
-            thumbnailFile    = Globals::thumbnailFolder + "/" + mapUid + ".jpg";
+            thumbnailFile    = Globals::thumbnailFolder + "/" + mapId + ".jpg";
             silverTime       = s.GetColumnInt("silverTime");
             thumbnailUrl     = s.GetColumnString("thumbnailUrl");
             timestamp        = s.GetColumnInt("timestamp");
@@ -170,9 +170,9 @@ namespace Models {
         void LoadThumbnailCoro() {
             string timerId = Various::LogTimerBegin(logName + "loading thumbnail", false);
 
-            if (Globals::thumbnailTextures.Exists(mapUid)) {
+            if (Globals::thumbnailTextures.Exists(mapId)) {
                 UI::Texture@ tex;
-                @tex = cast<UI::Texture@>(Globals::thumbnailTextures[mapUid]);
+                @tex = cast<UI::Texture@>(Globals::thumbnailTextures[mapId]);
                 if (@thumbnailTexture == null)
                     @thumbnailTexture = tex;
                 Various::LogTimerEnd(timerId, Settings::logThumbnailTimes);
@@ -188,7 +188,7 @@ namespace Models {
             @thumbnailTexture = UI::LoadTexture(file.Read(file.Size()));
             file.Close();
 
-            Globals::thumbnailTextures.Set(mapUid, @thumbnailTexture);
+            Globals::thumbnailTextures.Set(mapId, @thumbnailTexture);
 
             Various::LogTimerEnd(timerId, Settings::logThumbnailTimes);
         }
