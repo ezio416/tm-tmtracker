@@ -25,7 +25,6 @@ namespace Tabs {
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
                     catch { UI::Image(Globals::defaultTexture, thumbSize); }
 
-                    UI::SameLine();
                     UI::BeginGroup();
                         UI::Text(map.mapNameText);
                         UI::Text(Time::FormatStringUTC(Settings::dateFormat + "UTC", map.timestamp));
@@ -60,13 +59,35 @@ namespace Tabs {
                         )
                     );
 
-                    for (uint j = 0; j < map.records.Length; j++) {
-                        string name;
-                        Globals::accountIds.Get(map.records[j].accountId, name);
-                        UI::Text(
-                            map.records[j].position + " - " + Time::Format(map.records[j].time) +
-                            " - " + name + " - " + map.records[j].zoneName
-                        );
+                    int flags =
+                        UI::TableFlags::ScrollY;
+
+                    if (UI::BeginTable("table_records", 4, flags)) {
+                        UI::TableSetupScrollFreeze(0, 1);
+                        UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 30);
+                        UI::TableSetupColumn("Time", UI::TableColumnFlags::WidthFixed, 100);
+                        UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthFixed, 300);
+                        UI::TableSetupColumn("Zone");
+                        UI::TableHeadersRow();
+
+                        UI::ListClipper clipper(map.records.Length);
+                        while (clipper.Step()) {
+                            for (uint j = clipper.DisplayStart; j < clipper.DisplayEnd; j++) {
+                                UI::TableNextRow();
+                                UI::TableNextColumn();
+                                UI::Text("" + map.records[j].position);
+                                UI::TableNextColumn();
+                                UI::Text(Time::Format(map.records[j].time));
+                                UI::TableNextColumn();
+                                string name;
+                                Globals::accountIds.Get(map.records[j].accountId, name);
+                                UI::Text(name);
+                                UI::TableNextColumn();
+                                UI::Text(map.records[j].zoneName);
+                            }
+                        }
+
+                        UI::EndTable();
                     }
                 UI::EndGroup();
 

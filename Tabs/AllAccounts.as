@@ -17,10 +17,10 @@ namespace Tabs {
         UI::Separator();
 
         int flags =
-            UI::TableFlags::ScrollY |
-            UI::TableFlags::Resizable;
+            UI::TableFlags::Resizable |
+            UI::TableFlags::ScrollY;
 
-        if (UI::BeginTable("table_accounts", 4, flags)) {
+        if (UI::BeginTable("table_accounts", 3, flags)) {
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("ID");
             UI::TableSetupColumn("Name");
@@ -29,7 +29,7 @@ namespace Tabs {
 
             UI::ListClipper clipper(Globals::accounts.Length);
             while (clipper.Step()) {
-                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+                for (uint i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
                     UI::TableNextRow();
                     UI::TableNextColumn();
                     UI::Text(Globals::accounts[i].accountId);
