@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-05-26
+m 2023-06-13
 */
 
 void Main() {
@@ -16,6 +16,10 @@ void Main() {
     IO::CreateFolder(Globals::thumbnailFolder);
 
     NadeoServices::AddAudience("NadeoLiveServices");
+
+#if SIG_DEVELOPER
+    Globals::dev = !Settings::devHidden;
+#endif
 }
 
 void RenderMenu() {

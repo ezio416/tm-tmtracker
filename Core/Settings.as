@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-26
+m 2023-06-13
 */
 
 // Settings in the native Openplanet menu
@@ -75,6 +75,9 @@ namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
     [Setting hidden]
     string dateFormat = "%a \\$F98%Y-%m-%d \\$Z%H:%M:%S \\$F98";
+
+    [Setting hidden]
+    bool devHidden = false;
 
     [Setting hidden]
     uint timeBetweenNadeoRequests = 500;
