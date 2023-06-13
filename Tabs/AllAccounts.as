@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-05-29
+m 2023-06-13
 */
 
 // Functions for rendering tabs in the interface
@@ -16,17 +16,31 @@ namespace Tabs {
 
         UI::Separator();
 
-        UI::Text("Account ID,     Name Expire Date,     Name");
+        int flags =
+            UI::TableFlags::ScrollY |
+            UI::TableFlags::Resizable;
 
-        UI::Separator();
+        if (UI::BeginTable("table_accounts", 4, flags)) {
+            UI::TableSetupScrollFreeze(0, 1);
+            UI::TableSetupColumn("ID");
+            UI::TableSetupColumn("Name");
+            UI::TableSetupColumn("Zone");
+            UI::TableHeadersRow();
 
-        for (uint i = 0; i < Globals::accounts.Length; i++) {
-            UI::Text(
-                Globals::accounts[i].accountId + "        " +
-                Globals::accounts[i].NameExpireFormatted() + "        " +
-                Globals::accounts[i].accountName + "        " +
-                Globals::accounts[i].zoneName
-            );
+            UI::ListClipper clipper(Globals::accounts.Length);
+            while (clipper.Step()) {
+                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+                    UI::TableNextRow();
+                    UI::TableNextColumn();
+                    UI::Text(Globals::accounts[i].accountId);
+                    UI::TableNextColumn();
+                    UI::Text(Globals::accounts[i].accountName);
+                    UI::TableNextColumn();
+                    UI::Text(Globals::accounts[i].zoneName);
+                }
+            }
+
+            UI::EndTable();
         }
 
         UI::EndTabItem();
