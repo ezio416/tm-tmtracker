@@ -39,13 +39,13 @@ namespace Tabs {
         UI::Separator();
 
         if (Globals::dev) {
-            if (UI::Button("Lock Dev Tab")) {
+            if (UI::Button(Icons::Lock + " Lock Dev Tab")) {
                 Util::Trace("dev tab locked");
                 Settings::devHidden = true;
                 Globals::dev = false;
             }
         } else {
-            if (UI::InputText("Unlock Dev Tab", "") == "racist") {
+            if (UI::InputText(Icons::Unlock + " Unlock Dev Tab", "") == "racist") {
                 Util::Trace("dev tab unlocked");
                 Settings::devHidden = false;
                 Globals::dev = true;

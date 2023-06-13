@@ -10,9 +10,15 @@ namespace Tabs {
 
         UI::TextWrapped(
             "I take no responsibility if you break shit in here!" +
-            "\nThis is all debug stuff and could get you banned." +
-            "\n\nLock (hide) this tab from the 'Info' tab."
+            "\nThis is all debug stuff and could get you banned."
         );
+
+        UI::SameLine();
+        if (UI::Button(Icons::Lock + " Lock Dev Tab")) {
+                Util::Trace("dev tab locked");
+                Settings::devHidden = true;
+                Globals::dev = false;
+            }
 
         UI::Separator();
 
