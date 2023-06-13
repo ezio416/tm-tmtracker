@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-05-26
+m 2023-06-13
 */
 
 // Functions for rendering tabs in the interface
@@ -40,12 +40,12 @@ namespace Tabs {
 
         if (Globals::dev) {
             if (UI::Button("Lock Dev Tab")) {
-                Various::Trace("dev tab locked");
+                Util::Trace("dev tab locked");
                 Globals::dev = false;
             }
         } else {
             if (UI::InputText("Unlock Dev Tab", "") == "balls") {
-                Various::Trace("dev tab unlocked");
+                Util::Trace("dev tab unlocked");
                 Globals::dev = true;
             }
         }

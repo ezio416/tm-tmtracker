@@ -1,12 +1,12 @@
 /*
 c 2023-05-20
-m 2023-05-26
+m 2023-06-13
 */
 
 // Functions for getting/loading data on player profiles
 namespace Accounts {
     void GetAccountNamesCoro() {
-        string timerId = Various::LogTimerBegin("getting account names");
+        string timerId = Util::LogTimerBegin("getting account names");
 
         uint idLimit = 209;
         string[] missing;
@@ -49,6 +49,6 @@ namespace Accounts {
         // DB::AllAccounts::Save();
         // DB::AllAccounts::Load();
 
-        Various::LogTimerEnd(timerId);
+        Util::LogTimerEnd(timerId);
     }
 }

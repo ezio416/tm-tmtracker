@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-29
+m 2023-06-13
 */
 
 // Classes for holding data gathered during plugin operation
@@ -78,7 +78,7 @@ namespace Models {
         int opCmp(Map m) { return timestamp - m.timestamp; }
 
         void GetRecordsCoro() {
-            string timerId = Various::LogTimerBegin(logName + "getting records");
+            string timerId = Util::LogTimerBegin(logName + "getting records");
 
             uint offset = 0;
             bool tooManyRecords;
@@ -87,7 +87,7 @@ namespace Models {
             recordAccountIds.DeleteAll();
 
             do {
-                auto wait = startnew(CoroutineFunc(Various::WaitToDoNadeoRequestCoro));
+                auto wait = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
                 while (wait.IsRunning()) yield();
 
                 auto req = NadeoServices::Get(
@@ -132,13 +132,13 @@ namespace Models {
             DB::MyMaps::Save();
             DB::Records::Save();
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
 
         void GetThumbnailCoro() {
             if (IO::FileExists(thumbnailFile)) return;
 
-            string timerId = Various::LogTimerBegin(logName + "downloading thumbnail");
+            string timerId = Util::LogTimerBegin(logName + "downloading thumbnail");
 
             uint max_timeout = 3000;
             uint max_wait = 2000;
@@ -164,18 +164,18 @@ namespace Models {
                 break;
             }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
 
         void LoadThumbnailCoro() {
-            string timerId = Various::LogTimerBegin(logName + "loading thumbnail", false);
+            string timerId = Util::LogTimerBegin(logName + "loading thumbnail", false);
 
             if (Globals::thumbnailTextures.Exists(mapId)) {
                 UI::Texture@ tex;
                 @tex = cast<UI::Texture@>(Globals::thumbnailTextures[mapId]);
                 if (@thumbnailTexture == null)
                     @thumbnailTexture = tex;
-                Various::LogTimerEnd(timerId, Settings::logThumbnailTimes);
+                Util::LogTimerEnd(timerId, Settings::logThumbnailTimes);
                 return;
             }
 
@@ -190,7 +190,7 @@ namespace Models {
 
             Globals::thumbnailTextures.Set(mapId, @thumbnailTexture);
 
-            Various::LogTimerEnd(timerId, Settings::logThumbnailTimes);
+            Util::LogTimerEnd(timerId, Settings::logThumbnailTimes);
         }
     }
 }

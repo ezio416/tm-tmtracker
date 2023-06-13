@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-05-26
+m 2023-06-13
 */
 
 // Functions for rendering tabs in the interface
@@ -20,12 +20,12 @@ namespace Tabs {
         if (Globals::myHiddenMaps.Length > 0) {
             UI::SameLine();
             if (UI::Button(Icons::Eye + " Show Hidden (" + Globals::myHiddenMaps.Length + ")")) {
-                string timerId = Various::LogTimerBegin("unhiding all maps");
+                string timerId = Util::LogTimerBegin("unhiding all maps");
 
                 for (uint i = 0; i < Globals::myHiddenMaps.Length;)
                     DB::MyMaps::UnHide(Globals::myHiddenMaps[i]);
 
-                Various::LogTimerEnd(timerId);
+                Util::LogTimerEnd(timerId);
             }
         }
 
