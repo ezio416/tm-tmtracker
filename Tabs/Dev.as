@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-05-29
+m 2023-06-13
 */
 
 // Functions for rendering tabs in the interface
@@ -8,7 +8,11 @@ namespace Tabs {
     void Dev() {
         if (!UI::BeginTabItem(Icons::Cogs + " Dev")) return;
 
-        UI::Text("I take no responsibility if you break shit in here!");
+        UI::TextWrapped(
+            "I take no responsibility if you break shit in here!" +
+            "\nThis is all debug stuff and could get you banned." +
+            "\n\nLock (hide) this tab from the 'Info' tab."
+        );
 
         UI::Separator();
 
