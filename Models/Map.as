@@ -111,7 +111,6 @@ namespace Models {
 
                     auto account = Models::Account(record.accountId);
                     account.zoneId = record.zoneId;
-                    account.zoneName = record.zoneName;
                     Globals::AddAccount(account);
 
                     recordAccountIds.Set(record.accountId, "");

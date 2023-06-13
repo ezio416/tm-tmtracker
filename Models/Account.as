@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-26
+m 2023-06-13
 */
 
 // Classes for holding data gathered during plugin operation
@@ -13,7 +13,6 @@ namespace Models {
         dictionary recordMapIds;
         Record@[]  records;
         string     zoneId;
-        string     zoneName;
 
         Account() { }
         Account(const string &in id) { accountId = id; }
@@ -21,6 +20,11 @@ namespace Models {
             accountId   = s.GetColumnString("accountId");
             accountName = s.GetColumnString("accountName");
             nameExpire  = s.GetColumnInt("nameExpire");
+        }
+
+        string get_zoneName() {
+            try   { return string(Globals::zones.Get(zoneId)); }
+            catch { return "unknown-zone"; }
         }
 
         bool IsNameExpired() {
