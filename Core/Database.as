@@ -265,13 +265,10 @@ namespace DB {
         string tableColumns = """ (
             accountId    CHAR(36),
             mapId        CHAR(36),
-            mapName      TEXT,
-            mapUid       VARCHAR(27),
             position     INT,
             recordFakeId CHAR(73) PRIMARY KEY,
             time         INT,
-            zoneId       CHAR(36),
-            zoneName     TEXT
+            zoneId       CHAR(36)
         ); """;
 
         void Clear() {
@@ -319,24 +316,18 @@ namespace DB {
                     INSERT INTO Records (
                         accountId,
                         mapId,
-                        mapName,
-                        mapUid,
                         position,
                         recordFakeId,
                         time,
-                        zoneId,
-                        zoneName
-                    ) VALUES (?,?,?,?,?,?,?,?,?);
+                        zoneId
+                    ) VALUES (?,?,?,?,?,?);
                 """);
-                s.Bind(1,  record.accountId);
-                s.Bind(2,  record.mapId);
-                s.Bind(3,  record.mapName);
-                s.Bind(4,  record.mapUid);
-                s.Bind(5,  record.position);
-                s.Bind(6,  record.recordFakeId);
-                s.Bind(7,  record.time);
-                s.Bind(8,  record.zoneId);
-                s.Bind(9, record.zoneName);
+                s.Bind(1, record.accountId);
+                s.Bind(2, record.mapId);
+                s.Bind(3, record.position);
+                s.Bind(4, record.recordFakeId);
+                s.Bind(5, record.time);
+                s.Bind(6, record.zoneId);
                 s.Execute();
             }
 
