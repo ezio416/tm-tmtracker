@@ -11,7 +11,7 @@ namespace Models {
         string mapId;
         string mapName;
         string mapUid;
-        uint   medals;
+        uint   medals = 0;
         uint   position;
         string recordFakeId;
         uint   time;
@@ -38,6 +38,13 @@ namespace Models {
         string get_zoneName() {
             try   { return string(Globals::zones.Get(zoneId)); }
             catch { return "unknown-zone"; }
+        }
+
+        void SetMedals(Map@ map) {
+            if (time <= map.bronzeTime) medals++;
+            if (time <= map.silverTime) medals++;
+            if (time <= map.goldTime)   medals++;
+            if (time <= map.authorTime) medals++;
         }
     }
 }

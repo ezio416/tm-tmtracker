@@ -54,13 +54,18 @@ namespace Globals {
 
     void AddRecord(Models::Record record) {
         if (recordIds.Exists(record.recordFakeId)) return;
+
+        auto ix = uint(myMapIds[record.mapId]);
+        auto @map = myMaps[ix];
+
+        record.SetMedals(map);
+
         recordIds.Set(record.recordFakeId, records.Length);
         records.InsertLast(record);
 
-        auto ix = uint(myMapIds[record.mapId]);
-        if (!myMaps[ix].recordAccountIds.Exists(record.accountId)) {
-            myMaps[ix].recordAccountIds.Set(record.accountId, records.Length);
-            myMaps[ix].records.InsertLast(records[records.Length - 1]);
+        if (!map.recordAccountIds.Exists(record.accountId)) {
+            map.recordAccountIds.Set(record.accountId, records.Length);
+            map.records.InsertLast(record);
         }
     }
 

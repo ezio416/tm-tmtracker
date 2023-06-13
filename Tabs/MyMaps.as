@@ -11,7 +11,7 @@ namespace Tabs {
         if (Settings::welcomeText)
             UI::TextWrapped(
                 "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
-                "\nClose tabs with the \uE997 or with a middle click."
+                "\nClose tabs with a middle click or the \uE997"
             );
 
         if (UI::Button(Icons::Refresh + " Update Map List (" + Globals::myMaps.Length + ")"))

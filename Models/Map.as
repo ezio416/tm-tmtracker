@@ -109,6 +109,8 @@ namespace Models {
                     record.mapUid       = mapUid;
                     record.recordFakeId = mapId + "-" + record.accountId;
 
+                    record.SetMedals(this);
+
                     auto account = Models::Account(record.accountId);
                     account.zoneId = record.zoneId;
                     Globals::AddAccount(account);
