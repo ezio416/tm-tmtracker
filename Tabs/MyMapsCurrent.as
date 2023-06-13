@@ -59,10 +59,7 @@ namespace Tabs {
                         )
                     );
 
-                    int flags =
-                        UI::TableFlags::ScrollY;
-
-                    if (UI::BeginTable("table_records", 4, flags)) {
+                    if (UI::BeginTable("table_records", 4, UI::TableFlags::ScrollY)) {
                         UI::TableSetupScrollFreeze(0, 1);
                         UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 30);
                         UI::TableSetupColumn("Time", UI::TableColumnFlags::WidthFixed, 100);
@@ -72,12 +69,20 @@ namespace Tabs {
 
                         UI::ListClipper clipper(map.records.Length);
                         while (clipper.Step()) {
-                            for (uint j = clipper.DisplayStart; j < clipper.DisplayEnd; j++) {
+                            for (int j = clipper.DisplayStart; j < clipper.DisplayEnd; j++) {
                                 UI::TableNextRow();
                                 UI::TableNextColumn();
                                 UI::Text("" + map.records[j].position);
                                 UI::TableNextColumn();
-                                UI::Text(Time::Format(map.records[j].time));
+                                string timeColor = "";
+                                if (Settings::recordMedalColors)
+                                    switch (map.records[j].medals) {
+                                        case 1: timeColor = "\\$C80"; break;
+                                        case 2: timeColor = "\\$AAA"; break;
+                                        case 3: timeColor = "\\$DD1"; break;
+                                        case 4: timeColor = "\\$4B0"; break;
+                                    }
+                                UI::Text(timeColor + Time::Format(map.records[j].time));
                                 UI::TableNextColumn();
                                 string name;
                                 Globals::accountIds.Get(map.records[j].accountId, name);

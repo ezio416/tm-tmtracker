@@ -29,7 +29,7 @@ namespace Tabs {
 
             UI::ListClipper clipper(Globals::accounts.Length);
             while (clipper.Step()) {
-                for (uint i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
                     UI::TableNextRow();
                     UI::TableNextColumn();
                     UI::Text(Globals::accounts[i].accountId);

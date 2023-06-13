@@ -64,6 +64,9 @@ namespace Settings {
     [Setting category="Map Tabs" name="Show map name with color on tab"]
     bool myMapsTabsColor = true;
 
+    [Setting category="Map Tabs" name="Show record times with medal colors"]
+    bool recordMedalColors = true;
+
     [Setting category="Map Tabs" name="Thumbnail width" min=10 max=1000]
     uint myMapsThumbnailWidthTabs = 400;
 
