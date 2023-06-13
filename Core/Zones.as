@@ -17,8 +17,7 @@ namespace Zones {
             Globals::zones = Json::FromFile("Assets/zones.json");
             Globals::zonesFileMissing = false;
         } catch {
-            if (Settings::logEnabled)
-                trace("missing zones file!");
+            Util::Trace("missing zones file!");
             Util::LogTimerEnd(timerId, false);
             return;
         }
