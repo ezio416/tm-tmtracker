@@ -21,29 +21,27 @@ namespace Tabs {
         UI::Separator();
 
         UI::TextWrapped(
-            "If you do have suggestions or problems, please submit an issue below.\n" +
+            "If you do have suggestions or problems, please submit an issue.\n" +
             "It's very easy to add a setting, and probably easy to add a small feature."
         );
+        UI::SameLine();
         string linkGH = "https://github.com/ezio416/TMTracker-Openplanet/issues";
         if (UI::Button(Icons::Github + " Issues")) OpenBrowserURL(linkGH);
 
         UI::Separator();
 
         UI::TextWrapped(
-            "Files are kept at " + Globals::storageFolder +
+            "Files are kept at \\$1F1" + Globals::storageFolder + "\\$G"
             "\nIf you want to look in the database, I recommend DB Browser:"
         );
+        UI::SameLine();
         string linkSQL = "sqlitebrowser.org";
         if (UI::Button(Icons::Database + " " + linkSQL)) OpenBrowserURL("https://" + linkSQL);
 
         UI::Separator();
 
         if (Globals::dev) {
-            if (UI::Button(Icons::Lock + " Lock Dev Tab")) {
-                Util::Trace("dev tab locked");
-                Settings::devHidden = true;
-                Globals::dev = false;
-            }
+            Thing_LockDevButton();
         } else {
             if (UI::InputText(Icons::Unlock + " Unlock Dev Tab", "") == "racist") {
                 Util::Trace("dev tab unlocked");

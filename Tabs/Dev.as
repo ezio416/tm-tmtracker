@@ -14,11 +14,7 @@ namespace Tabs {
         );
 
         UI::SameLine();
-        if (UI::Button(Icons::Lock + " Lock Dev Tab")) {
-                Util::Trace("dev tab locked");
-                Settings::devHidden = true;
-                Globals::dev = false;
-            }
+        Thing_LockDevButton();
 
         UI::Separator();
 
@@ -32,5 +28,13 @@ namespace Tabs {
             DB::AllAccounts::Clear();
 
         UI::EndTabItem();
+    }
+
+    void Thing_LockDevButton() {
+        if (UI::Button(Icons::Lock + " Lock Dev Tab")) {
+            Util::Trace("dev tab locked");
+            Settings::devHidden = true;
+            Globals::dev = false;
+        }
     }
 }
