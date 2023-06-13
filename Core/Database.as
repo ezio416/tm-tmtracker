@@ -172,9 +172,9 @@ namespace DB {
                 SQLite::Statement@ s;
                 try {
                     if (map.recordsTimestamp == 0) throw("");
-                    @s = Globals::db.Prepare("UPDATE MyMaps SET recordsTimestamp=? WHERE mapUid=?");
+                    @s = Globals::db.Prepare("UPDATE MyMaps SET recordsTimestamp=? WHERE mapId=?");
                     s.Bind(1, map.recordsTimestamp);
-                    s.Bind(2, map.mapUid);
+                    s.Bind(2, map.mapId);
                     s.Execute();
                 } catch {
                     @s = Globals::db.Prepare("""
@@ -226,12 +226,12 @@ namespace DB {
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS MyHiddenMaps" + tableColumns);
             SQLite::Statement@ s;
 
-            @s = Globals::db.Prepare("INSERT INTO MyHiddenMaps SELECT * FROM MyMaps WHERE mapUid=?");
-            s.Bind(1, map.mapUid);
+            @s = Globals::db.Prepare("INSERT INTO MyHiddenMaps SELECT * FROM MyMaps WHERE mapId=?");
+            s.Bind(1, map.mapId);
             s.Execute();
 
-            @s = Globals::db.Prepare("DELETE FROM MyMaps WHERE mapUid=?");
-            s.Bind(1, map.mapUid);
+            @s = Globals::db.Prepare("DELETE FROM MyMaps WHERE mapId=?");
+            s.Bind(1, map.mapId);
             s.Execute();
 
             Util::LogTimerEnd(timerId);
@@ -246,12 +246,12 @@ namespace DB {
 
             SQLite::Statement@ s;
 
-            @s = Globals::db.Prepare("INSERT INTO MyMaps SELECT * FROM MyHiddenMaps WHERE mapUid=?");
-            s.Bind(1, map.mapUid);
+            @s = Globals::db.Prepare("INSERT INTO MyMaps SELECT * FROM MyHiddenMaps WHERE mapId=?");
+            s.Bind(1, map.mapId);
             s.Execute();
 
-            @s = Globals::db.Prepare("DELETE FROM MyHiddenMaps WHERE mapUid=?");
-            s.Bind(1, map.mapUid);
+            @s = Globals::db.Prepare("DELETE FROM MyHiddenMaps WHERE mapId=?");
+            s.Bind(1, map.mapId);
             s.Execute();
 
             Util::LogTimerEnd(timerId);
