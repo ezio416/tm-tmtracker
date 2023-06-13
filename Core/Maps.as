@@ -1,12 +1,12 @@
 /*
 c 2023-05-16
-m 2023-05-29
+m 2023-06-13
 */
 
 // Functions for getting/loading data on maps
 namespace Maps {
     void GetMyMapsCoro() {
-        string timerId = Various::LogTimerBegin("updating my maps");
+        string timerId = Util::LogTimerBegin("updating my maps");
 
         Globals::ClearMyMaps();
 
@@ -16,7 +16,7 @@ namespace Maps {
         bool tooManyMaps;
 
         do {
-            auto wait = startnew(CoroutineFunc(Various::WaitToDoNadeoRequestCoro));
+            auto wait = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
             while (wait.IsRunning()) yield();
 
             auto req = NadeoServices::Get(
@@ -39,7 +39,7 @@ namespace Maps {
             if (Globals::myHiddenMapIds.Exists(Globals::myMaps[i].mapId))
                 Globals::myMaps.RemoveAt(i);
 
-        Various::LogTimerEnd(timerId);
+        Util::LogTimerEnd(timerId);
 
         DB::MyMaps::Save();
         DB::MyMaps::Load();
@@ -47,7 +47,7 @@ namespace Maps {
     }
 
     void GetMyMapsRecordsCoro() {
-        string timerId = Various::LogTimerBegin("getting my map records");
+        string timerId = Util::LogTimerBegin("getting my map records");
 
         Globals::getAccountNames = false;
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
@@ -59,28 +59,28 @@ namespace Maps {
         auto coro = startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
         while (coro.IsRunning()) yield();
 
-        Various::LogTimerEnd(timerId);
+        Util::LogTimerEnd(timerId);
     }
 
     void GetMyMapsThumbnailsCoro() {
-        string timerId = Various::LogTimerBegin("getting my map thumbnails");
+        string timerId = Util::LogTimerBegin("getting my map thumbnails");
 
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
             auto @coro = startnew(CoroutineFunc(Globals::myMaps[i].GetThumbnailCoro));
             while (coro.IsRunning()) yield();
         }
 
-        Various::LogTimerEnd(timerId);
+        Util::LogTimerEnd(timerId);
     }
 
     void LoadMyMapsThumbnailsCoro() {
-        string timerId = Various::LogTimerBegin("loading my map thumbnails");
+        string timerId = Util::LogTimerBegin("loading my map thumbnails");
 
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
             auto @coro = startnew(CoroutineFunc(Globals::myMaps[i].LoadThumbnailCoro));
             while (coro.IsRunning()) yield();
         }
 
-        Various::LogTimerEnd(timerId);
+        Util::LogTimerEnd(timerId);
     }
 }

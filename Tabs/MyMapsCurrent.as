@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-05-29
+m 2023-06-13
 */
 
 // Functions for rendering tabs in the interface
@@ -55,7 +55,7 @@ namespace Tabs {
                         "Last Updated: " + (
                             map.recordsTimestamp > 0 ?
                                 Time::FormatString(Settings::dateFormat + "Local\\$Z", map.recordsTimestamp) +
-                                    " (" + Various::FormatSeconds(Time::Stamp - map.recordsTimestamp) + " ago)" :
+                                    " (" + Util::FormatSeconds(Time::Stamp - map.recordsTimestamp) + " ago)" :
                                 "not yet"
                         )
                     );

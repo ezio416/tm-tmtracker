@@ -1,10 +1,10 @@
 /*
 c 2023-05-20
-m 2023-05-26
+m 2023-06-13
 */
 
 // Functions that don't fit nicely in other categories
-namespace Various {
+namespace Util {
     string FormatSeconds(int seconds) {
         int minutes = seconds / 60;
         seconds %= 60;

@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-29
+m 2023-06-13
 */
 
 // Functions for the TMTracker.db file
@@ -16,17 +16,17 @@ namespace DB {
         ); """;
 
         void Clear() {
-            string timerId = Various::LogTimerBegin("clearing accounts from program and file");
+            string timerId = Util::LogTimerBegin("clearing accounts from program and file");
 
             Globals::ClearAccounts();
 
             try { Globals::db.Execute("DELETE FROM Accounts"); } catch { }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
 
         void Load() {
-            string timerId = Various::LogTimerBegin("loading accounts from file");
+            string timerId = Util::LogTimerBegin("loading accounts from file");
 
             Globals::ClearAccounts();
 
@@ -36,8 +36,8 @@ namespace DB {
             try {
                 @s = Globals::db.Prepare("SELECT * FROM Accounts ORDER BY accountName ASC");
             } catch {
-                Various::Trace("no Accounts table in database, plugin (likely) hasn't been run yet");
-                Various::LogTimerEnd(timerId);
+                Util::Trace("no Accounts table in database, plugin (likely) hasn't been run yet");
+                Util::LogTimerEnd(timerId);
                 return;
             }
             while (true) {
@@ -45,11 +45,11 @@ namespace DB {
                 Globals::AddAccount(Models::Account(s));
             }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
 
         void Save() {
-            string timerId = Various::LogTimerBegin("saving accounts to file");
+            string timerId = Util::LogTimerBegin("saving accounts to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS Accounts" + tableColumns);
 
@@ -85,7 +85,7 @@ namespace DB {
                 }
             }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
     }
 
@@ -110,7 +110,7 @@ namespace DB {
         ); """;
 
         void Clear() {
-            string timerId = Various::LogTimerBegin("clearing my maps from program and file");
+            string timerId = Util::LogTimerBegin("clearing my maps from program and file");
 
             Globals::ClearCurrentMaps();
             Globals::ClearMyHiddenMaps();
@@ -119,11 +119,11 @@ namespace DB {
             try { Globals::db.Execute("DELETE FROM MyMaps");       } catch { }
             try { Globals::db.Execute("DELETE FROM MyHiddenMaps"); } catch { }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
 
         void Load() {
-            string timerId = Various::LogTimerBegin("loading my maps from file");
+            string timerId = Util::LogTimerBegin("loading my maps from file");
 
             Globals::ClearMyMaps();
 
@@ -133,8 +133,8 @@ namespace DB {
             try {
                 @s = Globals::db.Prepare("SELECT * FROM MyMaps ORDER BY timestamp " + order);
             } catch {
-                Various::Trace("no MyMaps table in database, plugin hasn't been run yet");
-                Various::LogTimerEnd(timerId);
+                Util::Trace("no MyMaps table in database, plugin hasn't been run yet");
+                Util::LogTimerEnd(timerId);
                 return;
             }
             while (true) {
@@ -148,7 +148,7 @@ namespace DB {
                 @s = Globals::db.Prepare("SELECT * FROM MyHiddenMaps");
                 anyHidden = true;
             } catch {
-                Various::Trace("no MyHiddenMaps table in database, no maps are hidden yet");
+                Util::Trace("no MyHiddenMaps table in database, no maps are hidden yet");
             }
 
             if (anyHidden)
@@ -157,13 +157,13 @@ namespace DB {
                     Globals::AddMyHiddenMap(Models::Map(s));
                 }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
 
             startnew(CoroutineFunc(Maps::LoadMyMapsThumbnailsCoro));
         }
 
         void Save() {
-            string timerId = Various::LogTimerBegin("saving my maps to file");
+            string timerId = Util::LogTimerBegin("saving my maps to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS MyMaps" + tableColumns);
 
@@ -215,11 +215,11 @@ namespace DB {
                 }
             }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
 
         void Hide(Models::Map@ map) {
-            string timerId = Various::LogTimerBegin(map.logName + "hiding");
+            string timerId = Util::LogTimerBegin(map.logName + "hiding");
 
             map.hidden = true;
 
@@ -234,13 +234,13 @@ namespace DB {
             s.Bind(1, map.mapUid);
             s.Execute();
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
 
             Load();
         }
 
         void UnHide(Models::Map@ map) {
-            string timerId = Various::LogTimerBegin(map.logName + "unhiding");
+            string timerId = Util::LogTimerBegin(map.logName + "unhiding");
 
             map.hidden = false;
 
@@ -254,7 +254,7 @@ namespace DB {
             s.Bind(1, map.mapUid);
             s.Execute();
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
 
             Load();
         }
@@ -275,17 +275,17 @@ namespace DB {
         ); """;
 
         void Clear() {
-            string timerId = Various::LogTimerBegin("clearing records from program and file");
+            string timerId = Util::LogTimerBegin("clearing records from program and file");
 
             Globals::ClearRecords();
 
             try { Globals::db.Execute("DELETE FROM Records"); } catch { }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
 
         void Load() {
-            string timerId = Various::LogTimerBegin("loading records from file");
+            string timerId = Util::LogTimerBegin("loading records from file");
 
             Globals::ClearRecords();
 
@@ -295,8 +295,8 @@ namespace DB {
             try {
                 @s = Globals::db.Prepare("SELECT * FROM Records");
             } catch {
-                Various::Trace("no Records table in database, no records gotten yet");
-                Various::LogTimerEnd(timerId);
+                Util::Trace("no Records table in database, no records gotten yet");
+                Util::LogTimerEnd(timerId);
                 return;
             }
             while (true) {
@@ -304,11 +304,11 @@ namespace DB {
                 Globals::AddRecord(Models::Record(s));
             }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
 
         void Save() {
-            string timerId = Various::LogTimerBegin("saving records to file");
+            string timerId = Util::LogTimerBegin("saving records to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS Records" + tableColumns);
 
@@ -340,7 +340,7 @@ namespace DB {
                 s.Execute();
             }
 
-            Various::LogTimerEnd(timerId);
+            Util::LogTimerEnd(timerId);
         }
     }
 }

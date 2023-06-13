@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-26
+m 2023-06-13
 */
 
 // Functions for player regions
@@ -11,7 +11,7 @@ namespace Zones {
             return;
         } catch { }
 
-        string timerId = Various::LogTimerBegin("loading zones from file");
+        string timerId = Util::LogTimerBegin("loading zones from file");
 
         try {
             Globals::zones = Json::FromFile("Assets/zones.json");
@@ -19,10 +19,10 @@ namespace Zones {
         } catch {
             if (Settings::logEnabled)
                 trace("missing zones file!");
-            Various::LogTimerEnd(timerId, false);
+            Util::LogTimerEnd(timerId, false);
             return;
         }
 
-        Various::LogTimerEnd(timerId);
+        Util::LogTimerEnd(timerId);
     }
 }
