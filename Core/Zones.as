@@ -5,6 +5,11 @@ m 2023-06-13
 
 // Functions for player regions
 namespace Zones {
+    string Get(const string &in zoneId) {
+        try   { return string(Globals::zones.Get(zoneId)); }
+        catch { return "unknown-zone"; }
+    }
+
     void Load() {
         try {
             Globals::zones.Length;
