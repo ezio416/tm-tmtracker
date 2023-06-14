@@ -11,7 +11,8 @@ namespace DB {
             accountId   CHAR(36) PRIMARY KEY,
             accountName TEXT,
             nameExpire  INT,
-            zoneId      CHAR(36)
+            zoneId      CHAR(36),
+            zoneName    TEXT
         ); """;
 
         void Clear() {
@@ -24,7 +25,7 @@ namespace DB {
             Util::LogTimerEnd(timerId);
         }
 
-        void LoadCoro() {
+        void Load() {
             string timerId = Util::LogTimerBegin("loading accounts from file");
 
             Globals::ClearAccounts();
@@ -39,15 +40,15 @@ namespace DB {
                 Util::LogTimerEnd(timerId);
                 return;
             }
-            while (s.NextRow()) {
+            while (true) {
+                if (!s.NextRow()) break;
                 Globals::AddAccount(Models::Account(s));
-                yield();
             }
 
             Util::LogTimerEnd(timerId);
         }
 
-        void SaveCoro() {
+        void Save() {
             string timerId = Util::LogTimerBegin("saving accounts to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS Accounts" + tableColumns);
@@ -57,12 +58,13 @@ namespace DB {
                 SQLite::Statement@ s;
                 try {
                     @s = Globals::db.Prepare(
-                        "UPDATE Accounts SET accountName=? nameExpire=? zoneId=? WHERE accountId=?"
+                        "UPDATE Accounts SET accountName=? nameExpire=? zoneId=? zoneName=? WHERE accountId=?"
                     );
                     s.Bind(1, account.accountName);
                     s.Bind(2, account.nameExpire);
                     s.Bind(3, account.zoneId);
-                    s.Bind(4, account.accountId);
+                    s.Bind(4, account.zoneName);
+                    s.Bind(5, account.accountId);
                     s.Execute();
                 } catch {
                     @s = Globals::db.Prepare("""
@@ -70,16 +72,17 @@ namespace DB {
                             accountId,
                             accountName,
                             nameExpire,
-                            zoneId
-                        ) VALUES (?,?,?,?);
+                            zoneId,
+                            zoneName
+                        ) VALUES (?,?,?,?,?);
                     """);
                     s.Bind(1, account.accountId);
                     s.Bind(2, account.accountName);
                     s.Bind(3, account.nameExpire);
                     s.Bind(4, account.zoneId);
+                    s.Bind(5, account.zoneName);
                     s.Execute();
                 }
-                yield();
             }
 
             Util::LogTimerEnd(timerId);
@@ -119,7 +122,7 @@ namespace DB {
             Util::LogTimerEnd(timerId);
         }
 
-        void LoadCoro() {
+        void Load() {
             string timerId = Util::LogTimerBegin("loading my maps from file");
 
             Globals::ClearMyMaps();
@@ -134,9 +137,9 @@ namespace DB {
                 Util::LogTimerEnd(timerId);
                 return;
             }
-            while (s.NextRow()) {
+            while (true) {
+                if (!s.NextRow()) break;
                 Globals::AddMyMap(Models::Map(s));
-                yield();
             }
 
             Globals::ClearMyHiddenMaps();
@@ -149,9 +152,9 @@ namespace DB {
             }
 
             if (anyHidden)
-                while (s.NextRow()) {
+                while (true) {
+                    if (!s.NextRow()) break;
                     Globals::AddMyHiddenMap(Models::Map(s));
-                    yield();
                 }
 
             Util::LogTimerEnd(timerId);
@@ -159,7 +162,7 @@ namespace DB {
             startnew(CoroutineFunc(Maps::LoadMyMapsThumbnailsCoro));
         }
 
-        void SaveCoro() {
+        void Save() {
             string timerId = Util::LogTimerBegin("saving my maps to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS MyMaps" + tableColumns);
@@ -210,7 +213,6 @@ namespace DB {
                     s.Bind(15, map.timestamp);
                     s.Execute();
                 }
-                yield();
             }
 
             Util::LogTimerEnd(timerId);
@@ -234,7 +236,7 @@ namespace DB {
 
             Util::LogTimerEnd(timerId);
 
-            startnew(CoroutineFunc(LoadCoro));
+            Load();
         }
 
         void UnHide(Models::Map@ map) {
@@ -254,7 +256,7 @@ namespace DB {
 
             Util::LogTimerEnd(timerId);
 
-            startnew(CoroutineFunc(LoadCoro));
+            Load();
         }
     }
 
@@ -279,7 +281,7 @@ namespace DB {
             Util::LogTimerEnd(timerId);
         }
 
-        void LoadCoro() {
+        void Load() {
             string timerId = Util::LogTimerBegin("loading records from file");
 
             Globals::ClearRecords();
@@ -294,15 +296,15 @@ namespace DB {
                 Util::LogTimerEnd(timerId);
                 return;
             }
-            while (s.NextRow()) {
+            while (true) {
+                if (!s.NextRow()) break;
                 Globals::AddRecord(Models::Record(s));
-                yield();
             }
 
             Util::LogTimerEnd(timerId);
         }
 
-        void SaveCoro() {
+        void Save() {
             string timerId = Util::LogTimerBegin("saving records to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS Records" + tableColumns);
@@ -327,7 +329,6 @@ namespace DB {
                 s.Bind(5, record.time);
                 s.Bind(6, record.zoneId);
                 s.Execute();
-                yield();
             }
 
             Util::LogTimerEnd(timerId);
