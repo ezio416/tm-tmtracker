@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-06-13
+m 2023-06-14
 */
 
 // Functions for the TMTracker.db file
@@ -24,7 +24,7 @@ namespace DB {
             Util::LogTimerEnd(timerId);
         }
 
-        void Load() {
+        void LoadCoro() {
             string timerId = Util::LogTimerBegin("loading accounts from file");
 
             Globals::ClearAccounts();
@@ -35,52 +35,83 @@ namespace DB {
             try {
                 @s = Globals::db.Prepare("SELECT * FROM Accounts ORDER BY accountName ASC");
             } catch {
-                Util::Trace("no Accounts table in database, plugin (likely) hasn't been run yet");
-                Util::LogTimerEnd(timerId);
+                Util::Warn("no Accounts table in database");
+                Util::LogTimerEnd(timerId, false);
                 return;
             }
+            uint i = 0;
             while (s.NextRow()) {
+                i++;
                 Globals::AddAccount(Models::Account(s));
+                if (i % Globals::sqlLoadBatch == 0) yield();
             }
 
             Util::LogTimerEnd(timerId);
         }
 
-        void Save() {
+        void SaveCoro() {
             string timerId = Util::LogTimerBegin("saving accounts to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS Accounts" + tableColumns);
 
+            Models::Account[] newAccounts;
+
             for (uint i = 0; i < Globals::accounts.Length; i++) {
                 auto account = Globals::accounts[i];
                 SQLite::Statement@ s;
-                try {
-                    @s = Globals::db.Prepare(
-                        "UPDATE Accounts SET accountName=? nameExpire=? zoneId=? WHERE accountId=?"
-                    );
+                @s = Globals::db.Prepare("SELECT * FROM Accounts WHERE accountId=?");
+                s.Bind(1, account.accountId);
+                if (s.NextRow()) {
+                    @s = Globals::db.Prepare("UPDATE Accounts SET accountName=?, nameExpire=?, zoneId=? WHERE accountId=?");
                     s.Bind(1, account.accountName);
                     s.Bind(2, account.nameExpire);
                     s.Bind(3, account.zoneId);
                     s.Bind(4, account.accountId);
                     s.Execute();
-                } catch {
-                    @s = Globals::db.Prepare("""
-                        INSERT INTO Accounts (
-                            accountId,
-                            accountName,
-                            nameExpire,
-                            zoneId
-                        ) VALUES (?,?,?,?);
-                    """);
-                    s.Bind(1, account.accountId);
-                    s.Bind(2, account.accountName);
-                    s.Bind(3, account.nameExpire);
-                    s.Bind(4, account.zoneId);
-                    s.Execute();
+                } else {
+                    newAccounts.InsertLast(account);
                 }
             }
 
+            string[] accountGroups = AccountGroups(newAccounts);
+            for (uint i = 0; i < accountGroups.Length; i++) {
+                SQLite::Statement@ s;
+                @s = Globals::db.Prepare("""
+                    INSERT INTO Accounts (
+                        accountId,
+                        accountName,
+                        nameExpire,
+                        zoneId
+                    ) VALUES """ + accountGroups[i] + ";");
+                s.Execute();
+                yield();
+            }
+
             Util::LogTimerEnd(timerId);
+        }
+
+        string[] AccountGroups(Models::Account[]@ newAccounts) {
+            string[] ret;
+
+            while (newAccounts.Length > 0) {
+                uint accountsToAdd = Math::Min(newAccounts.Length, Globals::maxSqlValues);
+                string accountValue = "";
+
+                for (uint i = 0; i < accountsToAdd; i++) {
+                    auto account = newAccounts[i];
+                    accountValue += "(" +
+                        Util::StrWrap(account.accountId) + "," +
+                        Util::StrWrap(account.accountName) + "," +
+                        account.nameExpire + "," +
+                        Util::StrWrap(account.zoneId) + ")";
+
+                    if (i < accountsToAdd - 1)
+                        accountValue += ",";
+                }
+                newAccounts.RemoveRange(0, accountsToAdd);
+                ret.InsertLast(accountValue);
+            }
+            return ret;
         }
     }
 
@@ -94,9 +125,7 @@ namespace DB {
             downloadUrl      CHAR(93),
             goldTime         INT,
             mapId            CHAR(36) PRIMARY KEY,
-            mapNameColor     TEXT,
             mapNameRaw       TEXT,
-            mapNameText      TEXT,
             mapUid           VARCHAR(27),
             recordsTimestamp INT,
             silverTime       INT,
@@ -111,13 +140,13 @@ namespace DB {
             Globals::ClearMyHiddenMaps();
             Globals::ClearMyMaps();
 
-            try { Globals::db.Execute("DELETE FROM MyMaps");       } catch { }
             try { Globals::db.Execute("DELETE FROM MyHiddenMaps"); } catch { }
+            try { Globals::db.Execute("DELETE FROM MyMaps");       } catch { }
 
             Util::LogTimerEnd(timerId);
         }
 
-        void Load() {
+        void LoadCoro() {
             string timerId = Util::LogTimerBegin("loading my maps from file");
 
             Globals::ClearMyMaps();
@@ -128,12 +157,15 @@ namespace DB {
             try {
                 @s = Globals::db.Prepare("SELECT * FROM MyMaps ORDER BY timestamp " + order);
             } catch {
-                Util::Trace("no MyMaps table in database, plugin hasn't been run yet");
+                Util::Warn("no MyMaps table in database");
                 Util::LogTimerEnd(timerId);
                 return;
             }
+            uint i = 0;
             while (s.NextRow()) {
+                i++;
                 Globals::AddMyMap(Models::Map(s));
+                if (i % Globals::sqlLoadBatch == 0) yield();
             }
 
             Globals::ClearMyHiddenMaps();
@@ -142,12 +174,15 @@ namespace DB {
                 @s = Globals::db.Prepare("SELECT * FROM MyHiddenMaps");
                 anyHidden = true;
             } catch {
-                Util::Trace("no MyHiddenMaps table in database, no maps are hidden yet");
+                Util::Warn("no MyHiddenMaps table in database");
             }
 
+            i = 0;
             if (anyHidden)
                 while (s.NextRow()) {
+                    i++;
                     Globals::AddMyHiddenMap(Models::Map(s));
+                    if (i % Globals::sqlLoadBatch == 0) yield();
                 }
 
             Util::LogTimerEnd(timerId);
@@ -155,60 +190,85 @@ namespace DB {
             startnew(CoroutineFunc(Maps::LoadMyMapsThumbnailsCoro));
         }
 
-        void Save() {
+        void SaveCoro() {
             string timerId = Util::LogTimerBegin("saving my maps to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS MyMaps" + tableColumns);
 
+            Models::Map[] newMaps;
+
             for (uint i = 0; i < Globals::myMaps.Length; i++) {
                 auto map = Globals::myMaps[i];
                 SQLite::Statement@ s;
-                try {
-                    if (map.recordsTimestamp == 0) throw("");
+                @s = Globals::db.Prepare("SELECT * FROM MyMaps WHERE mapId=?");
+                s.Bind(1, map.mapId);
+                if (s.NextRow() && map.recordsTimestamp != 0) {
                     @s = Globals::db.Prepare("UPDATE MyMaps SET recordsTimestamp=? WHERE mapId=?");
                     s.Bind(1, map.recordsTimestamp);
                     s.Bind(2, map.mapId);
                     s.Execute();
-                } catch {
-                    @s = Globals::db.Prepare("""
-                        INSERT INTO MyMaps (
-                            authorId,
-                            authorTime,
-                            badUploadTime,
-                            bronzeTime,
-                            downloadUrl,
-                            goldTime,
-                            mapId,
-                            mapNameColor,
-                            mapNameRaw,
-                            mapNameText,
-                            mapUid,
-                            recordsTimestamp,
-                            silverTime,
-                            thumbnailUrl,
-                            timestamp
-                        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-                    """);
-                    s.Bind(1,  map.authorId);
-                    s.Bind(2,  map.authorTime);
-                    s.Bind(3,  map.badUploadTime ? 1 : 0);
-                    s.Bind(4,  map.bronzeTime);
-                    s.Bind(5,  map.downloadUrl);
-                    s.Bind(6,  map.goldTime);
-                    s.Bind(7,  map.mapId);
-                    s.Bind(8,  map.mapNameColor);
-                    s.Bind(9,  map.mapNameRaw);
-                    s.Bind(10, map.mapNameText);
-                    s.Bind(11, map.mapUid);
-                    s.Bind(12, map.recordsTimestamp);
-                    s.Bind(13, map.silverTime);
-                    s.Bind(14, map.thumbnailUrl);
-                    s.Bind(15, map.timestamp);
-                    s.Execute();
+                } else {
+                    newMaps.InsertLast(map);
                 }
             }
 
+            string[] mapGroups = MapGroups(newMaps);
+            for (uint i = 0; i < mapGroups.Length; i++) {
+                SQLite::Statement@ s;
+                @s = Globals::db.Prepare("""
+                    INSERT INTO MyMaps (
+                        authorId,
+                        authorTime,
+                        badUploadTime,
+                        bronzeTime,
+                        downloadUrl,
+                        goldTime,
+                        mapId,
+                        mapNameRaw,
+                        mapUid,
+                        recordsTimestamp,
+                        silverTime,
+                        thumbnailUrl,
+                        timestamp
+                    ) VALUES """ + mapGroups[i] + ";");
+                s.Execute();
+                yield();
+            }
+
             Util::LogTimerEnd(timerId);
+        }
+
+        string[] MapGroups(Models::Map[]@ newMaps) {
+            string[] ret;
+
+            while (newMaps.Length > 0) {
+                uint mapsToAdd = Math::Min(newMaps.Length, Globals::maxSqlValues);
+                string mapValue = "";
+
+                for (uint i = 0; i < mapsToAdd; i++) {
+                    auto map = newMaps[i];
+                    mapValue += "(" +
+                        Util::StrWrap(map.authorId) + "," +
+                        map.authorTime + "," +
+                        map.badUploadTime + "," +
+                        map.bronzeTime + "," +
+                        Util::StrWrap(map.downloadUrl) + "," +
+                        map.goldTime + "," +
+                        Util::StrWrap(map.mapId) + "," +
+                        Util::StrWrap(map.mapNameRaw.Replace("'", "''")) + "," +
+                        Util::StrWrap(map.mapUid) + "," +
+                        map.recordsTimestamp + "," +
+                        map.silverTime + "," +
+                        Util::StrWrap(map.thumbnailUrl) + "," +
+                        map.timestamp + ")";
+
+                    if (i < mapsToAdd - 1)
+                        mapValue += ",";
+                }
+                newMaps.RemoveRange(0, mapsToAdd);
+                ret.InsertLast(mapValue);
+            }
+            return ret;
         }
 
         void Hide(Models::Map@ map) {
@@ -229,7 +289,7 @@ namespace DB {
 
             Util::LogTimerEnd(timerId);
 
-            Load();
+            startnew(CoroutineFunc(LoadCoro));
         }
 
         void UnHide(Models::Map@ map) {
@@ -249,7 +309,7 @@ namespace DB {
 
             Util::LogTimerEnd(timerId);
 
-            Load();
+            startnew(CoroutineFunc(LoadCoro));
         }
     }
 
@@ -274,7 +334,7 @@ namespace DB {
             Util::LogTimerEnd(timerId);
         }
 
-        void Load() {
+        void LoadCoro() {
             string timerId = Util::LogTimerBegin("loading records from file");
 
             Globals::ClearRecords();
@@ -285,24 +345,45 @@ namespace DB {
             try {
                 @s = Globals::db.Prepare("SELECT * FROM Records");
             } catch {
-                Util::Trace("no Records table in database, no records gotten yet");
-                Util::LogTimerEnd(timerId);
+                Util::Warn("no Records table in database");
+                Util::LogTimerEnd(timerId, false);
                 return;
             }
+            uint i = 0;
             while (s.NextRow()) {
+                i++;
                 Globals::AddRecord(Models::Record(s));
+                if (i % Globals::sqlLoadBatch == 0) yield();
             }
 
             Util::LogTimerEnd(timerId);
         }
 
-        void Save() {
+        void SaveCoro() {
             string timerId = Util::LogTimerBegin("saving records to file");
 
             Globals::db.Execute("CREATE TABLE IF NOT EXISTS Records" + tableColumns);
 
+            Models::Record[] newRecords;
+
             for (uint i = 0; i < Globals::records.Length; i++) {
                 auto record = Globals::records[i];
+                SQLite::Statement@ s;
+                @s = Globals::db.Prepare("SELECT * FROM Records WHERE recordFakeId=?");
+                s.Bind(1, record.recordFakeId);
+                if (s.NextRow()) {
+                    @s = Globals::db.Prepare("UPDATE Records SET position=?, time=? WHERE recordFakeId=?");
+                    s.Bind(1, record.position);
+                    s.Bind(2, record.time);
+                    s.Bind(3, record.recordFakeId);
+                    s.Execute();
+                } else {
+                    newRecords.InsertLast(record);
+                }
+            }
+
+            string[] recordGroups = RecordGroups(newRecords);
+            for (uint i = 0; i < recordGroups.Length; i++) {
                 SQLite::Statement@ s;
                 @s = Globals::db.Prepare("""
                     INSERT INTO Records (
@@ -312,18 +393,38 @@ namespace DB {
                         recordFakeId,
                         time,
                         zoneId
-                    ) VALUES (?,?,?,?,?,?);
-                """);
-                s.Bind(1, record.accountId);
-                s.Bind(2, record.mapId);
-                s.Bind(3, record.position);
-                s.Bind(4, record.recordFakeId);
-                s.Bind(5, record.time);
-                s.Bind(6, record.zoneId);
+                    ) VALUES """ + recordGroups[i] + ";");
                 s.Execute();
+                yield();
             }
 
             Util::LogTimerEnd(timerId);
+        }
+
+        string[] RecordGroups(Models::Record[]@ newRecords) {
+            string[] ret;
+
+            while (newRecords.Length > 0) {
+                uint recordsToAdd = Math::Min(newRecords.Length, Globals::maxSqlValues);
+                string recordValue = "";
+
+                for (uint i = 0; i < recordsToAdd; i++) {
+                    auto record = newRecords[i];
+                    recordValue += "('" +
+                        record.accountId + "','" +
+                        record.mapId + "'," +
+                        record.position + ",'" +
+                        record.recordFakeId + "'," +
+                        record.time + ",'" +
+                        record.zoneId + "')";
+
+                    if (i < recordsToAdd - 1)
+                        recordValue += ",";
+                }
+                newRecords.RemoveRange(0, recordsToAdd);
+                ret.InsertLast(recordValue);
+            }
+            return ret;
         }
     }
 }

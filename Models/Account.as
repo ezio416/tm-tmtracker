@@ -1,16 +1,16 @@
 /*
 c 2023-05-16
-m 2023-06-13
+m 2023-06-14
 */
 
 // Classes for holding data gathered during plugin operation
 namespace Models {
     // Data on a player profile
     class Account {
-        string     accountId;
-        string     accountName = "";
-        uint64     nameExpire = 0;
-        string     zoneId;
+        string accountId;
+        string accountName = "";
+        uint64 nameExpire = 0;
+        string zoneId;
 
         Account() { }
         Account(const string &in id) { accountId = id; }

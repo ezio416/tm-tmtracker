@@ -18,14 +18,68 @@ namespace Tabs {
 
         UI::Separator();
 
-        if (UI::Button(Icons::Download + " Get All Records"))
+        if (UI::Button(Icons::FloppyO + " save records"))
+            startnew(CoroutineFunc(DB::Records::SaveCoro));
+
+        UI::SameLine();
+        if (UI::Button(Icons::Upload + " load records"))
+            startnew(CoroutineFunc(DB::Records::LoadCoro));
+
+        UI::SameLine();
+        if (UI::Button(Icons::Times + " clear records"))
+            DB::Records::Clear();
+
+        UI::SameLine();
+        if (UI::Button(Icons::Download + " get records"))
             startnew(CoroutineFunc(Maps::GetMyMapsRecordsCoro));
 
-        if (UI::Button(Icons::FloppyO + " save accounts"))
-            DB::AllAccounts::Save();
+        UI::SameLine();
+        UI::Text("total records: " + Globals::records.Length);
 
+        if (UI::Button(Icons::FloppyO + " save accounts"))
+            startnew(CoroutineFunc(DB::AllAccounts::SaveCoro));
+
+        UI::SameLine();
+        if (UI::Button(Icons::Upload + " load accounts"))
+            startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
+
+        UI::SameLine();
         if (UI::Button(Icons::Times + " clear accounts"))
             DB::AllAccounts::Clear();
+
+        UI::SameLine();
+        if (UI::Button(Icons::Download + " get names"))
+            startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
+
+        UI::SameLine();
+        UI::Text("total accounts: " + Globals::accounts.Length);
+
+        int flags =
+            UI::TableFlags::Resizable |
+            UI::TableFlags::ScrollY;
+
+        if (UI::BeginTable("table_accounts", 3, flags)) {
+            UI::TableSetupScrollFreeze(0, 1);
+            UI::TableSetupColumn("ID");
+            UI::TableSetupColumn("Name");
+            UI::TableSetupColumn("Zone");
+            UI::TableHeadersRow();
+
+            UI::ListClipper clipper(Globals::accounts.Length);
+            while (clipper.Step()) {
+                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+                    UI::TableNextRow();
+                    UI::TableNextColumn();
+                    UI::Text(Globals::accounts[i].accountId);
+                    UI::TableNextColumn();
+                    UI::Text(Globals::accounts[i].accountName);
+                    UI::TableNextColumn();
+                    UI::Text(Globals::accounts[i].zoneName);
+                }
+            }
+
+            UI::EndTable();
+        }
 
         UI::EndTabItem();
     }

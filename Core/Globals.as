@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-05-29
+m 2023-06-14
 */
 
 // Global variables for plugin operation, as well as functions to add/clear
@@ -17,6 +17,7 @@ namespace Globals {
     uint64            logTimerIndex = 0;
     dictionary        logTimers;
     bool              mapClicked = false;
+    uint              maxSqlValues = 1000;
     Models::Map[]     myHiddenMaps;
     dictionary        myHiddenMapIds;
     Models::Map[]     myMaps;
@@ -24,6 +25,8 @@ namespace Globals {
     dictionary        recordIds;
     Models::Record[]  records;
     int               requestsInProgress = 0;
+    bool              save = true;
+    uint              sqlLoadBatch = 100;
     string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
     string            dbFile = storageFolder + "TMTracker.db";
     string            thumbnailFolder = storageFolder + "thumbnails";

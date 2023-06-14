@@ -130,8 +130,16 @@ namespace Models {
                 while (coro.IsRunning()) yield();
             }
 
-            DB::MyMaps::Save();
-            DB::Records::Save();
+            if (Globals::save) {
+                auto accSaveCoro = startnew(CoroutineFunc(DB::AllAccounts::SaveCoro));
+                while (accSaveCoro.IsRunning()) yield();
+                auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
+                while (accLoadCoro.IsRunning()) yield();
+                auto mapSaveCoro = startnew(CoroutineFunc(DB::MyMaps::SaveCoro));
+                while (mapSaveCoro.IsRunning()) yield();
+                auto recSaveCoro = startnew(CoroutineFunc(DB::Records::SaveCoro));
+                while (recSaveCoro.IsRunning()) yield();
+            }
 
             Util::LogTimerEnd(timerId);
         }
