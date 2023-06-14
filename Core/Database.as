@@ -39,8 +39,7 @@ namespace DB {
                 Util::LogTimerEnd(timerId);
                 return;
             }
-            while (true) {
-                if (!s.NextRow()) break;
+            while (s.NextRow()) {
                 Globals::AddAccount(Models::Account(s));
             }
 
@@ -133,8 +132,7 @@ namespace DB {
                 Util::LogTimerEnd(timerId);
                 return;
             }
-            while (true) {
-                if (!s.NextRow()) break;
+            while (s.NextRow()) {
                 Globals::AddMyMap(Models::Map(s));
             }
 
@@ -148,8 +146,7 @@ namespace DB {
             }
 
             if (anyHidden)
-                while (true) {
-                    if (!s.NextRow()) break;
+                while (s.NextRow()) {
                     Globals::AddMyHiddenMap(Models::Map(s));
                 }
 
@@ -292,8 +289,7 @@ namespace DB {
                 Util::LogTimerEnd(timerId);
                 return;
             }
-            while (true) {
-                if (!s.NextRow()) break;
+            while (s.NextRow()) {
                 Globals::AddRecord(Models::Record(s));
             }
 
