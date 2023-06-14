@@ -10,8 +10,6 @@ namespace Models {
         string     accountId;
         string     accountName = "";
         uint64     nameExpire = 0;
-        dictionary recordMapIds;
-        Record@[]  records;
         string     zoneId;
 
         Account() { }
@@ -20,11 +18,11 @@ namespace Models {
             accountId   = s.GetColumnString("accountId");
             accountName = s.GetColumnString("accountName");
             nameExpire  = s.GetColumnInt("nameExpire");
+            zoneId      = s.GetColumnString("zoneId");
         }
 
         string get_zoneName() {
-            try   { return string(Globals::zones.Get(zoneId)); }
-            catch { return "unknown-zone"; }
+            return Zones::Get(zoneId);
         }
 
         bool IsNameExpired() {

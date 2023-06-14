@@ -36,8 +36,7 @@ namespace Models {
         }
 
         string get_zoneName() {
-            try   { return string(Globals::zones.Get(zoneId)); }
-            catch { return "unknown-zone"; }
+            return Zones::Get(zoneId);
         }
 
         void SetMedals(Map@ map) {
