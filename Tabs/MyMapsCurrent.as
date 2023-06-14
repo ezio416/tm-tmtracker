@@ -84,9 +84,8 @@ namespace Tabs {
                                     }
                                 UI::Text(timeColor + Time::Format(map.records[j].time));
                                 UI::TableNextColumn();
-                                string name;
-                                Globals::accountIds.Get(map.records[j].accountId, name);
-                                UI::Text(name);
+                                uint ix;
+                                UI::Text((Globals::accountIds.Get(map.records[j].accountId, ix)) ? Globals::accounts[ix].accountName : "");
                                 UI::TableNextColumn();
                                 UI::Text(map.records[j].zoneName);
                             }
