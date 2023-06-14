@@ -21,21 +21,18 @@ namespace Accounts {
             if (string(Globals::accountIds[ids[i]]) == "")
                 missing.InsertLast(ids[i]);
 
-        if (missing.Length > 0) {
-            while (true) {
-                string[] reqIds;
-                uint idsToAdd = Math::Min(missing.Length, idLimit);
-                for (uint i = 0; i < idsToAdd; i++) reqIds.InsertLast(missing[i]);
+        while (missing.Length > 0) {
+            string[] reqIds;
+            uint idsToAdd = Math::Min(missing.Length, idLimit);
+            for (uint i = 0; i < idsToAdd; i++) reqIds.InsertLast(missing[i]);
 
-                auto ret = NadeoServices::GetDisplayNamesAsync(reqIds);
-                for (uint i = 0; i < idsToAdd; i++) {
-                    string id = missing[i];
-                    names.Set(id, string(ret[id]));
-                }
-
-                if (missing.Length <= idLimit) break;
-                missing.RemoveRange(0, idLimit);
+            auto ret = NadeoServices::GetDisplayNamesAsync(reqIds);
+            for (uint i = 0; i < idsToAdd; i++) {
+                string id = missing[i];
+                names.Set(id, string(ret[id]));
             }
+
+            missing.RemoveRange(0, idsToAdd);
         }
 
         for (uint i = 0; i < Globals::accounts.Length; i++) {
