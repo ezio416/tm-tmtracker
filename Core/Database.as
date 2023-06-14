@@ -11,8 +11,7 @@ namespace DB {
             accountId   CHAR(36) PRIMARY KEY,
             accountName TEXT,
             nameExpire  INT,
-            zoneId      CHAR(36),
-            zoneName    TEXT
+            zoneId      CHAR(36)
         ); """;
 
         void Clear() {
@@ -58,13 +57,12 @@ namespace DB {
                 SQLite::Statement@ s;
                 try {
                     @s = Globals::db.Prepare(
-                        "UPDATE Accounts SET accountName=? nameExpire=? zoneId=? zoneName=? WHERE accountId=?"
+                        "UPDATE Accounts SET accountName=? nameExpire=? zoneId=? WHERE accountId=?"
                     );
                     s.Bind(1, account.accountName);
                     s.Bind(2, account.nameExpire);
                     s.Bind(3, account.zoneId);
-                    s.Bind(4, account.zoneName);
-                    s.Bind(5, account.accountId);
+                    s.Bind(4, account.accountId);
                     s.Execute();
                 } catch {
                     @s = Globals::db.Prepare("""
@@ -72,15 +70,13 @@ namespace DB {
                             accountId,
                             accountName,
                             nameExpire,
-                            zoneId,
-                            zoneName
-                        ) VALUES (?,?,?,?,?);
+                            zoneId
+                        ) VALUES (?,?,?,?);
                     """);
                     s.Bind(1, account.accountId);
                     s.Bind(2, account.accountName);
                     s.Bind(3, account.nameExpire);
                     s.Bind(4, account.zoneId);
-                    s.Bind(5, account.zoneName);
                     s.Execute();
                 }
             }
