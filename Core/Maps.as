@@ -41,23 +41,37 @@ namespace Maps {
 
         Util::LogTimerEnd(timerId);
 
-        DB::MyMaps::Save();
-        DB::MyMaps::Load();
-        DB::Records::Load();
+        auto mapSaveCoro = startnew(CoroutineFunc(DB::MyMaps::SaveCoro));
+        while (mapSaveCoro.IsRunning()) yield();
+        auto mapLoadCoro = startnew(CoroutineFunc(DB::MyMaps::LoadCoro));
+        while (mapLoadCoro.IsRunning()) yield();
+        auto recLoadCoro = startnew(CoroutineFunc(DB::Records::LoadCoro));
+        while (recLoadCoro.IsRunning()) yield();
     }
 
     void GetMyMapsRecordsCoro() {
         string timerId = Util::LogTimerBegin("getting my map records");
 
         Globals::getAccountNames = false;
+        Globals::save = false;
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
             auto coro = startnew(CoroutineFunc(Globals::myMaps[i].GetRecordsCoro));
             while (coro.IsRunning()) yield();
         }
         Globals::getAccountNames = true;
+        Globals::save = true;
 
-        auto coro = startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
-        while (coro.IsRunning()) yield();
+        auto nameCoro = startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
+        while (nameCoro.IsRunning()) yield();
+
+        auto accSaveCoro = startnew(CoroutineFunc(DB::AllAccounts::SaveCoro));
+        while (accSaveCoro.IsRunning()) yield();
+        auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
+        while (accLoadCoro.IsRunning()) yield();
+        auto mapCoro = startnew(CoroutineFunc(DB::MyMaps::SaveCoro));
+        while (mapCoro.IsRunning()) yield();
+        auto recCoro = startnew(CoroutineFunc(DB::Records::SaveCoro));
+        while (recCoro.IsRunning()) yield();
 
         Util::LogTimerEnd(timerId);
     }

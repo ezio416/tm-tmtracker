@@ -13,17 +13,16 @@ void Main() {
 
     Zones::Load();
 
-    // DB::AllAccounts::Load();
-    DB::MyMaps::Load();
-    DB::Records::Load();
-
     IO::CreateFolder(Globals::thumbnailFolder);
 
     NadeoServices::AddAudience("NadeoLiveServices");
 
-#if SIG_DEVELOPER
-    Globals::dev = !Settings::devHidden;
-#endif
+    auto mapLoadCoro = startnew(CoroutineFunc(DB::MyMaps::LoadCoro));
+    while (mapLoadCoro.IsRunning()) yield();
+    auto recLoadCoro = startnew(CoroutineFunc(DB::Records::LoadCoro));
+    while (recLoadCoro.IsRunning()) yield();
+    auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
+    while (accLoadCoro.IsRunning()) yield();
 }
 
 void RenderMenu() {
@@ -35,7 +34,7 @@ void RenderInterface() {
     if (!Settings::windowOpen) return;
 
     if (Settings::DetectSortMapsNewest())
-        DB::MyMaps::Load();
+        startnew(CoroutineFunc(DB::MyMaps::LoadCoro));
 
     UI::SetNextWindowSize(600, 540, UI::Cond::FirstUseEver);
     UI::SetNextWindowPos(100, 100, UI::Cond::FirstUseEver);
@@ -50,7 +49,7 @@ void RenderInterface() {
 void RenderTabs() {
     UI::BeginTabBar("tabs");
         Tabs::MyMaps();
-        Tabs::AllAccounts();
+        // Tabs::AllAccounts();
         // Tabs::MyRecords();
         if (Settings::infoTab) Tabs::Info();
         if (Globals::dev)      Tabs::Dev();

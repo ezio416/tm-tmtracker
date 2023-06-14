@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-06-13
+m 2023-06-14
 */
 
 // Functions that don't fit nicely in other categories
@@ -51,6 +51,10 @@ namespace Util {
         LogTimerDelete(timerId);
     }
 
+    string StrWrap(const string &in input, const string &in wrapper = "'") {
+        return wrapper + input + wrapper;
+    }
+
     void Trace(const string &in text) {
         if (!Settings::logEnabled) return;
         trace(text);
@@ -72,6 +76,11 @@ namespace Util {
             yield();
 
         Globals::latestNadeoRequest = Time::Now;
+    }
+
+    void Warn(const string &in text) {
+        if (!Settings::logEnabled) return;
+        warn(text);
     }
 
     string Zpad2(int num) {
