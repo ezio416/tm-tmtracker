@@ -7,6 +7,10 @@ void Main() {
     if (!Settings::rememberOpen)
         Settings::windowOpen = false;
 
+#if SIG_DEVELOPER
+    Globals::dev = !Settings::devHidden;
+#endif
+
     Zones::Load();
 
     // DB::AllAccounts::Load();
