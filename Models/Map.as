@@ -1,11 +1,9 @@
 /*
 c 2023-05-16
-m 2023-06-13
+m 2023-07-06
 */
 
-// Classes for holding data gathered during plugin operation
 namespace Models {
-    // Data on a map/track
     class Map {
         string       authorId;
         uint         authorTime;
@@ -13,15 +11,15 @@ namespace Models {
         uint         bronzeTime;
         string       downloadUrl;
         uint         goldTime;
-        bool         hidden;
+        // bool         hidden;
         string       logName;
         string       mapId;
         string       mapNameColor;
         string       mapNameRaw;
         string       mapNameText;
         string       mapUid;
-        dictionary   recordAccountIds;
-        Record@[]    records;
+        // dictionary   recordAccountIds;
+        // Record@[]    records;
         uint         recordsTimestamp;
         uint         silverTime;
         string       thumbnailFile;
@@ -54,95 +52,95 @@ namespace Models {
                 timestamp = map["uploadTimestamp"];
         }
 
-        Map(SQLite::Statement@ s) {
-            authorId         = s.GetColumnString("authorId");
-            authorTime       = s.GetColumnInt("authorTime");
-            badUploadTime    = s.GetColumnInt("badUploadTime") == 1 ? true : false;
-            bronzeTime       = s.GetColumnInt("bronzeTime");
-            downloadUrl      = s.GetColumnString("downloadUrl");
-            goldTime         = s.GetColumnInt("goldTime");
-            mapId            = s.GetColumnString("mapId");
-            mapNameRaw       = s.GetColumnString("mapNameRaw");
-            mapNameColor     = ColoredString(mapNameRaw);
-            mapNameText      = StripFormatCodes(mapNameRaw);
-            logName          = "MAP[" + mapNameText + "] - ";
-            mapUid           = s.GetColumnString("mapUid");
-            recordsTimestamp = s.GetColumnInt("recordsTimestamp");
-            thumbnailFile    = Globals::thumbnailFolder + "/" + mapId + ".jpg";
-            silverTime       = s.GetColumnInt("silverTime");
-            thumbnailUrl     = s.GetColumnString("thumbnailUrl");
-            timestamp        = s.GetColumnInt("timestamp");
-        }
+        // Map(SQLite::Statement@ s) {
+        //     authorId         = s.GetColumnString("authorId");
+        //     authorTime       = s.GetColumnInt("authorTime");
+        //     badUploadTime    = s.GetColumnInt("badUploadTime") == 1 ? true : false;
+        //     bronzeTime       = s.GetColumnInt("bronzeTime");
+        //     downloadUrl      = s.GetColumnString("downloadUrl");
+        //     goldTime         = s.GetColumnInt("goldTime");
+        //     mapId            = s.GetColumnString("mapId");
+        //     mapNameRaw       = s.GetColumnString("mapNameRaw");
+        //     mapNameColor     = ColoredString(mapNameRaw);
+        //     mapNameText      = StripFormatCodes(mapNameRaw);
+        //     logName          = "MAP[" + mapNameText + "] - ";
+        //     mapUid           = s.GetColumnString("mapUid");
+        //     recordsTimestamp = s.GetColumnInt("recordsTimestamp");
+        //     thumbnailFile    = Globals::thumbnailFolder + "/" + mapId + ".jpg";
+        //     silverTime       = s.GetColumnInt("silverTime");
+        //     thumbnailUrl     = s.GetColumnString("thumbnailUrl");
+        //     timestamp        = s.GetColumnInt("timestamp");
+        // }
 
         int opCmp(int i) { return timestamp - i; }
         int opCmp(Map m) { return timestamp - m.timestamp; }
 
-        void GetRecordsCoro() {
-            string timerId = Util::LogTimerBegin(logName + "getting records");
+        // void GetRecordsCoro() {
+        //     string timerId = Util::LogTimerBegin(logName + "getting records");
 
-            uint offset = 0;
-            bool tooManyRecords;
+        //     uint offset = 0;
+        //     bool tooManyRecords;
 
-            records.RemoveRange(0, records.Length);
-            recordAccountIds.DeleteAll();
+        //     records.RemoveRange(0, records.Length);
+        //     recordAccountIds.DeleteAll();
 
-            do {
-                auto wait = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
-                while (wait.IsRunning()) yield();
+        //     do {
+        //         auto wait = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
+        //         while (wait.IsRunning()) yield();
 
-                auto req = NadeoServices::Get(
-                    "NadeoLiveServices",
-                    NadeoServices::BaseURL() +
-                        "/api/token/leaderboard/group/Personal_Best/map/" + mapUid +
-                        "/top?onlyWorld=true&length=100&offset=" + offset
-                );
-                offset += 100;
-                req.Start();
-                while (!req.Finished()) yield();
+        //         auto req = NadeoServices::Get(
+        //             "NadeoLiveServices",
+        //             NadeoServices::BaseURLLive() +
+        //                 "/api/token/leaderboard/group/Personal_Best/map/" + mapUid +
+        //                 "/top?onlyWorld=true&length=100&offset=" + offset
+        //         );
+        //         req.Start();
+        //         while (!req.Finished()) yield();
+        //         Globals::requesting = false;
+        //         offset += 100;
 
-                auto top = Json::Parse(req.String())["tops"][0]["top"];
-                tooManyRecords = top.Length == 100;
-                for (uint i = 0; i < top.Length; i++) {
-                    auto record = Record(top[i]);
-                    record.mapId        = mapId;
-                    record.mapName      = mapNameText;
-                    record.mapUid       = mapUid;
-                    record.recordFakeId = mapId + "-" + record.accountId;
+        //         auto top = Json::Parse(req.String())["tops"][0]["top"];
+        //         tooManyRecords = top.Length == 100;
+        //         for (uint i = 0; i < top.Length; i++) {
+        //             auto record = Record(top[i]);
+        //             record.mapId        = mapId;
+        //             record.mapName      = mapNameText;
+        //             record.mapUid       = mapUid;
+        //             record.recordFakeId = mapId + "-" + record.accountId;
 
-                    record.SetMedals(this);
+        //             record.SetMedals(this);
 
-                    auto account = Models::Account(record.accountId);
-                    account.zoneId = record.zoneId;
-                    Globals::AddAccount(account);
+        //             auto account = Models::Account(record.accountId);
+        //             account.zoneId = record.zoneId;
+        //             Globals::AddAccount(account);
 
-                    recordAccountIds.Set(record.accountId, "");
-                    records.InsertLast(record);
-                    Globals::AddRecord(record);
-                }
+        //             recordAccountIds.Set(record.accountId, "");
+        //             records.InsertLast(record);
+        //             Globals::AddRecord(record);
+        //         }
 
-                Globals::requestsInProgress--;
-            } while (tooManyRecords && records.Length < Settings::maxRecordsPerMap);
+        //     } while (tooManyRecords && records.Length < Settings::maxRecordsPerMap);
 
-            recordsTimestamp = Time::Stamp;
+        //     recordsTimestamp = Time::Stamp;
 
-            if (Globals::getAccountNames) {
-                auto coro = startnew(CoroutineFunc(Accounts::GetAccountNamesCoro));
-                while (coro.IsRunning()) yield();
-            }
+        //     if (Globals::getAccountNames) {
+        //         auto coro = startnew(CoroutineFunc(API::GetAccountNamesCoro));
+        //         while (coro.IsRunning()) yield();
+        //     }
 
-            if (Globals::save) {
-                auto accSaveCoro = startnew(CoroutineFunc(DB::AllAccounts::SaveCoro));
-                while (accSaveCoro.IsRunning()) yield();
-                auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
-                while (accLoadCoro.IsRunning()) yield();
-                auto mapSaveCoro = startnew(CoroutineFunc(DB::MyMaps::SaveCoro));
-                while (mapSaveCoro.IsRunning()) yield();
-                auto recSaveCoro = startnew(CoroutineFunc(DB::Records::SaveCoro));
-                while (recSaveCoro.IsRunning()) yield();
-            }
+        //     // if (Globals::save) {
+        //     //     auto accSaveCoro = startnew(CoroutineFunc(DB::AllAccounts::SaveCoro));
+        //     //     while (accSaveCoro.IsRunning()) yield();
+        //     //     auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
+        //     //     while (accLoadCoro.IsRunning()) yield();
+        //     //     auto mapSaveCoro = startnew(CoroutineFunc(DB::MyMaps::SaveCoro));
+        //     //     while (mapSaveCoro.IsRunning()) yield();
+        //     //     auto recSaveCoro = startnew(CoroutineFunc(DB::Records::SaveCoro));
+        //     //     while (recSaveCoro.IsRunning()) yield();
+        //     // }
 
-            Util::LogTimerEnd(timerId);
-        }
+        //     Util::LogTimerEnd(timerId);
+        // }
 
         void GetThumbnailCoro() {
             if (IO::FileExists(thumbnailFile)) return;

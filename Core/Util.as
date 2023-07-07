@@ -1,9 +1,8 @@
 /*
 c 2023-05-20
-m 2023-06-14
+m 2023-07-06
 */
 
-// Functions that don't fit nicely in other categories
 namespace Util {
     string FormatSeconds(int seconds) {
         int minutes = seconds / 60;
@@ -66,11 +65,9 @@ namespace Util {
             return;
         }
 
-        while (Globals::requestsInProgress > 0)
+        while (Globals::requesting)
             yield();
-        if (Globals::requestsInProgress < 0)  // hopefully won't happen
-            Globals::requestsInProgress = 0;
-        Globals::requestsInProgress++;
+        Globals::requesting = true;
 
         while (Time::Now - Globals::latestNadeoRequest < Settings::timeBetweenNadeoRequests)
             yield();
