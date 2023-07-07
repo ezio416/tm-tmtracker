@@ -7,10 +7,13 @@ namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
     // GENERAL
     ///////////////////////////////////////////////////////////////////////////
-    [Setting category="General" name="Display welcome text"]
+    [Setting category="General" name="Show status bar"]
+    bool statusBar = true;
+
+    [Setting category="General" name="Show welcome text"]
     bool welcomeText = true;
 
-    [Setting category="General" name="Display info tab"]
+    [Setting category="General" name="Show info tab"]
     bool infoTab = true;
 
     [Setting category="General" name="Account name valid time (days)" min=0 max=60 description="time after which the name will be retrieved again"]
