@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-07-06
+m 2023-07-07
 */
 
 void Main() {
@@ -43,7 +43,7 @@ void RenderInterface() {
     UI::Begin(Globals::title, Settings::windowOpen, flags);
         if (Settings::statusBar) {
             UI::BeginMenuBar();
-                UI::Text("v3.0.0-20230706   |");
+                UI::Text("v3.0.0-20230707   |");
                 auto keys = Globals::status.GetKeys();
                 if (keys.Length > 0) {
                     for (uint i = 0; i < keys.Length; i++) {
