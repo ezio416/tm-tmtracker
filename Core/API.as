@@ -38,6 +38,7 @@ namespace API {
 
     void GetMyMapsCoro() {
         string timerId = Util::LogTimerBegin("updating my maps");
+        Globals::status.Set("get-my-maps", "getting maps...");
 
         Globals::ClearMyMaps();
 
@@ -69,6 +70,7 @@ namespace API {
         //     if (Globals::myHiddenMapIds.Exists(Globals::myMaps[i].mapId))
         //         Globals::myMaps.RemoveAt(i);
 
+        Globals::status.Delete("get-my-maps");
         Util::LogTimerEnd(timerId);
 
         // auto mapSaveCoro = startnew(CoroutineFunc(DB::MyMaps::SaveCoro));

@@ -26,6 +26,7 @@ namespace Globals {
     bool              requesting = false;
     // bool              save = true;
     // uint              sqlLoadBatch = 100;
+    dictionary        status;
     string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
     // string            dbFile = storageFolder + "TMTracker.db";
     string            thumbnailFolder = storageFolder + "thumbnails";

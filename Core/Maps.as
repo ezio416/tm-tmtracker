@@ -19,10 +19,12 @@ namespace Maps {
         string timerId = Util::LogTimerBegin("loading my map thumbnails");
 
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
+            Globals::status.Set("load-thumbs", "loading thumbnails... (" + i + "/" + Globals::myMaps.Length + ")");
             auto coro = startnew(CoroutineFunc(Globals::myMaps[i].LoadThumbnailCoro));
             while (coro.IsRunning()) yield();
         }
 
+        Globals::status.Delete("load-thumbs");
         Util::LogTimerEnd(timerId);
     }
 }
