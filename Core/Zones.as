@@ -1,9 +1,8 @@
 /*
 c 2023-05-16
-m 2023-06-13
+m 2023-07-06
 */
 
-// Functions for player regions
 namespace Zones {
     string Get(const string &in zoneId) {
         try   { return string(Globals::zones.Get(zoneId)); }

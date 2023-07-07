@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-06-13
+m 2023-07-06
 */
 
 void Main() {
@@ -8,7 +8,8 @@ void Main() {
         Settings::windowOpen = false;
 
 #if SIG_DEVELOPER
-    Globals::dev = !Settings::devHidden;
+    if (!Settings::devHiddenByUser)
+        Globals::dev = !Settings::devHidden;
 #endif
 
     Zones::Load();
@@ -17,12 +18,12 @@ void Main() {
 
     NadeoServices::AddAudience("NadeoLiveServices");
 
-    auto mapLoadCoro = startnew(CoroutineFunc(DB::MyMaps::LoadCoro));
-    while (mapLoadCoro.IsRunning()) yield();
-    auto recLoadCoro = startnew(CoroutineFunc(DB::Records::LoadCoro));
-    while (recLoadCoro.IsRunning()) yield();
-    auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
-    while (accLoadCoro.IsRunning()) yield();
+    // auto mapLoadCoro = startnew(CoroutineFunc(DB::MyMaps::LoadCoro));
+    // while (mapLoadCoro.IsRunning()) yield();
+    // auto recLoadCoro = startnew(CoroutineFunc(DB::Records::LoadCoro));
+    // while (recLoadCoro.IsRunning()) yield();
+    // auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
+    // while (accLoadCoro.IsRunning()) yield();
 }
 
 void RenderMenu() {
@@ -33,11 +34,8 @@ void RenderMenu() {
 void RenderInterface() {
     if (!Settings::windowOpen) return;
 
-    if (Settings::DetectSortMapsNewest())
-        startnew(CoroutineFunc(DB::MyMaps::LoadCoro));
-
     UI::SetNextWindowSize(600, 540, UI::Cond::FirstUseEver);
-    UI::SetNextWindowPos(100, 100, UI::Cond::FirstUseEver);
+    UI::SetNextWindowPos(300, 300, UI::Cond::FirstUseEver);
 
     UI::Begin(Globals::title, Settings::windowOpen);
         if (Settings::welcomeText)
@@ -48,10 +46,8 @@ void RenderInterface() {
 
 void RenderTabs() {
     UI::BeginTabBar("tabs");
-        Tabs::MyMaps();
-        // Tabs::AllAccounts();
-        // Tabs::MyRecords();
-        if (Settings::infoTab) Tabs::Info();
-        if (Globals::dev)      Tabs::Dev();
+        Tabs::Tab_MyMaps();
+        if (Settings::infoTab) Tabs::Tab_Info();
+        if (Globals::dev)      Tabs::Tab_Dev();
     UI::EndTabBar();
 }

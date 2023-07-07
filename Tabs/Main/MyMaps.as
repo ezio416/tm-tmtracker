@@ -1,11 +1,10 @@
 /*
 c 2023-05-26
-m 2023-06-13
+m 2023-07-06
 */
 
-// Functions for rendering tabs in the interface
 namespace Tabs {
-    void MyMaps() {
+    void Tab_MyMaps() {
         if (!UI::BeginTabItem(Icons::Map + " My Maps")) return;
 
         if (Settings::welcomeText)
@@ -15,19 +14,19 @@ namespace Tabs {
             );
 
         if (UI::Button(Icons::Refresh + " Update Map List (" + Globals::myMaps.Length + ")"))
-            startnew(CoroutineFunc(Maps::GetMyMapsCoro));
+            startnew(CoroutineFunc(API::GetMyMapsCoro));
 
-        if (Globals::myHiddenMaps.Length > 0) {
-            UI::SameLine();
-            if (UI::Button(Icons::Eye + " Show Hidden (" + Globals::myHiddenMaps.Length + ")")) {
-                string timerId = Util::LogTimerBegin("unhiding all maps");
+        // if (Globals::myHiddenMaps.Length > 0) {
+        //     UI::SameLine();
+            // if (UI::Button(Icons::Eye + " Show Hidden (" + Globals::myHiddenMaps.Length + ")")) {
+            //     string timerId = Util::LogTimerBegin("unhiding all maps");
 
-                for (uint i = 0; i < Globals::myHiddenMaps.Length;)
-                    DB::MyMaps::UnHide(Globals::myHiddenMaps[i]);
+            //     for (uint i = 0; i < Globals::myHiddenMaps.Length;)
+            //         DB::MyMaps::UnHide(Globals::myHiddenMaps[i]);
 
-                Util::LogTimerEnd(timerId);
-            }
-        }
+            //     Util::LogTimerEnd(timerId);
+            // }
+        // }
 
         if (Globals::currentMaps.Length > 0) {
             UI::SameLine();
@@ -40,8 +39,8 @@ namespace Tabs {
         Globals::mapClicked = false;
 
         UI::BeginTabBar("MyMapsTabs");
-            MyMapsList();
-            MyMapsCurrent();
+            MyMaps::Tab_List();
+            MyMaps::Tabs_Current();
         UI::EndTabBar();
 
         UI::EndTabItem();
