@@ -37,17 +37,28 @@ void RenderInterface() {
     UI::SetNextWindowSize(600, 540, UI::Cond::FirstUseEver);
     UI::SetNextWindowPos(300, 300, UI::Cond::FirstUseEver);
 
-    UI::Begin(Globals::title, Settings::windowOpen);
+    UI::Begin(Globals::title, Settings::windowOpen, UI::WindowFlags::MenuBar);
+        UI::BeginMenuBar();
+            UI::Text("v3.0.0-20230706   |");
+            auto keys = Globals::status.GetKeys();
+            if (keys.Length > 0) {
+                for (uint i = 0; i < keys.Length; i++) {
+                    string statusText;
+                    if (Globals::status.Get(keys[i], statusText))
+                        UI::Text(statusText);
+                }
+            } else {
+                UI::Text("idle");
+            }
+        UI::EndMenuBar();
+
         if (Settings::welcomeText)
             UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
-        RenderTabs();
-    UI::End();
-}
 
-void RenderTabs() {
-    UI::BeginTabBar("tabs");
-        Tabs::Tab_MyMaps();
-        if (Settings::infoTab) Tabs::Tab_Info();
-        if (Globals::dev)      Tabs::Tab_Dev();
-    UI::EndTabBar();
+        UI::BeginTabBar("tabs");
+            Tabs::Tab_MyMaps();
+            if (Settings::infoTab) Tabs::Tab_Info();
+            if (Globals::dev)      Tabs::Tab_Dev();
+        UI::EndTabBar();
+    UI::End();
 }
