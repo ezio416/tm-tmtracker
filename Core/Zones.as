@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-06
+m 2023-07-07
 */
 
 namespace Zones {
@@ -18,7 +18,7 @@ namespace Zones {
         string timerId = Util::LogTimerBegin("loading zones from file");
 
         try {
-            Globals::zones = Json::FromFile("Assets/zones.json");
+            Globals::zones = Json::FromFile(Globals::zonesFile);
             Globals::zonesFileMissing = false;
         } catch {
             Util::Trace("missing zones file!");
