@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-06
+m 2023-07-07
 */
 
 namespace Globals {
@@ -33,6 +33,7 @@ namespace Globals {
     dictionary        thumbnailTextures;
     string            title = "\\$2f3" + Icons::MapO + "\\$z TMTracker";
     Json::Value       zones;
+    string            zonesFile = "Assets/zones.json";
     bool              zonesFileMissing = true;
 
     // void AddAccount(Models::Account account) {
