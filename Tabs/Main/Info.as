@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-06
+m 2023-07-07
 */
 
 namespace Tabs {
@@ -45,6 +45,7 @@ namespace Tabs {
             if (UI::InputText(Icons::Unlock + " Unlock Dev Tab", "") == "racist") {
                 Util::Trace("dev tab unlocked");
                 Settings::devHidden = false;
+                Settings::devHiddenByUser = false;
                 Globals::dev = true;
             }
         }
