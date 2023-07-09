@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-07-06
+m 2023-07-09
 */
 
 namespace Util {
@@ -19,6 +19,33 @@ namespace Util {
         if (minutes > 0)
             return "00:00:" + Zpad2(minutes) + ":" + Zpad2(seconds);
         return "00:00:00:" + Zpad2(seconds);
+    }
+
+    dictionary JsonLoadToDict(const string &in filename) {
+        auto timer = LogTimerBegin("loading map order");
+        Json::Value json;
+        dictionary dict;
+
+        try {
+            json = Json::FromFile(filename);
+        } catch {
+            Warn("json file missing!");
+            return dict;
+        }
+
+        for (uint i = 1; i <= json.Length; i++) {
+            auto key = "" + i;
+            auto val = json.Get(key);
+            dict.Set(key, string(val));
+        }
+        LogTimerEnd(timer);
+        return dict;
+    }
+
+    void JsonSaveFromDict(dictionary dict, const string &in filename) {
+        auto timer = LogTimerBegin("saving json file");
+        Json::ToFile(filename, dict.ToJson());
+        LogTimerEnd(timer);
     }
 
     string LogTimerBegin(const string &in text, bool logNow = true) {
