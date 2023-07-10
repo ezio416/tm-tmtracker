@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-07
+m 2023-07-10
 */
 
 namespace Tabs {
@@ -37,18 +37,20 @@ namespace Tabs {
         string linkSQL = "sqlitebrowser.org";
         if (UI::Button(Icons::Database + " " + linkSQL)) OpenBrowserURL("https://" + linkSQL);
 
+#if SIG_DEVELOPER
         UI::Separator();
 
         if (Globals::dev) {
             Button_LockDev();
         } else {
-            if (UI::InputText(Icons::Unlock + " Unlock Dev Tab", "") == "racist") {
+            if (UI::Button(Icons::Unlock + " Unlock Dev Tab")) {
                 Util::Trace("dev tab unlocked");
                 Settings::devHidden = false;
                 Settings::devHiddenByUser = false;
                 Globals::dev = true;
             }
         }
+#endif
 
         UI::EndTabItem();
     }
