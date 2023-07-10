@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-07-07
+m 2023-07-09
 */
 
 void Main() {
@@ -40,20 +40,20 @@ void RenderInterface() {
     uint flags = 0;
     if (Settings::statusBar)
         flags |= UI::WindowFlags::MenuBar;
+
     UI::Begin(Globals::title, Settings::windowOpen, flags);
-        if (Settings::statusBar) {
-            UI::BeginMenuBar();
-                UI::Text("v3.0.0-20230707   |");
-                auto keys = Globals::status.GetKeys();
-                if (keys.Length > 0) {
-                    for (uint i = 0; i < keys.Length; i++) {
-                        string statusText;
-                        if (Globals::status.Get(keys[i], statusText))
-                            UI::Text(statusText);
-                    }
-                } else {
-                    UI::Text("idle");
+        if (Settings::statusBar && UI::BeginMenuBar()) {
+            UI::Text("v3.0.0-20230709   |");
+            auto keys = Globals::status.GetKeys();
+            if (keys.Length > 0) {
+                for (uint i = 0; i < keys.Length; i++) {
+                    string statusText;
+                    if (Globals::status.Get(keys[i], statusText))
+                        UI::Text(statusText);
                 }
+            } else {
+                UI::Text("idle");
+            }
             UI::EndMenuBar();
         }
 
