@@ -1,9 +1,9 @@
 /*
 c 2023-07-06
-m 2023-07-10
+m 2023-07-11
 */
 
-namespace API {
+namespace Bulk {
     void GetAccountNamesCoro() {
         if (!Globals::getAccountNames) return;
 
@@ -81,7 +81,7 @@ namespace API {
         Globals::getAccountNames = true;
         Globals::singleMapRecordStatus = true;
 
-        auto nameCoro = startnew(CoroutineFunc(API::GetAccountNamesCoro));
+        auto nameCoro = startnew(CoroutineFunc(GetAccountNamesCoro));
         while (nameCoro.IsRunning()) yield();
 
         Globals::status.Delete("get-all-records");

@@ -130,7 +130,7 @@ namespace Models {
 
             recordsTimestamp = Time::Stamp;
 
-            auto namesCoro = startnew(CoroutineFunc(API::GetAccountNamesCoro));
+            auto namesCoro = startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
             while (namesCoro.IsRunning()) yield();
 
             if (Globals::singleMapRecordStatus)
