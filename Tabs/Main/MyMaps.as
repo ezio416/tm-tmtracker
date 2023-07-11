@@ -11,10 +11,6 @@ namespace Tabs {
             startnew(CoroutineFunc(API::GetMyMapsCoro));
 
         UI::SameLine();
-        if (UI::Button(Icons::Download + " Get All Records (" + Globals::records.Length + ")"))
-            startnew(CoroutineFunc(API::GetMyMapsRecordsCoro));
-
-        UI::SameLine();
         if (Globals::showHidden) {
             if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + Globals::hiddenMapsIndex.GetSize() + ")"))
                 Globals::showHidden = false;

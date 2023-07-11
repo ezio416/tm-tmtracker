@@ -31,6 +31,9 @@ namespace Tabs { namespace MyMaps {
                     UI::Text("\\$AAA" + Icons::Circle + " " + Time::Format(map.silverTime));
                     UI::Text("\\$C80" + Icons::Circle + " " + Time::Format(map.bronzeTime));
 
+                    if (UI::Button(Icons::Play + " Play"))
+                        startnew(CoroutineFunc(map.PlayCoro));
+
                     if (map.hidden) {
                         if (UI::Button(Icons::Eye + " Show"))
                             Globals::ShowMap(map);
@@ -38,9 +41,6 @@ namespace Tabs { namespace MyMaps {
                         if (UI::Button(Icons::EyeSlash + " Hide"))
                             Globals::HideMap(map);
                     }
-
-                    if (UI::Button(Icons::Play + " Play"))
-                        startnew(CoroutineFunc(map.PlayCoro));
 
                     if (UI::Button(Icons::Heartbeat + " Trackmania.io"))
                         OpenBrowserURL("https://trackmania.io/#/leaderboard/" + map.mapUid);
