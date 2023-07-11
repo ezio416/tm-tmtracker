@@ -42,11 +42,11 @@ namespace Tabs { namespace MyMaps {
                     if (UI::Button(Icons::Play + " Play"))
                         startnew(CoroutineFunc(map.PlayCoro));
 
-                    if (UI::Button(Icons::Heartbeat + " \\$GTrackmania.io"))
+                    if (UI::Button(Icons::Heartbeat + " Trackmania.io"))
                         OpenBrowserURL("https://trackmania.io/#/leaderboard/" + map.mapUid);
 
-                    // if (UI::Button(Icons::Exchange + " Trackmania.exchange"))
-                    //     OpenBrowserURL();
+                    if (UI::Button(Icons::Exchange + " Trackmania.exchange"))
+                        startnew(CoroutineFunc(map.TmxCoro));
                 UI::EndGroup();
 
                 UI::SameLine();
@@ -80,6 +80,7 @@ namespace Tabs { namespace MyMaps {
                                 UI::TableNextRow();
                                 UI::TableNextColumn();
                                 UI::Text("" + record.position);
+
                                 UI::TableNextColumn();
                                 string timeColor = "";
                                 if (Settings::recordMedalColors)
@@ -90,10 +91,19 @@ namespace Tabs { namespace MyMaps {
                                         case 4: timeColor = "\\$4B0"; break;
                                     }
                                 UI::Text(timeColor + Time::Format(record.time));
+
                                 UI::TableNextColumn();
-                                UI::Text((account.accountName != "") ? account.accountName : account.accountId);
+                                if (UI::Selectable((account.accountName != "") ? account.accountName : account.accountId, false))
+                                    OpenBrowserURL("https://trackmania.io/#/player/" + account.accountId);
+                                // if (UI::IsItemHovered()) {
+                                //     UI::BeginTooltip();
+                                //     UI::Text("Trackmania.io profile");
+                                //     UI::EndTooltip();
+                                // }
+
                                 UI::TableNextColumn();
                                 UI::Text(Time::FormatString("%Y-%m-%d %H:%M:%S \\$AAA(%a)", record.timestampUnix));
+
                                 UI::TableNextColumn();
                                 UI::Text(Util::FormatSeconds(now - record.timestampUnix));
                             }
