@@ -63,16 +63,38 @@ namespace Tabs {
             }
 
             if (UI::BeginTabItem("maps (" + Globals::maps.Length + ")")) {
-                auto keys = Globals::hiddenMapsIndex.GetKeys();
-                UI::Text("hidden (" + keys.Length + "):");
-                if (UI::BeginChild("debug-maps-hidden")) {
-                    for (uint i = 0; i < keys.Length; i++) {
-                        auto map = cast<Models::Map@>(Globals::hiddenMapsIndex[keys[i]]);
-                        UI::Text(map.mapNameRaw);
-                    }
-                    UI::EndChild();
-                }
+                if (UI::Button(Icons::Times + " Clear"))
+                    Globals::ClearMaps();
 
+                int flags =
+                    UI::TableFlags::Resizable |
+                    UI::TableFlags::ScrollY;
+
+                if (UI::BeginTable("debug-maps-table", 3, flags)) {
+                    UI::TableSetupScrollFreeze(0, 1);
+                    UI::TableSetupColumn("Name");
+                    UI::TableSetupColumn("NameColor");
+                    UI::TableSetupColumn("Hidden");
+                    UI::TableHeadersRow();
+
+                    UI::ListClipper clipper(Globals::maps.Length);
+                    while (clipper.Step()) {
+                        for (uint i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+                            auto map = @Globals::maps[i];
+
+                            UI::TableNextRow();
+                            UI::TableNextColumn();
+                            UI::Text(map.mapNameText);
+
+                            UI::TableNextColumn();
+                            UI::Text(map.mapNameColor);
+
+                            UI::TableNextColumn();
+                            UI::Text((map.hidden) ? "yes" : "no");
+                        }
+                    }
+                    UI::EndTable();
+                }
                 UI::EndTabItem();
             }
 
