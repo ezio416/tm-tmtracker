@@ -196,5 +196,20 @@ namespace Models {
 
             Util::LogTimerEnd(timerId, false);
         }
+
+        // courtesy of "Play Map" plugin by XertroV - https://github.com/XertroV/tm-play-map
+        void PlayCoro() {
+            if (!Permissions::PlayLocalMap()) {
+                Util::Warn("Refusing to load map because you lack the necessary permissions. Standard or Club access required.");
+                return;
+            }
+            // change the menu page to avoid main menu bug where 3d scene not redrawn correctly (which can lead to a script error and `recovery restart...`)
+            auto app = cast<CGameManiaPlanet>(GetApp());
+            app.BackToMainMenu();
+            while (!app.ManiaTitleControlScriptAPI.IsReady) yield();
+            while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null) yield();
+            yield();
+            app.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
+        }
     }
 }
