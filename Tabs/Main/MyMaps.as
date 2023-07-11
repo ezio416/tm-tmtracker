@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-10
+m 2023-07-11
 */
 
 namespace Tabs {
@@ -11,7 +11,7 @@ namespace Tabs {
             startnew(CoroutineFunc(API::GetMyMapsCoro));
 
         UI::SameLine();
-        if (UI::Button(Icons::Download + " Get Records (" + Globals::records.Length + ")"))
+        if (UI::Button(Icons::Download + " Get All Records (" + Globals::records.Length + ")"))
             startnew(CoroutineFunc(API::GetMyMapsRecordsCoro));
 
         UI::SameLine();
