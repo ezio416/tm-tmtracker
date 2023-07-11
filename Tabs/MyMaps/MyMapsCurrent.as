@@ -25,21 +25,28 @@ namespace Tabs { namespace MyMaps {
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
                     catch { UI::Image(Globals::defaultTexture, thumbSize); }
 
-                    UI::BeginGroup();
-                        UI::Text(map.mapNameText);
-                        UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
-                        UI::Text("\\$DD1" + Icons::Circle + " " + Time::Format(map.goldTime));
-                        UI::Text("\\$AAA" + Icons::Circle + " " + Time::Format(map.silverTime));
-                        UI::Text("\\$C80" + Icons::Circle + " " + Time::Format(map.bronzeTime));
-                    UI::EndGroup();
+                    UI::Text(map.mapNameText);
+                    UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
+                    UI::Text("\\$DD1" + Icons::Circle + " " + Time::Format(map.goldTime));
+                    UI::Text("\\$AAA" + Icons::Circle + " " + Time::Format(map.silverTime));
+                    UI::Text("\\$C80" + Icons::Circle + " " + Time::Format(map.bronzeTime));
 
                     if (map.hidden) {
-                        if (UI::Button(Icons::Eye + " Show This Map (currently hidden)"))
+                        if (UI::Button(Icons::Eye + " Show"))
                             Globals::ShowMap(map);
                     } else {
-                        if (UI::Button(Icons::EyeSlash + " Hide This Map"))
+                        if (UI::Button(Icons::EyeSlash + " Hide"))
                             Globals::HideMap(map);
                     }
+
+                    if (UI::Button(Icons::Play + " Play"))
+                        startnew(CoroutineFunc(map.PlayCoro));
+
+                    if (UI::Button(Icons::Heartbeat + " \\$GTrackmania.io"))
+                        OpenBrowserURL("https://trackmania.io/#/leaderboard/" + map.mapUid);
+
+                    // if (UI::Button(Icons::Exchange + " Trackmania.exchange"))
+                    //     OpenBrowserURL();
                 UI::EndGroup();
 
                 UI::SameLine();
