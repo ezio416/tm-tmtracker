@@ -3,7 +3,7 @@ c 2023-05-26
 m 2023-07-11
 */
 
-namespace Tabs { namespace MyMaps {
+namespace Tabs { namespace Maps {
     void Tabs_Current() {
         auto now = Time::Stamp;
 
@@ -95,11 +95,6 @@ namespace Tabs { namespace MyMaps {
                                 UI::TableNextColumn();
                                 if (UI::Selectable((account.accountName != "") ? account.accountName : account.accountId, false))
                                     OpenBrowserURL("https://trackmania.io/#/player/" + account.accountId);
-                                // if (UI::IsItemHovered()) {
-                                //     UI::BeginTooltip();
-                                //     UI::Text("Trackmania.io profile");
-                                //     UI::EndTooltip();
-                                // }
 
                                 UI::TableNextColumn();
                                 UI::Text(Time::FormatString("%Y-%m-%d %H:%M:%S \\$AAA(%a)", record.timestampUnix));

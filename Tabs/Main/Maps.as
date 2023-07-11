@@ -4,7 +4,7 @@ m 2023-07-11
 */
 
 namespace Tabs {
-    void Tab_MyMaps() {
+    void Tab_Maps() {
         if (!UI::BeginTabItem(Icons::Map + " Maps")) return;
 
         if (UI::Button(Icons::Refresh + " Get My Maps (" + (Globals::maps.Length - Globals::hiddenMapsIndex.GetSize()) + ")"))
@@ -32,9 +32,9 @@ namespace Tabs {
             );
         }
 
-        UI::BeginTabBar("MyMapsTabs");
-            MyMaps::Tab_List();
-            MyMaps::Tabs_Current();
+        UI::BeginTabBar("MapsTabs");
+            Maps::Tab_MyMapsList();
+            Maps::Tabs_Current();
         UI::EndTabBar();
 
         UI::EndTabItem();
