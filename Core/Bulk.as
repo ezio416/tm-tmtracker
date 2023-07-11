@@ -65,7 +65,7 @@ namespace Bulk {
         Globals::status.Delete("get-my-maps");
         Util::LogTimerEnd(timerId);
 
-        startnew(CoroutineFunc(Maps::LoadMyMapsThumbnailsCoro));
+        startnew(CoroutineFunc(LoadMyMapsThumbnailsCoro));
     }
 
     void GetMyMapsRecordsCoro() {
@@ -85,6 +85,20 @@ namespace Bulk {
         while (nameCoro.IsRunning()) yield();
 
         Globals::status.Delete("get-all-records");
+        Util::LogTimerEnd(timerId);
+    }
+
+    void LoadMyMapsThumbnailsCoro() {
+        string timerId = Util::LogTimerBegin("loading my map thumbnails");
+
+        for (uint i = 0; i < Globals::maps.Length; i++) {
+            Globals::status.Set("load-thumbs", "loading thumbnails... (" + (i + 1) + "/" + Globals::maps.Length + ")");
+            auto map = @Globals::maps[i];
+            auto coro = startnew(CoroutineFunc(map.LoadThumbnailCoro));
+            while (coro.IsRunning()) yield();
+        }
+
+        Globals::status.Delete("load-thumbs");
         Util::LogTimerEnd(timerId);
     }
 }
