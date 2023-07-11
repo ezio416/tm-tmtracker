@@ -1,120 +1,111 @@
 /*
 c 2023-05-16
-m 2023-07-07
+m 2023-07-10
 */
 
 namespace Globals {
-    // Models::Account[] accounts;
-    // dictionary        accountIds;
+    Models::Account[] accounts;
+    dictionary        accountsIndex;
     Models::Map@[]    currentMaps;
-    dictionary        currentMapIds;
-    // SQLite::Database@ db;
+    dictionary        currentMapsIndex;
     UI::Texture@      defaultTexture = UI::LoadTexture("Assets/1x1.png");
     bool              dev = false;
-    // bool              getAccountNames = true;
+    bool              getAccountNames = true;
     uint64            latestNadeoRequest = 0;
     uint64            logTimerIndex = 0;
     dictionary        logTimers;
-    bool              mapClicked = false;
-    // uint              maxSqlValues = 1000;
-    // Models::Map[]     myHiddenMaps;
-    // dictionary        myHiddenMapIds;
-    Models::Map[]     myMaps;
-    dictionary        myMapIds;
-    // dictionary        recordIds;
-    // Models::Record[]  records;
+    string            clickedMapId;
+    dictionary        hiddenMapsIndex;
+    Models::Map[]     maps;
+    dictionary        mapsIndex;
+    Models::Record[]  records;
+    dictionary        recordsIndex;
     bool              requesting = false;
-    // bool              save = true;
-    // uint              sqlLoadBatch = 100;
+    bool              showHidden = false;
+    bool              singleMapRecordStatus = true;
     dictionary        status;
     string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
-    // string            dbFile = storageFolder + "TMTracker.db";
     string            thumbnailFolder = storageFolder + "thumbnails";
     dictionary        thumbnailTextures;
-    string            title = "\\$2f3" + Icons::MapO + "\\$z TMTracker";
+    string            title = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
     Json::Value       zones;
     string            zonesFile = "Assets/zones.json";
     bool              zonesFileMissing = true;
 
-    // void AddAccount(Models::Account account) {
-    //     if (accountIds.Exists(account.accountId)) return;
-    //     accountIds.Set(account.accountId, accountIds.GetKeys().Length);
-    //     accounts.InsertLast(account);
-    // }
-
-    void AddMyMap(Models::Map map) {
-        if (myMapIds.Exists(map.mapId)) return;
-        myMapIds.Set(map.mapId, myMapIds.GetKeys().Length);
-        // map.hidden = false;
-        myMaps.InsertLast(map);
+    void AddAccount(Models::Account account) {
+        if (accountsIndex.Exists(account.accountId)) return;
+        accounts.InsertLast(account);
+        accountsIndex.Set(account.accountId, @accounts[accounts.Length - 1]);
     }
 
-    // void AddMyHiddenMap(Models::Map map) {
-    //     if (myHiddenMapIds.Exists(map.mapId)) return;
-    //     myHiddenMapIds.Set(map.mapId, "");
-    //     map.hidden = true;
-    //     myHiddenMaps.InsertLast(map);
-    // }
+    void ClearAccounts() {
+        accounts.RemoveRange(0, accounts.Length);
+        accountsIndex.DeleteAll();
+    }
 
-    // void AddRecord(Models::Record record) {
-    //     if (recordIds.Exists(record.recordFakeId)) return;
+    void AddMap(Models::Map map) {
+        if (mapsIndex.Exists(map.mapId)) return;
+        maps.InsertLast(map);
+        mapsIndex.Set(map.mapId, @maps[maps.Length - 1]);
+    }
 
-    //     auto ix = uint(myMapIds[record.mapId]);
-    //     auto @map = myMaps[ix];
-
-    //     record.SetMedals(map);
-
-    //     recordIds.Set(record.recordFakeId, records.Length);
-    //     records.InsertLast(record);
-
-    //     if (!map.recordAccountIds.Exists(record.accountId)) {
-    //         map.recordAccountIds.Set(record.accountId, records.Length);
-    //         map.records.InsertLast(record);
-    //     }
-    // }
-
-    // void ClearAccounts() {
-    //     accounts.RemoveRange(0, accounts.Length);
-    //     ClearAccountIds();
-    // }
-
-    // void ClearAccountIds() {
-    //     accountIds.DeleteAll();
-    // }
+    void AddCurrentMap(Models::Map@ map) {
+        if (currentMapsIndex.Exists(map.mapId)) return;
+        currentMaps.InsertLast(map);
+        currentMapsIndex.Set(map.mapId, map);
+    }
 
     void ClearCurrentMaps() {
         currentMaps.RemoveRange(0, currentMaps.Length);
-        ClearCurrentMapIds();
+        currentMapsIndex.DeleteAll();
     }
 
-    void ClearCurrentMapIds() {
-        currentMapIds.DeleteAll();
+    void HideMap(Models::Map@ map) {
+        if (hiddenMapsIndex.Exists(map.mapId)) return;
+        hiddenMapsIndex.Set(map.mapId, map);
+        map.hidden = true;
     }
 
-    void ClearMyMaps() {
-        myMaps.RemoveRange(0, myMaps.Length);
-        ClearMyMapIds();
+    void ShowMap(Models::Map@ map) {
+        if (!hiddenMapsIndex.Exists(map.mapId)) return;
+        hiddenMapsIndex.Delete(map.mapId);
+        map.hidden = false;
     }
 
-    void ClearMyMapIds() {
-        myMapIds.DeleteAll();
+    void ClearHiddenMaps() {
+        hiddenMapsIndex.DeleteAll();
     }
 
-    // void ClearMyHiddenMaps() {
-    //     myHiddenMaps.RemoveRange(0, myHiddenMaps.Length);
-    //     ClearMyHiddenMapIds();
-    // }
+    void ClearMaps() {
+        maps.RemoveRange(0, maps.Length);
+        mapsIndex.DeleteAll();
+        ClearAccounts();
+        ClearCurrentMaps();
+        ClearHiddenMaps();
+        ClearRecords();
+    }
 
-    // void ClearMyHiddenMapIds() {
-    //     myHiddenMapIds.DeleteAll();
-    // }
+    void AddRecord(Models::Record record) {
+        records.InsertLast(record);
+        auto storedRecord = @records[records.Length - 1];
+        recordsIndex.Set(record.recordFakeId, storedRecord);
+        auto map = cast<Models::Map@>(mapsIndex[record.mapId]);
+        map.records.InsertLast(storedRecord);
+        map.recordsIndex.Set(record.accountId, storedRecord);
+    }
 
-    // void ClearRecords() {
-    //     records.RemoveRange(0, records.Length);
-    //     ClearRecordIds();
-    // }
+    void ClearMapRecords(Models::Map@ map) {
+        map.records.RemoveRange(0, records.Length);
+        map.recordsIndex.DeleteAll();
 
-    // void ClearRecordIds() {
-    //     recordIds.DeleteAll();
-    // }
+        if (records.Length == 0) return;
+        for (int i = records.Length - 1; i >= 0; i--)
+            if (records[i].mapId == map.mapId)
+                records.RemoveAt(i);
+    }
+
+    void ClearRecords() {
+        records.RemoveRange(0, records.Length);
+        recordsIndex.DeleteAll();
+    }
 }
