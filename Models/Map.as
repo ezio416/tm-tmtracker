@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-10
+m 2023-07-11
 */
 
 namespace Models {
@@ -55,6 +55,8 @@ namespace Models {
 
             uint offset = 0;
             bool tooManyRecords;
+            Models::Record[] tmpRecords;
+            dictionary tmpRecordsIndex;
 
             Globals::ClearMapRecords(this);
 
@@ -62,7 +64,7 @@ namespace Models {
                 auto waitCoro = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
                 while (waitCoro.IsRunning()) yield();
 
-                auto req = NadeoServices::Get(
+                auto req = NadeoServices::Get(  // sorted by position asc
                     "NadeoLiveServices",
                     NadeoServices::BaseURLLive() +
                         "/api/token/leaderboard/group/Personal_Best/map/" + mapUid +
@@ -85,10 +87,57 @@ namespace Models {
                     record.SetMedals(this);
 
                     Globals::AddAccount(Account(record));
-                    Globals::AddRecord(record);
+                    tmpRecords.InsertLast(record);
+                    tmpRecordsIndex.Set(record.accountId, @tmpRecords[tmpRecords.Length - 1]);
                 }
 
             } while (tooManyRecords && recordsIndex.GetSize() < Settings::maxRecordsPerMap);
+
+            int maxAccounts = 206;
+            string[] accountIds;
+            for (uint i = 0; i < tmpRecords.Length; i++) {
+                accountIds.InsertLast(tmpRecords[i].accountId);
+            }
+            string[][] accountIdGroups;
+            while (accountIds.Length > 0) {
+                string[] group;
+                int idsToAdd = Math::Min(accountIds.Length, maxAccounts);
+                for (int i = 0; i < idsToAdd; i++) {
+                    group.InsertLast(accountIds[i]);
+                }
+                accountIds.RemoveRange(0, idsToAdd);
+                accountIdGroups.InsertLast(group);
+            }
+            string[] accountIdReqGroups;
+            for (uint i = 0; i < accountIdGroups.Length; i++) {
+                accountIdReqGroups.InsertLast(string::Join(accountIdGroups[i], "%2C"));
+            }
+            for (uint i = 0; i < accountIdReqGroups.Length; i++) {
+                auto waitCoro = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
+                while (waitCoro.IsRunning()) yield();
+
+                auto req = NadeoServices::Get(  // sorted by timestamp asc
+                    "NadeoServices",
+                    NadeoServices::BaseURLCore() +
+                    "/mapRecords/?accountIdList=" + accountIdReqGroups[i] +
+                    "&mapIdList=" + mapId
+                );
+                req.Start();
+                while (!req.Finished()) yield();
+                Globals::requesting = false;
+
+                auto coreRecords = Json::Parse(req.String());
+                for (uint j = 0; j < coreRecords.Length; j++) {
+                    auto coreRecord = @coreRecords[j];
+                    auto tmpRecord = cast<Models::Record@>(tmpRecordsIndex[coreRecord["accountId"]]);
+
+                    tmpRecord.recordId = coreRecord["mapRecordId"];
+                    tmpRecord.timestampIso = coreRecord["timestamp"];
+                    tmpRecord.timestampUnix = Util::IsoToUnix(tmpRecord.timestampIso);
+
+                    Globals::AddRecord(tmpRecord);
+                }
+            }
 
             recordsTimestamp = Time::Stamp;
 

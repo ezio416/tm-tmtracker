@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-07-09
+m 2023-07-11
 */
 
 namespace Util {
@@ -19,6 +19,16 @@ namespace Util {
         if (minutes > 0)
             return "00:00:" + Zpad2(minutes) + ":" + Zpad2(seconds);
         return "00:00:00:" + Zpad2(seconds);
+    }
+
+    // courtesy of MisfitMaid
+    int64 IsoToUnix(const string &in inTime) {
+        auto st = Globals::timeDB.Prepare("SELECT unixepoch(?) as x");
+        st.Bind(1, inTime);
+        st.Execute();
+        st.NextRow();
+        st.NextRow();
+        return st.GetColumnInt64("x");
     }
 
     dictionary JsonLoadToDict(const string &in filename) {

@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-10
+m 2023-07-11
 */
 
 namespace Globals {
@@ -27,6 +27,7 @@ namespace Globals {
     string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
     string            thumbnailFolder = storageFolder + "thumbnails";
     dictionary        thumbnailTextures;
+    SQLite::Database@ timeDB = SQLite::Database(":memory:");
     string            title = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
     Json::Value       zones;
     string            zonesFile = "Assets/zones.json";
