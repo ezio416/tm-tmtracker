@@ -8,8 +8,7 @@ void Main() {
         Settings::windowOpen = false;
 
 #if SIG_DEVELOPER
-    if (!Settings::devHiddenByUser)
-        Globals::dev = !Settings::devHidden;
+    Globals::debug = !Settings::debugHidden;
 #endif
 
     Zones::Load();
@@ -57,7 +56,7 @@ void RenderInterface() {
         UI::BeginTabBar("tabs");
             Tabs::Tab_MyMaps();
             if (Settings::infoTab) Tabs::Tab_Info();
-            if (Globals::dev)      Tabs::Tab_Dev();
+            if (Globals::debug)    Tabs::Tab_Debug();
         UI::EndTabBar();
     UI::End();
 }

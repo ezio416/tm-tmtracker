@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-10
+m 2023-07-11
 */
 
 namespace Tabs {
@@ -40,14 +40,13 @@ namespace Tabs {
 #if SIG_DEVELOPER
         UI::Separator();
 
-        if (Globals::dev) {
-            Button_LockDev();
+        if (Globals::debug) {
+            Button_LockDebug();
         } else {
-            if (UI::Button(Icons::Unlock + " Unlock Dev Tab")) {
-                Util::Trace("dev tab unlocked");
-                Settings::devHidden = false;
-                Settings::devHiddenByUser = false;
-                Globals::dev = true;
+            if (UI::Button(Icons::Unlock + " Unlock Debug Tab")) {
+                Util::Trace("debug tab unlocked");
+                Settings::debugHidden = false;
+                Globals::debug = true;
             }
         }
 #endif

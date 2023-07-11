@@ -8,8 +8,8 @@ namespace Globals {
     dictionary        accountsIndex;
     Models::Map@[]    currentMaps;
     dictionary        currentMapsIndex;
+    bool              debug = false;
     UI::Texture@      defaultTexture = UI::LoadTexture("Assets/1x1.png");
-    bool              dev = false;
     bool              getAccountNames = true;
     uint64            latestNadeoRequest = 0;
     uint64            logTimerIndex = 0;

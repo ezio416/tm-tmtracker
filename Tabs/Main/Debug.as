@@ -4,10 +4,10 @@ m 2023-07-11
 */
 
 namespace Tabs {
-    void Tab_Dev() {
-        if (!UI::BeginTabItem(Icons::CodeFork + " Dev")) return;
+    void Tab_Debug() {
+        if (!UI::BeginTabItem(Icons::Cogs + " Debug")) return;
 
-        Button_LockDev();
+        Button_LockDebug();
 
         UI::TextWrapped(
             "I take no responsibility if you break the plugin, your game, or get yourself" +
@@ -16,7 +16,7 @@ namespace Tabs {
 
         UI::Separator();
 
-        UI::BeginTabBar("dev-tabs");
+        UI::BeginTabBar("debug-tabs");
             if (UI::BeginTabItem("accounts (" + Globals::accounts.Length + ")")) {
                 if (UI::Button(Icons::Times + " Clear"))
                     Globals::ClearAccounts();
@@ -31,7 +31,7 @@ namespace Tabs {
                     UI::TableFlags::Resizable |
                     UI::TableFlags::ScrollY;
 
-                if (UI::BeginTable("table_accounts", 4, flags)) {
+                if (UI::BeginTable("debug-table-accounts", 4, flags)) {
                     UI::TableSetupScrollFreeze(0, 1);
                     UI::TableSetupColumn("ID");
                     UI::TableSetupColumn("Name");
@@ -65,7 +65,7 @@ namespace Tabs {
             if (UI::BeginTabItem("maps (" + Globals::maps.Length + ")")) {
                 auto keys = Globals::hiddenMapsIndex.GetKeys();
                 UI::Text("hidden (" + keys.Length + "):");
-                if (UI::BeginChild("dev-hidden-maps")) {
+                if (UI::BeginChild("debug-maps-hidden")) {
                     for (uint i = 0; i < keys.Length; i++) {
                         auto map = cast<Models::Map@>(Globals::hiddenMapsIndex[keys[i]]);
                         UI::Text(map.mapNameRaw);
@@ -88,7 +88,7 @@ namespace Tabs {
                     UI::TableFlags::Resizable |
                     UI::TableFlags::ScrollY;
 
-                if (UI::BeginTable("dev-records-table", 8, flags)) {
+                if (UI::BeginTable("debug-records-table", 8, flags)) {
                     UI::TableSetupScrollFreeze(0, 1);
                     UI::TableSetupColumn("Map");
                     UI::TableSetupColumn("Account");
@@ -136,12 +136,11 @@ namespace Tabs {
         UI::EndTabItem();
     }
 
-    void Button_LockDev() {
-        if (UI::Button(Icons::Lock + " Lock Dev Tab")) {
-            Util::Trace("dev tab locked");
-            Settings::devHidden = true;
-            Settings::devHiddenByUser = true;
-            Globals::dev = false;
+    void Button_LockDebug() {
+        if (UI::Button(Icons::Lock + " Lock Debug Tab")) {
+            Util::Trace("debug tab locked");
+            Settings::debugHidden = true;
+            Globals::debug = false;
         }
     }
 }
