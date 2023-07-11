@@ -1,10 +1,10 @@
 /*
 c 2023-05-26
-m 2023-07-10
+m 2023-07-11
 */
 
-namespace Tabs { namespace MyMaps {
-    void Tab_List() {
+namespace Tabs { namespace Maps {
+    void Tab_MyMapsList() {
         if (!UI::BeginTabItem(Icons::MapO + " My Maps")) return;
 
         Globals::clickedMapId = "";
