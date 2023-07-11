@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-06
+m 2023-07-10
 */
 
 namespace Settings {
@@ -16,13 +16,13 @@ namespace Settings {
     [Setting category="General" name="Show info tab"]
     bool infoTab = true;
 
-    [Setting category="General" name="Account name valid time (days)" min=0 max=60 description="time after which the name will be retrieved again"]
+    [Setting category="General" name="Account name valid time (days)" min=0 max=60 description="time after which names will be retrieved again"]
     uint accountNameExpirationDays = 7;
 
     ///////////////////////////////////////////////////////////////////////////
     // STARTUP
     ///////////////////////////////////////////////////////////////////////////
-    [Setting category="Startup" name="Remember window open state"]
+    [Setting category="Startup" name="Remember window open state" description="if unchecked, the window is never shown when the game starts"]
     bool rememberOpen = false;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -33,9 +33,6 @@ namespace Settings {
 
     [Setting category="Logging" name="Task durations"]
     bool logDurations = false;
-
-    [Setting category="Logging" name="    + thumbnail load times"]
-    bool logThumbnailTimes = false;
 
     ///////////////////////////////////////////////////////////////////////////
     // MAP LIST
@@ -68,7 +65,7 @@ namespace Settings {
     // HIDDEN
     ///////////////////////////////////////////////////////////////////////////
     [Setting hidden]
-    string dateFormat = "%a \\$F98%Y-%m-%d \\$Z%H:%M:%S \\$F98";
+    string dateFormat = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
 
     [Setting hidden]
     bool devHidden = false;

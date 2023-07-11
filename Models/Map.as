@@ -1,35 +1,32 @@
 /*
 c 2023-05-16
-m 2023-07-06
+m 2023-07-10
 */
 
 namespace Models {
     class Map {
-        string       authorId;
-        uint         authorTime;
-        bool         badUploadTime;
-        uint         bronzeTime;
-        string       downloadUrl;
-        uint         goldTime;
-        // bool         hidden;
-        string       logName;
-        string       mapId;
-        string       mapNameColor;
-        string       mapNameRaw;
-        string       mapNameText;
-        string       mapUid;
-        // dictionary   recordAccountIds;
-        // Record@[]    records;
-        uint         recordsTimestamp;
-        uint         silverTime;
-        string       thumbnailFile;
-        UI::Texture@ thumbnailTexture;
-        string       thumbnailUrl;
-        uint         timestamp;
-        bool         viewing;
+        string            authorId;
+        uint              authorTime;
+        uint              bronzeTime;
+        string            downloadUrl;
+        uint              goldTime;
+        bool              hidden;
+        string            logName;
+        string            mapId;
+        string            mapNameColor;
+        string            mapNameRaw;
+        string            mapNameText;
+        string            mapUid;
+        Models::Record@[] records;
+        dictionary        recordsIndex;
+        uint              recordsTimestamp;
+        uint              silverTime;
+        string            thumbnailFile;
+        UI::Texture@      thumbnailTexture;
+        string            thumbnailUrl;
+        bool              viewing;
 
         Map() { }
-
         Map(Json::Value map) {
             mapUid        = map["uid"];
             thumbnailFile = Globals::thumbnailFolder + "/" + mapUid + ".jpg";
@@ -45,102 +42,64 @@ namespace Models {
             bronzeTime    = map["bronzeTime"];
             downloadUrl   = string(map["downloadUrl"]).Replace("\\", "");
             thumbnailUrl  = string(map["thumbnailUrl"]).Replace("\\", "");
-            if (map["uploadTimestamp"] < 1600000000) {
-                badUploadTime = true;  // for some maps, Nadeo only provides the year
-                timestamp = map["updateTimestamp"];
-            } else
-                timestamp = map["uploadTimestamp"];
         }
 
-        // Map(SQLite::Statement@ s) {
-        //     authorId         = s.GetColumnString("authorId");
-        //     authorTime       = s.GetColumnInt("authorTime");
-        //     badUploadTime    = s.GetColumnInt("badUploadTime") == 1 ? true : false;
-        //     bronzeTime       = s.GetColumnInt("bronzeTime");
-        //     downloadUrl      = s.GetColumnString("downloadUrl");
-        //     goldTime         = s.GetColumnInt("goldTime");
-        //     mapId            = s.GetColumnString("mapId");
-        //     mapNameRaw       = s.GetColumnString("mapNameRaw");
-        //     mapNameColor     = ColoredString(mapNameRaw);
-        //     mapNameText      = StripFormatCodes(mapNameRaw);
-        //     logName          = "MAP[" + mapNameText + "] - ";
-        //     mapUid           = s.GetColumnString("mapUid");
-        //     recordsTimestamp = s.GetColumnInt("recordsTimestamp");
-        //     thumbnailFile    = Globals::thumbnailFolder + "/" + mapId + ".jpg";
-        //     silverTime       = s.GetColumnInt("silverTime");
-        //     thumbnailUrl     = s.GetColumnString("thumbnailUrl");
-        //     timestamp        = s.GetColumnInt("timestamp");
-        // }
+        void GetRecordsCoro() {
+            if (hidden) return;
 
-        int opCmp(int i) { return timestamp - i; }
-        int opCmp(Map m) { return timestamp - m.timestamp; }
+            string timerId = Util::LogTimerBegin(logName + "getting records");
 
-        // void GetRecordsCoro() {
-        //     string timerId = Util::LogTimerBegin(logName + "getting records");
+            string statusId = "map-records-" + mapId;
+            if (Globals::singleMapRecordStatus)
+                Globals::status.Set(statusId, "getting records for " + mapNameText + " ...");
 
-        //     uint offset = 0;
-        //     bool tooManyRecords;
+            uint offset = 0;
+            bool tooManyRecords;
 
-        //     records.RemoveRange(0, records.Length);
-        //     recordAccountIds.DeleteAll();
+            Globals::ClearMapRecords(this);
 
-        //     do {
-        //         auto wait = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
-        //         while (wait.IsRunning()) yield();
+            do {
+                auto waitCoro = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
+                while (waitCoro.IsRunning()) yield();
 
-        //         auto req = NadeoServices::Get(
-        //             "NadeoLiveServices",
-        //             NadeoServices::BaseURLLive() +
-        //                 "/api/token/leaderboard/group/Personal_Best/map/" + mapUid +
-        //                 "/top?onlyWorld=true&length=100&offset=" + offset
-        //         );
-        //         req.Start();
-        //         while (!req.Finished()) yield();
-        //         Globals::requesting = false;
-        //         offset += 100;
+                auto req = NadeoServices::Get(
+                    "NadeoLiveServices",
+                    NadeoServices::BaseURLLive() +
+                        "/api/token/leaderboard/group/Personal_Best/map/" + mapUid +
+                        "/top?onlyWorld=true&length=100&offset=" + offset
+                );
+                req.Start();
+                while (!req.Finished()) yield();
+                Globals::requesting = false;
+                offset += 100;
 
-        //         auto top = Json::Parse(req.String())["tops"][0]["top"];
-        //         tooManyRecords = top.Length == 100;
-        //         for (uint i = 0; i < top.Length; i++) {
-        //             auto record = Record(top[i]);
-        //             record.mapId        = mapId;
-        //             record.mapName      = mapNameText;
-        //             record.mapUid       = mapUid;
-        //             record.recordFakeId = mapId + "-" + record.accountId;
+                auto top = Json::Parse(req.String())["tops"][0]["top"];
+                tooManyRecords = top.Length == 100;
+                for (uint i = 0; i < top.Length; i++) {
+                    auto record = Record(top[i]);
+                    record.mapId        = mapId;
+                    record.mapName      = mapNameText;
+                    record.mapUid       = mapUid;
+                    record.recordFakeId = mapId + "-" + record.accountId;
 
-        //             record.SetMedals(this);
+                    record.SetMedals(this);
 
-        //             auto account = Models::Account(record.accountId);
-        //             account.zoneId = record.zoneId;
-        //             Globals::AddAccount(account);
+                    Globals::AddAccount(Account(record));
+                    Globals::AddRecord(record);
+                }
 
-        //             recordAccountIds.Set(record.accountId, "");
-        //             records.InsertLast(record);
-        //             Globals::AddRecord(record);
-        //         }
+            } while (tooManyRecords && recordsIndex.GetSize() < Settings::maxRecordsPerMap);
 
-        //     } while (tooManyRecords && records.Length < Settings::maxRecordsPerMap);
+            recordsTimestamp = Time::Stamp;
 
-        //     recordsTimestamp = Time::Stamp;
+            auto namesCoro = startnew(CoroutineFunc(API::GetAccountNamesCoro));
+            while (namesCoro.IsRunning()) yield();
 
-        //     if (Globals::getAccountNames) {
-        //         auto coro = startnew(CoroutineFunc(API::GetAccountNamesCoro));
-        //         while (coro.IsRunning()) yield();
-        //     }
+            if (Globals::singleMapRecordStatus)
+                Globals::status.Delete(statusId);
 
-        //     // if (Globals::save) {
-        //     //     auto accSaveCoro = startnew(CoroutineFunc(DB::AllAccounts::SaveCoro));
-        //     //     while (accSaveCoro.IsRunning()) yield();
-        //     //     auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
-        //     //     while (accLoadCoro.IsRunning()) yield();
-        //     //     auto mapSaveCoro = startnew(CoroutineFunc(DB::MyMaps::SaveCoro));
-        //     //     while (mapSaveCoro.IsRunning()) yield();
-        //     //     auto recSaveCoro = startnew(CoroutineFunc(DB::Records::SaveCoro));
-        //     //     while (recSaveCoro.IsRunning()) yield();
-        //     // }
-
-        //     Util::LogTimerEnd(timerId);
-        // }
+            Util::LogTimerEnd(timerId);
+        }
 
         void GetThumbnailCoro() {
             if (IO::FileExists(thumbnailFile)) return;
@@ -162,7 +121,7 @@ namespace Models {
                     yield();
                 }
                 if (timedOut) {
-                    trace(logName + "timed out, waiting " + max_wait + " ms");
+                    Util::Trace(logName + "timed out, waiting " + max_wait + " ms");
                     auto nowWait = Time::Now;
                     while (Time::Now - nowWait < max_wait) yield();
                     continue;
@@ -182,7 +141,7 @@ namespace Models {
                 @tex = cast<UI::Texture@>(Globals::thumbnailTextures[mapId]);
                 if (@thumbnailTexture == null)
                     @thumbnailTexture = tex;
-                Util::LogTimerEnd(timerId, Settings::logThumbnailTimes);
+                Util::LogTimerEnd(timerId, false);
                 return;
             }
 
@@ -197,7 +156,7 @@ namespace Models {
 
             Globals::thumbnailTextures.Set(mapId, @thumbnailTexture);
 
-            Util::LogTimerEnd(timerId, Settings::logThumbnailTimes);
+            Util::LogTimerEnd(timerId, false);
         }
     }
 }

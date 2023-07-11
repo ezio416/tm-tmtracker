@@ -1,46 +1,42 @@
 /*
 c 2023-07-06
-m 2023-07-06
+m 2023-07-10
 */
 
 namespace API {
-    // void GetAccountNamesCoro() {
-    //     string timerId = Util::LogTimerBegin("getting account names");
+    void GetAccountNamesCoro() {
+        if (!Globals::getAccountNames) return;
 
-    //     string[] missing;
-    //     dictionary names;
+        string timerId = Util::LogTimerBegin("getting account names");
+        Globals::status.Set("account-names", "getting account names...");
 
-    //     for (uint i = 0; i < Globals::accounts.Length; i++)
-    //         if (Globals::accounts[i].IsNameExpired())
-    //             Globals::accounts[i].accountName = "";
+        string[] missing;
 
-    //     auto ids = Globals::accountIds.GetKeys();
-    //     for (uint i = 0; i < ids.Length; i++)
-    //         if (string(Globals::accountIds[ids[i]]) == "")
-    //             missing.InsertLast(ids[i]);
+        for (uint i = 0; i < Globals::accounts.Length; i++) {
+            auto account = @Globals::accounts[i];
+            if (account.IsNameExpired()) {
+                account.accountName = "";
+                missing.InsertLast(account.accountId);
+            }
+        }
 
-    //     auto ret = NadeoServices::GetDisplayNamesAsync(missing);
-    //     for (uint i = 0; i < missing.Length; i++) {
-    //         string id = missing[i];
-    //         names.Set(id, string(ret[id]));
-    //     }
+        auto ret = NadeoServices::GetDisplayNamesAsync(missing);
+        for (uint i = 0; i < missing.Length; i++) {
+            string id = missing[i];
+            auto account = cast<Models::Account@>(Globals::accountsIndex[id]);
+            account.accountName = string(ret[id]);
+            account.SetNameExpire();
+        }
 
-    //     for (uint i = 0; i < Globals::accounts.Length; i++) {
-    //         auto account = @Globals::accounts[i];
-    //         if (account.accountName != "") continue;
-    //         account.accountName = string(names[account.accountId]);
-    //         account.SetNameExpire();
-    //         Globals::accountIds.Set(account.accountId, account.accountName);
-    //     }
-
-    //     Util::LogTimerEnd(timerId);
-    // }
+        Globals::status.Delete("account-names");
+        Util::LogTimerEnd(timerId);
+    }
 
     void GetMyMapsCoro() {
         string timerId = Util::LogTimerBegin("updating my maps");
         Globals::status.Set("get-my-maps", "getting maps...");
 
-        Globals::ClearMyMaps();
+        Globals::ClearMaps();
 
         while (!NadeoServices::IsAuthenticated("NadeoLiveServices")) yield();
 
@@ -63,50 +59,32 @@ namespace API {
             auto mapList = Json::Parse(req.String())["mapList"];
             tooManyMaps = mapList.Length == 1000;
             for (uint i = 0; i < mapList.Length; i++)
-                Globals::AddMyMap(Models::Map(mapList[i]));
+                Globals::AddMap(Models::Map(mapList[i]));
         } while (tooManyMaps);
-
-        // for (int i = Globals::myMaps.Length - 1; i >= 0; i--)
-        //     if (Globals::myHiddenMapIds.Exists(Globals::myMaps[i].mapId))
-        //         Globals::myMaps.RemoveAt(i);
 
         Globals::status.Delete("get-my-maps");
         Util::LogTimerEnd(timerId);
 
-        // auto mapSaveCoro = startnew(CoroutineFunc(DB::MyMaps::SaveCoro));
-        // while (mapSaveCoro.IsRunning()) yield();
-        // auto mapLoadCoro = startnew(CoroutineFunc(DB::MyMaps::LoadCoro));
-        // while (mapLoadCoro.IsRunning()) yield();
-        // auto recLoadCoro = startnew(CoroutineFunc(DB::Records::LoadCoro));
-        // while (recLoadCoro.IsRunning()) yield();
-
         startnew(CoroutineFunc(Maps::LoadMyMapsThumbnailsCoro));
     }
 
-    // void GetMyMapsRecordsCoro() {
-    //     string timerId = Util::LogTimerBegin("getting my map records");
+    void GetMyMapsRecordsCoro() {
+        string timerId = Util::LogTimerBegin("getting records");
 
-    //     Globals::getAccountNames = false;
-    //     // Globals::save = false;
-    //     for (uint i = 0; i < Globals::myMaps.Length; i++) {
-    //         auto coro = startnew(CoroutineFunc(Globals::myMaps[i].GetRecordsCoro));
-    //         while (coro.IsRunning()) yield();
-    //     }
-    //     Globals::getAccountNames = true;
-    //     // Globals::save = true;
+        Globals::getAccountNames = false;
+        Globals::singleMapRecordStatus = false;
+        for (uint i = 0; i < Globals::maps.Length; i++) {
+            Globals::status.Set("get-all-records", "getting records... (" + (i + 1) + "/" + Globals::maps.Length + ")");
+            auto recordsCoro = startnew(CoroutineFunc(@Globals::maps[i].GetRecordsCoro));
+            while (recordsCoro.IsRunning()) yield();
+        }
+        Globals::getAccountNames = true;
+        Globals::singleMapRecordStatus = true;
 
-    //     auto nameCoro = startnew(CoroutineFunc(API::GetAccountNamesCoro));
-    //     while (nameCoro.IsRunning()) yield();
+        auto nameCoro = startnew(CoroutineFunc(API::GetAccountNamesCoro));
+        while (nameCoro.IsRunning()) yield();
 
-    //     // auto accSaveCoro = startnew(CoroutineFunc(DB::AllAccounts::SaveCoro));
-    //     // while (accSaveCoro.IsRunning()) yield();
-    //     // auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
-    //     // while (accLoadCoro.IsRunning()) yield();
-    //     // auto mapCoro = startnew(CoroutineFunc(DB::MyMaps::SaveCoro));
-    //     // while (mapCoro.IsRunning()) yield();
-    //     // auto recCoro = startnew(CoroutineFunc(DB::Records::SaveCoro));
-    //     // while (recCoro.IsRunning()) yield();
-
-    //     Util::LogTimerEnd(timerId);
-    // }
+        Globals::status.Delete("get-all-records");
+        Util::LogTimerEnd(timerId);
+    }
 }

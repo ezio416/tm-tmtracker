@@ -1,18 +1,22 @@
 /*
 c 2023-05-26
-m 2023-07-06
+m 2023-07-10
 */
 
 namespace Tabs { namespace MyMaps {
     void Tab_List() {
-        if (!UI::BeginTabItem(Icons::Map + " Map List " + Icons::Map)) return;
+        if (!UI::BeginTabItem(Icons::MapO + " My Maps")) return;
+
+        Globals::clickedMapId = "";
 
         if (UI::BeginChild("MyMapsList")) {
             uint curX = 0;
             auto size = UI::GetWindowSize();
 
-            for (uint i = 0; i < Globals::myMaps.Length; i++) {
-                auto map = Globals::myMaps[i];
+            for (uint i = 0; i < Globals::maps.Length; i++) {
+                auto map = @Globals::maps[i];
+
+                if (map.hidden && !Globals::showHidden) continue;
 
                 curX += Settings::myMapsListThumbnailWidth;
                 if (i > 0 && curX < uint(size.x))
@@ -26,11 +30,8 @@ namespace Tabs { namespace MyMaps {
 
                     UI::SetCursorPos(pos);
                     if (UI::InvisibleButton("invis_" + map.mapId, thumbSize)) {
-                        if (!Globals::currentMapIds.Exists(map.mapId)) {
-                            Globals::currentMapIds.Set(map.mapId, "");
-                            Globals::currentMaps.InsertLast(@Globals::myMaps[i]);
-                        }
-                        Globals::mapClicked = true;
+                        Globals::AddCurrentMap(map);
+                        Globals::clickedMapId = map.mapId;
                     }
 
                     uint scrollbarPixels = 44;  // works on 4K, 1.5x scaling

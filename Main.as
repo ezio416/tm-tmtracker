@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-07-09
+m 2023-07-10
 */
 
 void Main() {
@@ -17,13 +17,6 @@ void Main() {
     IO::CreateFolder(Globals::thumbnailFolder);
 
     NadeoServices::AddAudience("NadeoLiveServices");
-
-    // auto mapLoadCoro = startnew(CoroutineFunc(DB::MyMaps::LoadCoro));
-    // while (mapLoadCoro.IsRunning()) yield();
-    // auto recLoadCoro = startnew(CoroutineFunc(DB::Records::LoadCoro));
-    // while (recLoadCoro.IsRunning()) yield();
-    // auto accLoadCoro = startnew(CoroutineFunc(DB::AllAccounts::LoadCoro));
-    // while (accLoadCoro.IsRunning()) yield();
 }
 
 void RenderMenu() {
@@ -43,7 +36,7 @@ void RenderInterface() {
 
     UI::Begin(Globals::title, Settings::windowOpen, flags);
         if (Settings::statusBar && UI::BeginMenuBar()) {
-            UI::Text("v3.0.0-20230709   |");
+            UI::Text("v3.0.0-20230710   |");
             auto keys = Globals::status.GetKeys();
             if (keys.Length > 0) {
                 for (uint i = 0; i < keys.Length; i++) {
