@@ -80,6 +80,10 @@ namespace Tabs {
                 if (UI::Button(Icons::Times + " Clear"))
                     Globals::ClearRecords();
 
+                UI::SameLine();
+                if (UI::Button(Icons::Download + " Get All"))
+                    startnew(CoroutineFunc(API::GetMyMapsRecordsCoro));
+
                 int flags =
                     UI::TableFlags::Resizable |
                     UI::TableFlags::ScrollY;
