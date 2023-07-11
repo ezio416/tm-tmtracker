@@ -197,7 +197,7 @@ namespace Models {
             Util::LogTimerEnd(timerId, false);
         }
 
-        // courtesy of "Play Map" plugin by XertroV - https://github.com/XertroV/tm-play-map
+        // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
         void PlayCoro() {
             if (!Permissions::PlayLocalMap()) {
                 Util::Warn("Refusing to load map because you lack the necessary permissions. Standard or Club access required.");
@@ -210,6 +210,25 @@ namespace Models {
             while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null) yield();
             yield();
             app.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
+        }
+
+        // courtesy of "Map Info" plugin - https://github.com/MisfitMaid/tm-map-info
+        void TmxCoro() {
+            auto req = Net::HttpRequest();
+            req.Url = "https://trackmania.exchange/api/maps/get_map_info/uid/" + mapUid;
+            req.Headers['User-Agent'] = "TMTracker v3 Plugin / contact=Ezio416";
+            req.Method = Net::HttpMethod::Get;
+            req.Start();
+            while (!req.Finished()) yield();
+            if (req.ResponseCode() >= 400 || req.ResponseCode() < 200 || req.Error().Length > 0) {
+                Util::Warn("[status:" + req.ResponseCode() + "] Error getting map by UID from TMX: " + req.Error());
+                return;
+            }
+            try {
+                OpenBrowserURL("https://trackmania.exchange/tracks/view/" + int(Json::Parse(req.String()).Get("TrackID")));
+            } catch {
+                Util::NotifyWarn("Error opening TMX for map " + mapNameText);
+            }
         }
     }
 }

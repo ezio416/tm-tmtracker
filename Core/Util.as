@@ -87,6 +87,10 @@ namespace Util {
         LogTimerDelete(timerId);
     }
 
+    void NotifyWarn(const string &in msg) {
+        UI::ShowNotification("TMTracker", msg, UI::HSV(0.02, 0.8, 0.9));
+    }
+
     string StrWrap(const string &in input, const string &in wrapper = "'") {
         return wrapper + input + wrapper;
     }
