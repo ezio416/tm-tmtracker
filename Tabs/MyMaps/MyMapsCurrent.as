@@ -1,10 +1,12 @@
 /*
 c 2023-05-26
-m 2023-07-10
+m 2023-07-11
 */
 
 namespace Tabs { namespace MyMaps {
     void Tabs_Current() {
+        auto now = Time::Stamp;
+
         for (uint i = 0; i < Globals::currentMaps.Length; i++) {
             auto map = @Globals::currentMaps[i];
 
@@ -49,16 +51,17 @@ namespace Tabs { namespace MyMaps {
                     UI::Text("Last Updated: " + (
                         map.recordsTimestamp > 0 ?
                             Time::FormatString(Settings::dateFormat + "Local\\$G", map.recordsTimestamp) +
-                                " (" + Util::FormatSeconds(Time::Stamp - map.recordsTimestamp) + " ago)" :
+                                " (" + Util::FormatSeconds(now - map.recordsTimestamp) + " ago)" :
                             "not yet"
                     ));
 
-                    if (UI::BeginTable("table_records", 4, UI::TableFlags::ScrollY)) {
+                    if (UI::BeginTable("table_records", 5, UI::TableFlags::ScrollY)) {
                         UI::TableSetupScrollFreeze(0, 1);
                         UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 30);
                         UI::TableSetupColumn("Time", UI::TableColumnFlags::WidthFixed, 100);
                         UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthFixed, 300);
-                        UI::TableSetupColumn("Zone");
+                        UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, 300);
+                        UI::TableSetupColumn("Recency");
                         UI::TableHeadersRow();
 
                         UI::ListClipper clipper(map.records.Length);
@@ -83,10 +86,11 @@ namespace Tabs { namespace MyMaps {
                                 UI::TableNextColumn();
                                 UI::Text((account.accountName != "") ? account.accountName : account.accountId);
                                 UI::TableNextColumn();
-                                UI::Text(record.zoneName);
+                                UI::Text(Time::FormatString("%Y-%m-%d %H:%M:%S \\$AAA(%a)", record.timestampUnix));
+                                UI::TableNextColumn();
+                                UI::Text(Util::FormatSeconds(now - record.timestampUnix));
                             }
                         }
-
                         UI::EndTable();
                     }
                 UI::EndGroup();
