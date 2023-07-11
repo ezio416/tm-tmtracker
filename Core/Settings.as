@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-10
+m 2023-07-11
 */
 
 namespace Settings {
@@ -68,10 +68,7 @@ namespace Settings {
     string dateFormat = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
 
     [Setting hidden]
-    bool devHidden = false;
-
-    [Setting hidden]
-    bool devHiddenByUser = false;
+    bool debugHidden = true;
 
     [Setting hidden]
     uint timeBetweenNadeoRequests = 500;
