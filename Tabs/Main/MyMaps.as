@@ -8,7 +8,7 @@ namespace Tabs {
         if (!UI::BeginTabItem(Icons::Map + " Maps")) return;
 
         if (UI::Button(Icons::Refresh + " Get My Maps (" + (Globals::maps.Length - Globals::hiddenMapsIndex.GetSize()) + ")"))
-            startnew(CoroutineFunc(API::GetMyMapsCoro));
+            startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
 
         UI::SameLine();
         if (Globals::showHidden) {

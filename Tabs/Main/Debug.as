@@ -23,7 +23,7 @@ namespace Tabs {
 
                 UI::SameLine();
                 if (UI::Button(Icons::Download + " Get Names"))
-                    startnew(CoroutineFunc(API::GetAccountNamesCoro));
+                    startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
 
                 auto now = Time::Stamp;
 
@@ -82,7 +82,7 @@ namespace Tabs {
 
                 UI::SameLine();
                 if (UI::Button(Icons::Download + " Get All"))
-                    startnew(CoroutineFunc(API::GetMyMapsRecordsCoro));
+                    startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
 
                 int flags =
                     UI::TableFlags::Resizable |
