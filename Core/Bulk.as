@@ -33,6 +33,8 @@ namespace Bulk {
     }
 
     void GetMyMapsCoro() {
+        if (Locks::myMaps) return;
+        Locks::myMaps = true;
         string timerId = Util::LogTimerBegin("updating my maps");
         Globals::status.Set("get-my-maps", "getting maps...");
 
@@ -64,6 +66,7 @@ namespace Bulk {
 
         Globals::status.Delete("get-my-maps");
         Util::LogTimerEnd(timerId);
+        Locks::myMaps = false;
 
         startnew(CoroutineFunc(LoadMyMapsThumbnailsCoro));
     }
