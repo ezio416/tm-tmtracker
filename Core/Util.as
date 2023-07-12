@@ -4,7 +4,7 @@ m 2023-07-12
 */
 
 namespace Util {
-    string FormatSeconds(int seconds, bool day = true, bool hour = true, bool minute = true) {
+    string FormatSeconds(int seconds, bool day = false, bool hour = false, bool minute = false) {
         int minutes = seconds / 60;
         seconds %= 60;
         int hours = minutes / 60;
@@ -13,12 +13,12 @@ namespace Util {
         hours %= 24;
 
         if (days > 0)
-            return Zpad2(days) + ":" + Zpad2(hours) + ":" + Zpad2(minutes) + ":" + Zpad2(seconds);
+            return days + "d " + hours + "h " + minutes + "m " + seconds + "s";
         if (hours > 0)
-            return (day ? "00:" : "") + Zpad2(hours) + ":" + Zpad2(minutes) + ":" + Zpad2(seconds);
+            return (day ? "0d " : "") + hours + "h " + minutes + "m " + seconds + "s";
         if (minutes > 0)
-            return (day ? "00:" : "") + (hour ? "00:" : "") + Zpad2(minutes) + ":" + Zpad2(seconds);
-        return (day ? "00:" : "") + (hour ? "00:" : "") + (minute ? "00:" : "") + Zpad2(seconds);
+            return (day ? "0d " : "") + (hour ? "0h " : "") + minutes + "m " + seconds + "s";
+        return (day ? "0d " : "") + (hour ? "0h " : "") + (minute ? "0m " : "") + seconds + "s";
     }
 
     // courtesy of MisfitMaid
