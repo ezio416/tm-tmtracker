@@ -56,7 +56,7 @@ namespace Settings {
     bool myMapsTabsColor = true;
 
     [Setting category="Map Tabs" name="Show record times with medal colors"]
-    bool recordMedalColors = true;
+    bool mapRecordsMedalColors = true;
 
     [Setting category="Map Tabs" name="Thumbnail width" min=10 max=1000]
     uint myMapsCurrentThumbnailWidth = 400;
@@ -67,8 +67,17 @@ namespace Settings {
     ///////////////////////////////////////////////////////////////////////////
     // RECORDS
     ///////////////////////////////////////////////////////////////////////////
+    [Setting category="Records" name="Show time estimate"]
+    bool recordsEstimate = true;
+
     [Setting category="Records" name="Highlight top 5 world" description="so you can spectate with proper access"]
     bool recordsHighlight5 = true;
+
+    [Setting category="Records" name="Highlight color"]
+    string recordsHighlightColor = "F71";
+
+    [Setting category="Records" name="Show record times with medal colors"]
+    bool recordsMedalColors = true;
 
     ///////////////////////////////////////////////////////////////////////////
     // HIDDEN

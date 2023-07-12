@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-11
+m 2023-07-12
 */
 
 namespace Tabs { namespace Maps {
@@ -10,11 +10,39 @@ namespace Tabs { namespace Maps {
         Globals::clickedMapId = "";
         bool firstMapExcluded = false;
 
-        Globals::mapSearch = UI::InputText("search", Globals::mapSearch, false).ToLower();
+        if (Settings::welcomeText) {
+            UI::TextWrapped(
+                "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
+                "\nClose tabs with a middle click or the \uE997"
+            );
+        }
+
+        if (UI::Button(Icons::Refresh + " Refresh Maps (" + Globals::shownMaps + ")"))
+            startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
 
         UI::SameLine();
-        if (UI::Button(Icons::Times + " Clear Search"))
-            Globals::mapSearch = "";
+        int hiddenMapCount = Globals::hiddenMapsIndex.GetSize();
+        if (Globals::showHidden) {
+            if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + hiddenMapCount + ")"))
+                Globals::showHidden = false;
+        } else {
+            if (UI::Button(Icons::Eye + " Show Hidden (" + hiddenMapCount + ")"))
+                Globals::showHidden = true;
+        }
+
+        if (Globals::currentMaps.Length > 0) {
+            UI::SameLine();
+            if (UI::Button(Icons::Times + " Clear Current Maps (" + Globals::currentMaps.Length + ")"))
+                Globals::ClearCurrentMaps();
+        }
+
+        Globals::mapSearch = UI::InputText("search", Globals::mapSearch, false).ToLower();
+
+        if (Globals::mapSearch != "") {
+            UI::SameLine();
+            if (UI::Button(Icons::Times + " Clear Search"))
+                Globals::mapSearch = "";
+        }
 
         if (UI::BeginChild("MyMapsList")) {
             uint curX = 0;
