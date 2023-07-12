@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-07-11
+m 2023-07-12
 */
 
 void Main() {
@@ -22,6 +22,12 @@ void Main() {
 
     if (Settings::startupMyMaps)
         startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
+}
+
+void OnSettingsChanged() {
+    uint tmp = 3 - Settings::recordsHighlightColor.Length;
+    for (uint i = 0; i < tmp; i++)
+        Settings::recordsHighlightColor += "0";
 }
 
 void RenderMenu() {

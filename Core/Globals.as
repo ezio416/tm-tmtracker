@@ -22,7 +22,9 @@ namespace Globals {
     string            mapSearch;
     dictionary        mapsIndex;
     Models::Record[]  records;
+    // string            recordsAccountSearch;
     dictionary        recordsIndex;
+    // string            recordsMapSearch;
     Models::Record[]  recordsSorted;
     uint              recordsTimestamp = 0;
     bool              requesting = false;
@@ -70,15 +72,17 @@ namespace Globals {
 
     void HideMap(Models::Map@ map) {
         if (hiddenMapsIndex.Exists(map.mapId)) return;
-        map.hidden = true;
         hiddenMapsIndex.Set(map.mapId, "");
+        map.hidden = true;
+        Globals::shownMaps--;
         Util::JsonSaveFromDict(hiddenMapsIndex, hiddenMapsFile);
     }
 
     void ShowMap(Models::Map@ map) {
         if (!hiddenMapsIndex.Exists(map.mapId)) return;
-        map.hidden = false;
         hiddenMapsIndex.Delete(map.mapId);
+        map.hidden = false;
+        Globals::shownMaps++;
         Util::JsonSaveFromDict(hiddenMapsIndex, hiddenMapsFile);
     }
 

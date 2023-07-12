@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-11
+m 2023-07-12
 */
 
 namespace Tabs { namespace Maps {
@@ -30,10 +30,14 @@ namespace Tabs { namespace Maps {
                     UI::Text("\\$DD1" + Icons::Circle + " " + Time::Format(map.goldTime));
                     UI::Text("\\$AAA" + Icons::Circle + " " + Time::Format(map.silverTime));
                     UI::Text("\\$C80" + Icons::Circle + " " + Time::Format(map.bronzeTime));
+                UI::EndGroup();
 
+                UI::SameLine();
+                UI::BeginGroup();
                     if (UI::Button(Icons::Play + " Play"))
                         startnew(CoroutineFunc(map.PlayCoro));
 
+                    UI::SameLine();
                     if (map.hidden) {
                         if (UI::Button(Icons::Eye + " Show"))
                             Globals::ShowMap(map);
@@ -42,15 +46,14 @@ namespace Tabs { namespace Maps {
                             Globals::HideMap(map);
                     }
 
+                    UI::SameLine();
                     if (UI::Button(Icons::Heartbeat + " Trackmania.io"))
                         OpenBrowserURL("https://trackmania.io/#/leaderboard/" + map.mapUid);
 
+                    UI::SameLine();
                     if (UI::Button(Icons::Exchange + " Trackmania.exchange"))
                         startnew(CoroutineFunc(map.TmxCoro));
-                UI::EndGroup();
 
-                UI::SameLine();
-                UI::BeginGroup();
                     if (UI::Button(Icons::Download + " Get Records (" + map.records.Length + ")"))
                         startnew(CoroutineFunc(map.GetRecordsCoro));
 
@@ -59,16 +62,16 @@ namespace Tabs { namespace Maps {
                         map.recordsTimestamp > 0 ?
                             Time::FormatString(Settings::dateFormat + "Local\\$G", map.recordsTimestamp) +
                                 " (" + Util::FormatSeconds(now - map.recordsTimestamp) + " ago)" :
-                            "not yet"
+                            "never"
                     ));
 
                     if (UI::BeginTable("table_records", 5, UI::TableFlags::ScrollY)) {
                         UI::TableSetupScrollFreeze(0, 1);
                         UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 30);
                         UI::TableSetupColumn("Time", UI::TableColumnFlags::WidthFixed, 100);
-                        UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthFixed, 300);
+                        UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthFixed, 200);
                         UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, 300);
-                        UI::TableSetupColumn("Recency");
+                        UI::TableSetupColumn("Recency", UI::TableColumnFlags::WidthFixed, 200);
                         UI::TableHeadersRow();
 
                         UI::ListClipper clipper(map.records.Length);
@@ -83,7 +86,7 @@ namespace Tabs { namespace Maps {
 
                                 UI::TableNextColumn();
                                 string timeColor = "";
-                                if (Settings::recordMedalColors)
+                                if (Settings::mapRecordsMedalColors)
                                     switch (record.medals) {
                                         case 1: timeColor = "\\$C80"; break;
                                         case 2: timeColor = "\\$AAA"; break;
