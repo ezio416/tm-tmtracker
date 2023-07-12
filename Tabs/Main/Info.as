@@ -19,23 +19,32 @@ namespace Tabs {
 
         UI::Separator();
 
-        UI::TextWrapped(
-            "If you do have suggestions or problems, please submit an issue:\n" +
-            "It's very easy to add a setting, and probably easy to add a small feature."
-        );
+        UI::TextWrapped("Files are kept in: ");
+
         UI::SameLine();
-        string linkGH = "https://github.com/ezio416/TMTracker-Openplanet/issues";
-        if (UI::Button(Icons::Github + " Issues")) OpenBrowserURL(linkGH);
+        if (UI::Selectable("\\$1F1" + Globals::storageFolder, false))
+            IO::SetClipboard(Globals::storageFolder);
+        if (UI::IsItemHovered()) {
+            UI::BeginTooltip();
+            UI::Text("click to copy");
+            UI::EndTooltip();
+        }
+
+        UI::TextWrapped("If you want to look in the database, I recommend DB Browser:");
+
+        UI::SameLine();
+        string linkSQL = "sqlitebrowser.org";
+        if (UI::Button(Icons::Database + " " + linkSQL)) OpenBrowserURL("https://" + linkSQL);
 
         UI::Separator();
 
         UI::TextWrapped(
-            "If you want to look in the database, I recommend DB Browser:"
-            "\nFiles are kept at \\$1F1" + Globals::storageFolder
+            "If you do have suggestions or problems, please submit an issue:\n" +
+            "It's very easy to add a setting, and probably easy to add a small feature!"
         );
         UI::SameLine();
-        string linkSQL = "sqlitebrowser.org";
-        if (UI::Button(Icons::Database + " " + linkSQL)) OpenBrowserURL("https://" + linkSQL);
+        string linkGH = "https://github.com/ezio416/TMTracker-Openplanet/issues";
+        if (UI::Button(Icons::Github + " Issues")) OpenBrowserURL(linkGH);
 
 #if SIG_DEVELOPER
         UI::Separator();
