@@ -1,10 +1,10 @@
 /*
 c 2023-05-20
-m 2023-07-11
+m 2023-07-12
 */
 
 namespace Util {
-    string FormatSeconds(int seconds) {
+    string FormatSeconds(int seconds, bool day = true, bool hour = true, bool minute = true) {
         int minutes = seconds / 60;
         seconds %= 60;
         int hours = minutes / 60;
@@ -15,10 +15,10 @@ namespace Util {
         if (days > 0)
             return Zpad2(days) + ":" + Zpad2(hours) + ":" + Zpad2(minutes) + ":" + Zpad2(seconds);
         if (hours > 0)
-            return "00:" + Zpad2(hours) + ":" + Zpad2(minutes) + ":" + Zpad2(seconds);
+            return (day ? "00:" : "") + Zpad2(hours) + ":" + Zpad2(minutes) + ":" + Zpad2(seconds);
         if (minutes > 0)
-            return "00:00:" + Zpad2(minutes) + ":" + Zpad2(seconds);
-        return "00:00:00:" + Zpad2(seconds);
+            return (day ? "00:" : "") + (hour ? "00:" : "") + Zpad2(minutes) + ":" + Zpad2(seconds);
+        return (day ? "00:" : "") + (hour ? "00:" : "") + (minute ? "00:" : "") + Zpad2(seconds);
     }
 
     // courtesy of MisfitMaid
