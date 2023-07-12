@@ -8,6 +8,13 @@ namespace Tabs { namespace Maps {
         if (!UI::BeginTabItem(Icons::MapO + " My Maps")) return;
 
         Globals::clickedMapId = "";
+        bool firstMapExcluded = false;
+
+        Globals::mapSearch = UI::InputText("search", Globals::mapSearch, false).ToLower();
+
+        UI::SameLine();
+        if (UI::Button(Icons::Times + " Clear Search"))
+            Globals::mapSearch = "";
 
         if (UI::BeginChild("MyMapsList")) {
             uint curX = 0;
@@ -17,10 +24,18 @@ namespace Tabs { namespace Maps {
                 auto map = @Globals::maps[i];
 
                 if (map.hidden && !Globals::showHidden) continue;
+                if (!map.mapNameText.ToLower().Contains(Globals::mapSearch)) {
+                    if (i == 0) firstMapExcluded = true;
+                    continue;
+                }
 
                 curX += Settings::myMapsListThumbnailWidth;
-                if (i > 0 && curX < uint(size.x))
-                    UI::SameLine();
+                if (i > 0) {
+                    if (curX < uint(size.x) && !firstMapExcluded)
+                        UI::SameLine();
+                    else
+                        firstMapExcluded = false;
+                }
 
                 UI::BeginGroup();
                     auto pos = UI::GetCursorPos();

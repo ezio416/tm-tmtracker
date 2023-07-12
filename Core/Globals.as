@@ -18,6 +18,7 @@ namespace Globals {
     string            hiddenMapsFile = storageFolder + "hiddenMaps.json";
     dictionary        hiddenMapsIndex;
     Models::Map[]     maps;
+    string            mapSearch;
     dictionary        mapsIndex;
     Models::Record[]  records;
     dictionary        recordsIndex;
