@@ -45,7 +45,8 @@ namespace Models {
         }
 
         void GetRecordsCoro() {
-            if (hidden) return;
+            if (hidden || Locks::singleRecords) return;
+            Locks::singleRecords = true;
 
             string timerId = Util::LogTimerBegin(logName + "getting records");
 
@@ -137,6 +138,7 @@ namespace Models {
                 Globals::status.Delete(statusId);
 
             Util::LogTimerEnd(timerId);
+            Locks::singleRecords = false;
         }
 
         void GetThumbnailCoro() {
@@ -199,6 +201,9 @@ namespace Models {
 
         // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
         void PlayCoro() {
+            if (Locks::playMap) return;
+            Locks::playMap = true;
+
             if (!Permissions::PlayLocalMap()) {
                 Util::Warn("Refusing to load map because you lack the necessary permissions. Standard or Club access required.");
                 return;
@@ -210,10 +215,19 @@ namespace Models {
             while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null) yield();
             yield();
             app.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
+
+            int waitToPlayAgain = 5000;
+            auto now = Time::Now;
+            while (Time::Now - now < waitToPlayAgain) yield();
+
+            Locks::playMap = false;
         }
 
         // courtesy of "Map Info" plugin - https://github.com/MisfitMaid/tm-map-info
         void TmxCoro() {
+            if (Locks::tmx) return;
+            Locks::tmx = true;
+
             auto req = Net::HttpRequest();
             req.Url = "https://trackmania.exchange/api/maps/get_map_info/uid/" + mapUid;
             req.Headers['User-Agent'] = "TMTracker v3 Plugin / contact=Ezio416";
@@ -229,6 +243,8 @@ namespace Models {
             } catch {
                 Util::NotifyWarn("Error opening TMX for map " + mapNameText);
             }
+
+            Locks::tmx = false;
         }
     }
 }
