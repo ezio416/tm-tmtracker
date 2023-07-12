@@ -60,6 +60,7 @@ void RenderInterface() {
 
         UI::BeginTabBar("tabs");
             Tabs::Tab_Maps();
+            Tabs::Tab_Records();
             if (Settings::infoTab) Tabs::Tab_Info();
             if (Globals::debug)    Tabs::Tab_Debug();
         UI::EndTabBar();

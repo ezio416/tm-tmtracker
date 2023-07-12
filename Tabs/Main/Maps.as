@@ -1,19 +1,17 @@
 /*
 c 2023-05-26
-m 2023-07-11
+m 2023-07-12
 */
 
 namespace Tabs {
     void Tab_Maps() {
         if (!UI::BeginTabItem(Icons::Map + " Maps")) return;
 
-        int hiddenMapCount = Globals::hiddenMapsIndex.GetSize();
-        int totalMaps = Globals::maps.Length - hiddenMapCount;
-        totalMaps = Math::Max(totalMaps, 0);
-        if (UI::Button(Icons::Refresh + " Get My Maps (" + totalMaps + ")"))
+        if (UI::Button(Icons::Refresh + " Refresh My Maps (" + Globals::shownMaps + ")"))
             startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
 
         UI::SameLine();
+        int hiddenMapCount = Globals::hiddenMapsIndex.GetSize();
         if (Globals::showHidden) {
             if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + hiddenMapCount + ")"))
                 Globals::showHidden = false;
