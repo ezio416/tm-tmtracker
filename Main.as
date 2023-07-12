@@ -13,10 +13,15 @@ void Main() {
 
     Zones::Load();
 
+    try { Globals::hiddenMapsIndex = Util::JsonLoadToDict(Globals::hiddenMapsFile); } catch { }
+
     IO::CreateFolder(Globals::thumbnailFolder);
 
     NadeoServices::AddAudience("NadeoServices");
     NadeoServices::AddAudience("NadeoLiveServices");
+
+    if (Settings::startupMyMaps)
+        startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
 }
 
 void RenderMenu() {

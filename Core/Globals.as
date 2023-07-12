@@ -15,6 +15,7 @@ namespace Globals {
     uint64            logTimerIndex = 0;
     dictionary        logTimers;
     string            clickedMapId;
+    string            hiddenMapsFile = storageFolder + "hiddenMaps.json";
     dictionary        hiddenMapsIndex;
     Models::Map[]     maps;
     dictionary        mapsIndex;
@@ -46,6 +47,7 @@ namespace Globals {
 
     void AddMap(Models::Map map) {
         if (mapsIndex.Exists(map.mapId)) return;
+        if (hiddenMapsIndex.Exists(map.mapId)) map.hidden = true;
         maps.InsertLast(map);
         mapsIndex.Set(map.mapId, @maps[maps.Length - 1]);
     }
@@ -63,14 +65,16 @@ namespace Globals {
 
     void HideMap(Models::Map@ map) {
         if (hiddenMapsIndex.Exists(map.mapId)) return;
-        hiddenMapsIndex.Set(map.mapId, map);
         map.hidden = true;
+        hiddenMapsIndex.Set(map.mapId, "");
+        Util::JsonSaveFromDict(hiddenMapsIndex, hiddenMapsFile);
     }
 
     void ShowMap(Models::Map@ map) {
         if (!hiddenMapsIndex.Exists(map.mapId)) return;
-        hiddenMapsIndex.Delete(map.mapId);
         map.hidden = false;
+        hiddenMapsIndex.Delete(map.mapId);
+        Util::JsonSaveFromDict(hiddenMapsIndex, hiddenMapsFile);
     }
 
     void ClearHiddenMaps() {
@@ -82,7 +86,7 @@ namespace Globals {
         mapsIndex.DeleteAll();
         ClearAccounts();
         ClearCurrentMaps();
-        ClearHiddenMaps();
+        // ClearHiddenMaps();
         ClearRecords();
     }
 

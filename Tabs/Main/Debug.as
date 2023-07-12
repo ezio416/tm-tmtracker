@@ -79,7 +79,7 @@ namespace Tabs {
 
                     UI::ListClipper clipper(Globals::maps.Length);
                     while (clipper.Step()) {
-                        for (uint i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+                        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
                             auto map = @Globals::maps[i];
 
                             UI::TableNextRow();
