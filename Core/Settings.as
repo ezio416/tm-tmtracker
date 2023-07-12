@@ -25,6 +25,9 @@ namespace Settings {
     [Setting category="Startup" name="Remember window open state" description="if unchecked, the window is never shown when the game starts"]
     bool rememberOpen = false;
 
+    [Setting category="Startup" name="Get my maps"]
+    bool startupMyMaps = true;
+
     ///////////////////////////////////////////////////////////////////////////
     // LOGGING
     ///////////////////////////////////////////////////////////////////////////

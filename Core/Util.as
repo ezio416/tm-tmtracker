@@ -32,7 +32,7 @@ namespace Util {
     }
 
     dictionary JsonLoadToDict(const string &in filename) {
-        auto timer = LogTimerBegin("loading map order");
+        auto timer = LogTimerBegin("loading json file");
         Json::Value json;
         dictionary dict;
 
@@ -43,8 +43,9 @@ namespace Util {
             return dict;
         }
 
-        for (uint i = 1; i <= json.Length; i++) {
-            auto key = "" + i;
+        auto keys = json.GetKeys();
+        for (uint i = 0; i < json.Length; i++) {
+            auto key = keys[i];
             auto val = json.Get(key);
             dict.Set(key, string(val));
         }

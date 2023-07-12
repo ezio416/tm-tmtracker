@@ -216,7 +216,7 @@ namespace Models {
             yield();
             app.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
 
-            int waitToPlayAgain = 5000;
+            uint64 waitToPlayAgain = 5000;
             auto now = Time::Now;
             while (Time::Now - now < waitToPlayAgain) yield();
 
