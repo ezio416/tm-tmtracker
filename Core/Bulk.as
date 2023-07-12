@@ -28,6 +28,8 @@ namespace Bulk {
             account.SetNameExpire();
         }
 
+        Globals::SortRecords();
+
         Globals::status.Delete("account-names");
         Util::LogTimerEnd(timerId);
     }
@@ -84,12 +86,20 @@ namespace Bulk {
             Globals::status.Set("get-all-records", "getting records... (" + (i + 1) + "/" + Globals::maps.Length + ")");
             auto recordsCoro = startnew(CoroutineFunc(@Globals::maps[i].GetRecordsCoro));
             while (recordsCoro.IsRunning()) yield();
+            if (Globals::cancelAllRecords) {
+                Globals::cancelAllRecords = false;
+                Util::Trace("getting records cancelled by user");
+                Locks::allRecords = false;
+                break;
+            }
         }
         Globals::getAccountNames = true;
         Globals::singleMapRecordStatus = true;
 
         auto nameCoro = startnew(CoroutineFunc(GetAccountNamesCoro));
         while (nameCoro.IsRunning()) yield();
+
+        Globals::recordsTimestamp = Time::Stamp;
 
         Globals::status.Delete("get-all-records");
         Util::LogTimerEnd(timerId);

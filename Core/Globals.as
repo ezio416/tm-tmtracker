@@ -6,6 +6,7 @@ m 2023-07-12
 namespace Globals {
     Models::Account[] accounts;
     dictionary        accountsIndex;
+    bool              cancelAllRecords = false;
     Models::Map@[]    currentMaps;
     dictionary        currentMapsIndex;
     bool              debug = false;
@@ -22,6 +23,8 @@ namespace Globals {
     dictionary        mapsIndex;
     Models::Record[]  records;
     dictionary        recordsIndex;
+    Models::Record[]  recordsSorted;
+    uint              recordsTimestamp = 0;
     bool              requesting = false;
     bool              showHidden = false;
     uint              shownMaps;
@@ -86,10 +89,10 @@ namespace Globals {
     void ClearMaps() {
         maps.RemoveRange(0, maps.Length);
         mapsIndex.DeleteAll();
-        ClearAccounts();
+        // ClearAccounts();
         ClearCurrentMaps();
         // ClearHiddenMaps();
-        ClearRecords();
+        // ClearRecords();
     }
 
     void AddRecord(Models::Record record) {
@@ -99,6 +102,18 @@ namespace Globals {
         auto map = cast<Models::Map@>(mapsIndex[record.mapId]);
         map.records.InsertLast(storedRecord);
         map.recordsIndex.Set(record.accountId, storedRecord);
+    }
+
+    void SortRecords() {
+        auto timerId = Util::LogTimerBegin("sorting records");
+        Globals::status.Set("sort-records", "sorting records...");
+
+        recordsSorted = records;
+        if (recordsSorted.Length > 1)
+            recordsSorted.Sort(function(a,b) { return a.timestampUnix > b.timestampUnix; });  // times out, 3s for 2600 records
+
+        Globals::status.Delete("sort-records");
+        Util::LogTimerEnd(timerId);
     }
 
     void ClearMapRecords(Models::Map@ map) {
