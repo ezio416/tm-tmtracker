@@ -2,8 +2,7 @@
 name     = "TMTracker"
 author   = "Ezio414"
 category = "Utilities"
-version  = "3.0.1"
+version  = "3.0.0"
 
 [script]
 dependencies = [ "NadeoServices" ]
-timeout      = 10000

@@ -1,28 +1,31 @@
 /*
 c 2023-05-16
-m 2023-05-26
+m 2023-07-07
 */
 
-// Functions for player regions
 namespace Zones {
+    string Get(const string &in zoneId) {
+        try   { return string(Globals::zones.Get(zoneId)); }
+        catch { return "unknown-zone"; }
+    }
+
     void Load() {
         try {
             Globals::zones.Length;
             return;
         } catch { }
 
-        string timerId = Various::LogTimerBegin("loading zones from file");
+        string timerId = Util::LogTimerBegin("loading zones from file");
 
         try {
-            Globals::zones = Json::FromFile("Assets/zones.json");
+            Globals::zones = Json::FromFile(Globals::zonesFile);
             Globals::zonesFileMissing = false;
         } catch {
-            if (Settings::logEnabled)
-                trace("missing zones file!");
-            Various::LogTimerEnd(timerId, false);
+            Util::Trace("missing zones file!");
+            Util::LogTimerEnd(timerId, false);
             return;
         }
 
-        Various::LogTimerEnd(timerId);
+        Util::LogTimerEnd(timerId);
     }
 }
