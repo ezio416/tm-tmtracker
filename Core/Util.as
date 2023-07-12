@@ -1,10 +1,9 @@
 /*
 c 2023-05-20
-m 2023-05-26
+m 2023-07-11
 */
 
-// Functions that don't fit nicely in other categories
-namespace Various {
+namespace Util {
     string FormatSeconds(int seconds) {
         int minutes = seconds / 60;
         seconds %= 60;
@@ -20,6 +19,44 @@ namespace Various {
         if (minutes > 0)
             return "00:00:" + Zpad2(minutes) + ":" + Zpad2(seconds);
         return "00:00:00:" + Zpad2(seconds);
+    }
+
+    // courtesy of MisfitMaid
+    int64 IsoToUnix(const string &in inTime) {
+        auto st = Globals::timeDB.Prepare("SELECT unixepoch(?) as x");
+        st.Bind(1, inTime);
+        st.Execute();
+        st.NextRow();
+        st.NextRow();
+        return st.GetColumnInt64("x");
+    }
+
+    dictionary JsonLoadToDict(const string &in filename) {
+        auto timer = LogTimerBegin("loading json file");
+        Json::Value json;
+        dictionary dict;
+
+        try {
+            json = Json::FromFile(filename);
+        } catch {
+            Warn("json file missing!");
+            return dict;
+        }
+
+        auto keys = json.GetKeys();
+        for (uint i = 0; i < json.Length; i++) {
+            auto key = keys[i];
+            auto val = json.Get(key);
+            dict.Set(key, string(val));
+        }
+        LogTimerEnd(timer);
+        return dict;
+    }
+
+    void JsonSaveFromDict(dictionary dict, const string &in filename) {
+        auto timer = LogTimerBegin("saving json file");
+        Json::ToFile(filename, dict.ToJson());
+        LogTimerEnd(timer);
     }
 
     string LogTimerBegin(const string &in text, bool logNow = true) {
@@ -51,6 +88,14 @@ namespace Various {
         LogTimerDelete(timerId);
     }
 
+    void NotifyWarn(const string &in msg) {
+        UI::ShowNotification("TMTracker", msg, UI::HSV(0.02, 0.8, 0.9));
+    }
+
+    string StrWrap(const string &in input, const string &in wrapper = "'") {
+        return wrapper + input + wrapper;
+    }
+
     void Trace(const string &in text) {
         if (!Settings::logEnabled) return;
         trace(text);
@@ -62,16 +107,19 @@ namespace Various {
             return;
         }
 
-        while (Globals::requestsInProgress > 0)
+        while (Globals::requesting)
             yield();
-        if (Globals::requestsInProgress < 0)  // hopefully won't happen
-            Globals::requestsInProgress = 0;
-        Globals::requestsInProgress++;
+        Globals::requesting = true;
 
         while (Time::Now - Globals::latestNadeoRequest < Settings::timeBetweenNadeoRequests)
             yield();
 
         Globals::latestNadeoRequest = Time::Now;
+    }
+
+    void Warn(const string &in text) {
+        if (!Settings::logEnabled) return;
+        warn(text);
     }
 
     string Zpad2(int num) {
