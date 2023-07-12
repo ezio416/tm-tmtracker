@@ -1,6 +1,6 @@
 /*
 c 2023-07-06
-m 2023-07-11
+m 2023-07-12
 */
 
 namespace Bulk {
@@ -64,6 +64,8 @@ namespace Bulk {
                 Globals::AddMap(Models::Map(mapList[i]));
         } while (tooManyMaps);
 
+        Globals::shownMaps = Math::Max(Globals::maps.Length - Globals::hiddenMapsIndex.GetSize(), 0);
+
         Globals::status.Delete("get-my-maps");
         Util::LogTimerEnd(timerId);
         Locks::myMaps = false;
@@ -72,6 +74,8 @@ namespace Bulk {
     }
 
     void GetMyMapsRecordsCoro() {
+        if (Locks::allRecords) return;
+        Locks::allRecords = true;
         string timerId = Util::LogTimerBegin("getting records");
 
         Globals::getAccountNames = false;
@@ -89,6 +93,7 @@ namespace Bulk {
 
         Globals::status.Delete("get-all-records");
         Util::LogTimerEnd(timerId);
+        Locks::allRecords = false;
     }
 
     void LoadMyMapsThumbnailsCoro() {

@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-11
+m 2023-07-12
 */
 
 namespace Globals {
@@ -24,6 +24,7 @@ namespace Globals {
     dictionary        recordsIndex;
     bool              requesting = false;
     bool              showHidden = false;
+    uint              shownMaps;
     bool              singleMapRecordStatus = true;
     dictionary        status;
     string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");

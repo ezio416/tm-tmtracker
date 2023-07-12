@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-11
+m 2023-07-12
 */
 
 namespace Settings {
@@ -25,7 +25,7 @@ namespace Settings {
     [Setting category="Startup" name="Remember window open state" description="if unchecked, the window is never shown when the game starts"]
     bool rememberOpen = false;
 
-    [Setting category="Startup" name="Get my maps"]
+    [Setting category="Startup" name="Refresh maps"]
     bool startupMyMaps = true;
 
     ///////////////////////////////////////////////////////////////////////////
