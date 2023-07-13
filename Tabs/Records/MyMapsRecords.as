@@ -33,7 +33,8 @@ namespace Tabs { namespace Records {
                 "Getting records for \\$F71" + Globals::shownMaps + " \\$Gmaps should take between \\$F71" +
                 Util::FormatSeconds(uint(0.6 * Globals::shownMaps)) + " - " + Util::FormatSeconds(uint(1.8 * Globals::shownMaps)) +
                 "\\$G.\nIt could be faster, but each map takes 2+ API requests and we don't want to spam." +
-                "\nIt will take longer if there are lots of records, lots of unique accounts, or you have low framerate."
+                "\nMaps with no records only take 1 request, and are therefore faster." +
+                "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate."
             );
 
         // Globals::recordsMapSearch = UI::InputText("search maps", Globals::recordsMapSearch, false);
@@ -43,7 +44,7 @@ namespace Tabs { namespace Records {
         if (UI::BeginTable("records-table", 6, UI::TableFlags::ScrollY)) {
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 30);
+            UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 50);
             UI::TableSetupColumn("Time", UI::TableColumnFlags::WidthFixed, 100);
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthFixed, 200);
             UI::TableSetupColumn("Timestamp " + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, 300);

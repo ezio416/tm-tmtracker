@@ -25,7 +25,7 @@ namespace Globals {
     // string            recordsAccountSearch;
     dictionary        recordsIndex;
     // string            recordsMapSearch;
-    Models::Record[]  recordsSorted;
+    Models::Record@[] recordsSorted;
     uint              recordsTimestamp = 0;
     bool              requesting = false;
     bool              showHidden = false;
@@ -93,10 +93,7 @@ namespace Globals {
     void ClearMaps() {
         maps.RemoveRange(0, maps.Length);
         mapsIndex.DeleteAll();
-        // ClearAccounts();
         ClearCurrentMaps();
-        // ClearHiddenMaps();
-        // ClearRecords();
     }
 
     void AddRecord(Models::Record record) {
@@ -108,13 +105,28 @@ namespace Globals {
         map.recordsIndex.Set(record.accountId, storedRecord);
     }
 
-    void SortRecords() {
+    void SortRecordsCoro() {
         auto timerId = Util::LogTimerBegin("sorting records");
-        Globals::status.Set("sort-records", "sorting records...");
 
-        recordsSorted = records;
-        if (recordsSorted.Length > 1)
-            recordsSorted.Sort(function(a,b) { return a.timestampUnix > b.timestampUnix; });  // times out, 3s for 2600 records
+        recordsSorted.RemoveRange(0, recordsSorted.Length);
+
+        for (uint i = 0; i < records.Length; i++) {
+            Globals::status.Set("sort-records", "sorting records... (" + i + "/" + records.Length + ")");
+            auto record = @records[i];
+            for (uint j = 0; j < recordsSorted.Length; j++) {
+                if (record.timestampUnix > recordsSorted[j].timestampUnix) {
+                    recordsSorted.InsertAt(j, record);
+                    break;
+                }
+                if (j == recordsSorted.Length - 1) {
+                    recordsSorted.InsertLast(record);
+                    break;
+                }
+            }
+            if (recordsSorted.Length == 0)
+                recordsSorted.InsertLast(record);
+            if (i % 5 == 0) yield();
+        }
 
         Globals::status.Delete("sort-records");
         Util::LogTimerEnd(timerId);
