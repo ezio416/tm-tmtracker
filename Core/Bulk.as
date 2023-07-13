@@ -28,7 +28,7 @@ namespace Bulk {
             account.SetNameExpire();
         }
 
-        Globals::SortRecords();
+        startnew(CoroutineFunc(Globals::SortRecordsCoro));
 
         Globals::status.Delete("account-names");
         Util::LogTimerEnd(timerId);

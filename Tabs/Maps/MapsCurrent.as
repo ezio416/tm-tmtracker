@@ -67,7 +67,7 @@ namespace Tabs { namespace Maps {
 
                     if (UI::BeginTable("table_records", 5, UI::TableFlags::ScrollY)) {
                         UI::TableSetupScrollFreeze(0, 1);
-                        UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 30);
+                        UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 50);
                         UI::TableSetupColumn("Time", UI::TableColumnFlags::WidthFixed, 100);
                         UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthFixed, 200);
                         UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, 300);
