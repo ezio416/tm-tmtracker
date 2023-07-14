@@ -89,7 +89,6 @@ namespace Bulk {
             if (Globals::cancelAllRecords) {
                 Globals::cancelAllRecords = false;
                 Util::Trace("getting records cancelled by user");
-                Locks::allRecords = false;
                 break;
             }
         }

@@ -13,7 +13,7 @@ namespace Tabs { namespace Maps {
         if (Settings::welcomeText) {
             UI::TextWrapped(
                 "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
-                "\nClose tabs with a middle click or the \uE997"
+                "\nClose map tabs with a middle click or the \uE997"
             );
         }
 
