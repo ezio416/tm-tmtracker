@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-11
+m 2023-07-16
 */
 
 namespace Tabs {
@@ -13,8 +13,7 @@ namespace Tabs {
             "more features planned, like:\n\n - adding other maps and campaigns, such as the current "   +
             "map or from TMX\n - tracking personal records on maps and campaigns" +
             "\n - more, please suggest what you'd like!\n\nThis is by far my " +
-            "largest coding project with hundreds of hours put in, so I hope you find it useful! "       +
-            "\n\nAlso check the Openplanet settings, there's quite a lot you can customize \uF118\n\n"
+            "largest coding project with hundreds of hours put in, so I hope you find it useful! "
         );
 
         UI::Separator();

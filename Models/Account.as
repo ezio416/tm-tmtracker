@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-10
+m 2023-07-16
 */
 
 namespace Models {
@@ -34,7 +34,7 @@ namespace Models {
                 return;
             }
             if (now == 0) now = Time::Stamp;
-            nameExpire = Settings::accountNameExpirationDays * 86400 + now;
+            nameExpire = Settings::accountNameValidDays * 86400 + now;
         }
     }
 }

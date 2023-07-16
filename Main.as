@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-07-12
+m 2023-07-16
 */
 
 void Main() {
@@ -38,6 +38,8 @@ void RenderMenu() {
 void RenderInterface() {
     if (!Settings::windowOpen) return;
 
+    Settings::Window_Settings();
+
     UI::SetNextWindowSize(600, 540, UI::Cond::FirstUseEver);
     UI::SetNextWindowPos(300, 300, UI::Cond::FirstUseEver);
 
@@ -67,6 +69,7 @@ void RenderInterface() {
         UI::BeginTabBar("tabs");
             Tabs::Tab_Maps();
             Tabs::Tab_Records();
+            Tabs::Tab_Settings();
             if (Settings::infoTab) Tabs::Tab_Info();
             if (Globals::debug)    Tabs::Tab_Debug();
         UI::EndTabBar();

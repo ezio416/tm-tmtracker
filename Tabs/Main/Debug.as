@@ -1,11 +1,11 @@
 /*
 c 2023-05-26
-m 2023-07-11
+m 2023-07-16
 */
 
 namespace Tabs {
     void Tab_Debug() {
-        if (!UI::BeginTabItem(Icons::Cogs + " Debug")) return;
+        if (!UI::BeginTabItem(Icons::CodeFork + " Debug")) return;
 
         Button_LockDebug();
 

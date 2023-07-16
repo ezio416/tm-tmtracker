@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-12
+m 2023-07-16
 */
 
 namespace Tabs { namespace Maps {
@@ -57,7 +57,7 @@ namespace Tabs { namespace Maps {
                     continue;
                 }
 
-                curX += Settings::myMapsListThumbnailWidth;
+                curX += Settings::myMapsListThumbWidth;
                 if (i > 0) {
                     if (curX < uint(size.x) && !firstMapExcluded)
                         UI::SameLine();
@@ -67,7 +67,7 @@ namespace Tabs { namespace Maps {
 
                 UI::BeginGroup();
                     auto pos = UI::GetCursorPos();
-                    auto thumbSize = vec2(Settings::myMapsListThumbnailWidth, Settings::myMapsListThumbnailWidth);
+                    auto thumbSize = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
                     catch { UI::Image(Globals::defaultTexture, thumbSize); }
 
@@ -78,7 +78,7 @@ namespace Tabs { namespace Maps {
                     }
 
                     uint scrollbarPixels = 44;  // works on 4K, 1.5x scaling
-                    curX = uint(UI::GetCursorPos().x) + Settings::myMapsListThumbnailWidth + scrollbarPixels;
+                    curX = uint(UI::GetCursorPos().x) + Settings::myMapsListThumbWidth + scrollbarPixels;
                     UI::PushTextWrapPos(curX - scrollbarPixels);
                     UI::Text((Settings::myMapsListColor) ? map.mapNameColor : map.mapNameText);
                     UI::PopTextWrapPos();
