@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-12
+m 2023-07-16
 */
 
 namespace Tabs { namespace Maps {
@@ -21,7 +21,7 @@ namespace Tabs { namespace Maps {
 
             if (UI::BeginTabItem(Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText, map.viewing, flags)) {
                 UI::BeginGroup();
-                    auto thumbSize = vec2(Settings::myMapsCurrentThumbnailWidth, Settings::myMapsCurrentThumbnailWidth);
+                    auto thumbSize = vec2(Settings::myMapsCurrentThumbWidth, Settings::myMapsCurrentThumbWidth);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
                     catch { UI::Image(Globals::defaultTexture, thumbSize); }
 
