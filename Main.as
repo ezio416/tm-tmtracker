@@ -24,12 +24,6 @@ void Main() {
         startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
 }
 
-void OnSettingsChanged() {
-    uint tmp = 3 - Settings::recordsHighlightColor.Length;
-    for (uint i = 0; i < tmp; i++)
-        Settings::recordsHighlightColor += "0";
-}
-
 void RenderMenu() {
 	if (UI::MenuItem(Globals::title, "", Settings::windowOpen))
 		Settings::windowOpen = !Settings::windowOpen;
