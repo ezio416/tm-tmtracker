@@ -71,6 +71,11 @@ namespace Tabs { namespace Maps {
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
                     catch { UI::Image(Globals::defaultTexture, thumbSize); }
 
+                    if (map.hidden) {
+                        UI::SetCursorPos(pos);
+                        UI::Image(Globals::eyeTexture, thumbSize);
+                    }
+
                     UI::SetCursorPos(pos);
                     if (UI::InvisibleButton("invis_" + map.mapId, thumbSize)) {
                         Globals::AddCurrentMap(map);
