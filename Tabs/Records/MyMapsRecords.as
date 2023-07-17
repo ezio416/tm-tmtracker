@@ -9,6 +9,15 @@ namespace Tabs { namespace Records {
 
         auto now = Time::Stamp;
 
+        if (Settings::recordsEstimate)
+            UI::TextWrapped(
+                "Getting records for \\$F71" + Globals::shownMaps + " \\$Gmaps should take between \\$F71" +
+                Util::FormatSeconds(uint(0.6 * Globals::shownMaps)) + " - " + Util::FormatSeconds(uint(1.8 * Globals::shownMaps)) +
+                "\\$G.\nIt could be faster, but each map takes 2+ API requests and we don't want to spam." +
+                "\nMaps with no records only take 1 request, and are therefore faster." +
+                "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate."
+            );
+
         UI::BeginDisabled(Locks::allRecords);
         if (UI::Button(Icons::Download + " Get Records (" + Globals::records.Length + ")"))
             startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
@@ -29,15 +38,6 @@ namespace Tabs { namespace Records {
                     "never"
             ));
         }
-
-        if (Settings::recordsEstimate)
-            UI::TextWrapped(
-                "Getting records for \\$F71" + Globals::shownMaps + " \\$Gmaps should take between \\$F71" +
-                Util::FormatSeconds(uint(0.6 * Globals::shownMaps)) + " - " + Util::FormatSeconds(uint(1.8 * Globals::shownMaps)) +
-                "\\$G.\nIt could be faster, but each map takes 2+ API requests and we don't want to spam." +
-                "\nMaps with no records only take 1 request, and are therefore faster." +
-                "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate."
-            );
 
         // Globals::recordsMapSearch = UI::InputText("search maps", Globals::recordsMapSearch, false);
 
