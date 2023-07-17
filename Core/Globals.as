@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-12
+m 2023-07-15
 */
 
 namespace Globals {
@@ -127,6 +127,8 @@ namespace Globals {
                 recordsSorted.InsertLast(record);
             if (i % 5 == 0) yield();
         }
+
+        startnew(CoroutineFunc(Database::SaveCoro));
 
         Globals::status.Delete("sort-records");
         Util::LogTimerEnd(timerId);
