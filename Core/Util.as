@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-07-12
+m 2023-07-17
 */
 
 namespace Util {
@@ -32,7 +32,7 @@ namespace Util {
     }
 
     dictionary JsonLoadToDict(const string &in filename) {
-        auto timer = LogTimerBegin("loading json file");
+        string timerId = LogTimerBegin("loading json file");
         Json::Value json;
         dictionary dict;
 
@@ -49,14 +49,14 @@ namespace Util {
             auto val = json.Get(key);
             dict.Set(key, string(val));
         }
-        LogTimerEnd(timer);
+        LogTimerEnd(timerId);
         return dict;
     }
 
     void JsonSaveFromDict(dictionary dict, const string &in filename) {
-        auto timer = LogTimerBegin("saving json file");
+        string timerId = LogTimerBegin("saving json file");
         Json::ToFile(filename, dict.ToJson());
-        LogTimerEnd(timer);
+        LogTimerEnd(timerId);
     }
 
     string LogTimerBegin(const string &in text, bool logNow = true) {
