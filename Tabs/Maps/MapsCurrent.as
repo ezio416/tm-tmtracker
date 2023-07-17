@@ -34,8 +34,10 @@ namespace Tabs { namespace Maps {
 
                 UI::SameLine();
                 UI::BeginGroup();
+                    UI::BeginDisabled(Locks::playMap);
                     if (UI::Button(Icons::Play + " Play"))
                         startnew(CoroutineFunc(map.PlayCoro));
+                    UI::EndDisabled();
 
                     UI::SameLine();
                     if (map.hidden) {
@@ -50,12 +52,16 @@ namespace Tabs { namespace Maps {
                     if (UI::Button(Icons::Heartbeat + " Trackmania.io"))
                         OpenBrowserURL("https://trackmania.io/#/leaderboard/" + map.mapUid);
 
+                    UI::BeginDisabled(Locks::tmx);
                     UI::SameLine();
                     if (UI::Button(Icons::Exchange + " Trackmania.exchange"))
                         startnew(CoroutineFunc(map.TmxCoro));
+                    UI::EndDisabled();
 
+                    UI::BeginDisabled(map.hidden || Locks::singleRecords);
                     if (UI::Button(Icons::Download + " Get Records (" + map.records.Length + ")"))
                         startnew(CoroutineFunc(map.GetRecordsCoro));
+                    UI::EndDisabled();
 
                     UI::SameLine();
                     UI::Text("Last Updated: " + (

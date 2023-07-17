@@ -12,14 +12,17 @@ namespace Tabs { namespace Maps {
 
         if (Settings::myMapsListHint) {
             UI::TextWrapped(
-                "Click on a thumbnail to open a tab for that map." +
+                "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
+                "\nClick on a thumbnail to open a tab for that map." +
                 "\nYou cannot get records for hidden maps." +
                 "\nClose map tabs with a middle click or the \uE997"
             );
         }
 
+        UI::BeginDisabled(Locks::myMaps);
         if (UI::Button(Icons::Refresh + " Refresh Maps (" + Globals::shownMaps + ")"))
             startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
+        UI::EndDisabled();
 
         UI::SameLine();
         int hiddenMapCount = Globals::hiddenMapsIndex.GetSize();

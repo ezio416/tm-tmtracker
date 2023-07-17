@@ -1,6 +1,6 @@
 /*
 c 2023-07-12
-m 2023-07-12
+m 2023-07-16
 */
 
 namespace Tabs { namespace Records {
@@ -9,8 +9,10 @@ namespace Tabs { namespace Records {
 
         auto now = Time::Stamp;
 
+        UI::BeginDisabled(Locks::allRecords);
         if (UI::Button(Icons::Download + " Get Records (" + Globals::records.Length + ")"))
             startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
+        UI::EndDisabled();
 
         if (Locks::allRecords && !Globals::cancelAllRecords) {
             UI::SameLine();
