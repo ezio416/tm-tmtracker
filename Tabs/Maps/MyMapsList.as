@@ -10,9 +10,10 @@ namespace Tabs { namespace Maps {
         Globals::clickedMapId = "";
         bool firstMapExcluded = false;
 
-        if (Settings::welcomeText) {
+        if (Settings::myMapsListHint) {
             UI::TextWrapped(
-                "Once you've updated your maps, click on a thumbnail to open a tab for that map. " +
+                "Click on a thumbnail to open a tab for that map." +
+                "\nYou cannot get records for hidden maps." +
                 "\nClose map tabs with a middle click or the \uE997"
             );
         }
