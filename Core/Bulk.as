@@ -1,6 +1,6 @@
 /*
 c 2023-07-06
-m 2023-07-12
+m 2023-07-16
 */
 
 namespace Bulk {
@@ -73,6 +73,7 @@ namespace Bulk {
         Locks::myMaps = false;
 
         startnew(CoroutineFunc(LoadMyMapsThumbnailsCoro));
+        startnew(CoroutineFunc(Database::SaveCoro));
     }
 
     void GetMyMapsRecordsCoro() {

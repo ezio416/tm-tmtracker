@@ -35,7 +35,8 @@ namespace Database {
         accountId     CHAR(36),
         mapId         CHAR(36),
         position      INT,
-        recordId      CHAR(36) PRIMARY KEY,
+        recordFakeId  CHAR(73) PRIMARY KEY,
+        recordId      CHAR(36),
         time          INT,
         timestampUnix INT
     ); """;
@@ -56,7 +57,7 @@ namespace Database {
     }
 
     void SaveCoro() {
-        if (Locks::dbSave) return;
+        while (Locks::dbSave) yield();
         Locks::dbSave = true;
 
         string timerId = Util::LogTimerBegin("saving database");
@@ -100,21 +101,22 @@ namespace Database {
             yield();
         }
 
-        // db.Execute("CREATE TABLE IF NOT EXISTS Records" + recordColumns);
-        // string[] recordGroups = RecordGroups(Globals::records);
-        // for (uint i = 0; i < recordGroups.Length; i++) {
-        //     @s = db.Prepare("""
-        //         REPLACE INTO Records (
-        //             accountId,
-        //             mapId,
-        //             position,
-        //             recordId,
-        //             time,
-        //             timestampUnix
-        //         ) VALUES """ + recordGroups[i]);
-        //     s.Execute();
-        //     yield();
-        // }
+        db.Execute("CREATE TABLE IF NOT EXISTS Records" + recordColumns);
+        string[] recordGroups = RecordGroups(Globals::records);
+        for (uint i = 0; i < recordGroups.Length; i++) {
+            @s = db.Prepare("""
+                REPLACE INTO Records (
+                    accountId,
+                    mapId,
+                    position,
+                    recordFakeId,
+                    recordId,
+                    time,
+                    timestampUnix
+                ) VALUES """ + recordGroups[i]);
+            s.Execute();
+            yield();
+        }
 
         Util::LogTimerEnd(timerId);
         Locks::dbSave = false;
@@ -180,31 +182,32 @@ namespace Database {
         return ret;
     }
 
-    // string[] RecordGroups(Models::Record[] records) {
-    //     string[] ret;
+    string[] RecordGroups(Models::Record[] records) {
+        string[] ret;
 
-    //     while (records.Length > 0) {
-    //         uint recordsToAdd = Math::Min(records.Length, maxSqlValues);
-    //         string recordValue = "";
+        while (records.Length > 0) {
+            uint recordsToAdd = Math::Min(records.Length, maxSqlValues);
+            string recordValue = "";
 
-    //         for (uint i = 0; i < recordsToAdd; i++) {
-    //             auto record = @records[i];
-    //             recordValue += "(" +
-    //                 Util::StrWrap(record.accountId) + "," +
-    //                 Util::StrWrap(record.mapId) + "," +
-    //                 record.position + "," +
-    //                 Util::StrWrap(record.recordId) + "," +
-    //                 record.time + "," +
-    //                 record.timestampUnix + ")";
+            for (uint i = 0; i < recordsToAdd; i++) {
+                auto record = @records[i];
+                recordValue += "(" +
+                    Util::StrWrap(record.accountId) + "," +
+                    Util::StrWrap(record.mapId) + "," +
+                    record.position + "," +
+                    Util::StrWrap(record.recordFakeId) + "," +
+                    Util::StrWrap(record.recordId) + "," +
+                    record.time + "," +
+                    record.timestampUnix + ")";
 
-    //             if (i < recordsToAdd - 1)
-    //                 recordValue += ",";
-    //         }
+                if (i < recordsToAdd - 1)
+                    recordValue += ",";
+            }
 
-    //         records.RemoveRange(0, recordsToAdd);
-    //         ret.InsertLast(recordValue);
-    //     }
+            records.RemoveRange(0, recordsToAdd);
+            ret.InsertLast(recordValue);
+        }
 
-    //     return ret;
-    // }
+        return ret;
+    }
 }
