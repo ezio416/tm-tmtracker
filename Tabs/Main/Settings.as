@@ -45,6 +45,7 @@ namespace Settings {
 
             UI::Separator();
             UI::Text("\\$2F3" + Icons::MapO + " My Maps");
+            myMapsListHint = UI::Checkbox("Show help text", myMapsListHint);
             myMapsListColor = UI::Checkbox("Show map names with color", myMapsListColor);
             myMapsListThumbWidth = UI::SliderInt("Thumbnail size (list)", myMapsListThumbWidth, 10, 1000);
 
@@ -88,6 +89,7 @@ namespace Settings {
     [Setting hidden] bool   mapRecordsMedalColors = true;
     [Setting hidden] uint   maxRecordsPerMap = 100;
     [Setting hidden] uint   myMapsCurrentThumbWidth = 400;
+    [Setting hidden] bool   myMapsListHint = true;
     [Setting hidden] bool   myMapsListColor = true;
     [Setting hidden] uint   myMapsListThumbWidth = 200;
     [Setting hidden] bool   myMapsSwitchOnClicked = true;
