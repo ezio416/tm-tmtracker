@@ -13,8 +13,8 @@ namespace Tabs { namespace Maps {
         if (Settings::myMapsListHint) {
             UI::TextWrapped(
                 "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
+                "\nHidden maps are totally excluded from record-getting." +
                 "\nClick on a thumbnail to open a tab for that map." +
-                "\nYou cannot get records for hidden maps." +
                 "\nClose map tabs with a middle click or the \uE997"
             );
         }
