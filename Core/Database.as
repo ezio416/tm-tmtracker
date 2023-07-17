@@ -52,7 +52,11 @@ namespace Database {
 
     void Load() {
         string timerId = Util::LogTimerBegin("loading database");
+        Globals::status.Set("db-load", "loading database...");
+
         @db = SQLite::Database(dbFile);
+
+        Globals::status.Delete("db-load");
         Util::LogTimerEnd(timerId);
     }
 
@@ -61,6 +65,7 @@ namespace Database {
         Locks::dbSave = true;
 
         string timerId = Util::LogTimerBegin("saving database");
+        Globals::status.Set("db-save", "saving database...");
 
         @db = SQLite::Database(dbFile);
         SQLite::Statement@ s;
@@ -118,6 +123,7 @@ namespace Database {
             yield();
         }
 
+        Globals::status.Delete("db-save");
         Util::LogTimerEnd(timerId);
         Locks::dbSave = false;
     }

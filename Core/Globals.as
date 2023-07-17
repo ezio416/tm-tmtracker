@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-15
+m 2023-07-16
 */
 
 namespace Globals {
@@ -11,6 +11,7 @@ namespace Globals {
     dictionary        currentMapsIndex;
     bool              debug = false;
     UI::Texture@      defaultTexture = UI::LoadTexture("Assets/1x1.png");
+    UI::Texture@      eyeTexture = UI::LoadTexture("Assets/eye.png");
     bool              getAccountNames = true;
     uint64            latestNadeoRequest = 0;
     uint64            logTimerIndex = 0;
