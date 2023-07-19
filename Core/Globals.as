@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-16
+m 2023-07-19
 */
 
 namespace Globals {
@@ -30,7 +30,7 @@ namespace Globals {
     uint              recordsTimestamp = 0;
     bool              requesting = false;
     bool              showHidden = false;
-    uint              shownMaps;
+    uint              shownMaps = 0;
     bool              singleMapRecordStatus = true;
     dictionary        status;
     string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
@@ -55,7 +55,10 @@ namespace Globals {
 
     void AddMap(Models::Map map) {
         if (mapsIndex.Exists(map.mapId)) return;
-        if (hiddenMapsIndex.Exists(map.mapId)) map.hidden = true;
+        if (hiddenMapsIndex.Exists(map.mapId))
+            map.hidden = true;
+        else
+            shownMaps++;
         maps.InsertLast(map);
         mapsIndex.Set(map.mapId, @maps[maps.Length - 1]);
     }
@@ -95,6 +98,7 @@ namespace Globals {
         maps.RemoveRange(0, maps.Length);
         mapsIndex.DeleteAll();
         ClearCurrentMaps();
+        shownMaps = 0;
     }
 
     void AddRecord(Models::Record record) {
@@ -136,7 +140,7 @@ namespace Globals {
     }
 
     void ClearMapRecords(Models::Map@ map) {
-        map.records.RemoveRange(0, records.Length);
+        map.records.RemoveRange(0, map.records.Length);
         map.recordsIndex.DeleteAll();
 
         if (records.Length == 0) return;
