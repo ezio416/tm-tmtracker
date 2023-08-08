@@ -117,7 +117,7 @@ namespace Globals {
         while (Locks::sortRecords) yield();
         Locks::sortRecords = true;
 
-        auto timerId = Util::LogTimerBegin("sorting records");
+        string timerId = Util::LogTimerBegin("sorting records");
 
         recordsSorted.RemoveRange(0, recordsSorted.Length);
 

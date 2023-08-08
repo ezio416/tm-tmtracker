@@ -71,7 +71,7 @@ namespace Tabs { namespace Maps {
 
                 UI::BeginGroup();
                     vec2 pos = UI::GetCursorPos();
-                    auto thumbSize = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
+                    vec2 thumbSize = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
                     catch { UI::Image(Globals::defaultTexture, thumbSize); }
 

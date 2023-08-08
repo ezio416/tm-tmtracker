@@ -5,7 +5,7 @@ m 2023-07-16
 
 namespace Tabs { namespace Maps {
     void Tabs_Current() {
-        auto now = Time::Stamp;
+        int64 now = Time::Stamp;
 
         for (uint i = 0; i < Globals::currentMaps.Length; i++) {
             auto map = @Globals::currentMaps[i];
@@ -21,7 +21,7 @@ namespace Tabs { namespace Maps {
 
             if (UI::BeginTabItem(Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText, map.viewing, flags)) {
                 UI::BeginGroup();
-                    auto thumbSize = vec2(Settings::myMapsCurrentThumbWidth, Settings::myMapsCurrentThumbWidth);
+                    vec2 thumbSize = vec2(Settings::myMapsCurrentThumbWidth, Settings::myMapsCurrentThumbWidth);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
                     catch { UI::Image(Globals::defaultTexture, thumbSize); }
 

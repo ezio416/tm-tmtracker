@@ -25,7 +25,7 @@ namespace Tabs {
                 if (UI::Button(Icons::Download + " Get Names"))
                     startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
 
-                auto now = Time::Stamp;
+                int64 now = Time::Stamp;
 
                 int flags =
                     UI::TableFlags::Resizable |
@@ -49,7 +49,7 @@ namespace Tabs {
                             UI::TableNextColumn();
                             UI::Text(account.accountName);
                             UI::TableNextColumn();
-                            auto nameValid = account.nameExpire - now;
+                            int64 nameValid = account.nameExpire - now;
                             UI::Text("" + (nameValid > 0 ? nameValid : 0));
                             UI::TableNextColumn();
                             UI::Text(account.zoneName);
