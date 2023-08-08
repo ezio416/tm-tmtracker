@@ -24,7 +24,7 @@ namespace Tabs {
             "It's very easy to add a setting, and probably easy to add a small feature."
         );
         UI::SameLine();
-        string linkGH = "https://github.com/ezio416/TMTracker-Openplanet/issues";
+        string linkGH = "https://github.com/ezio416/tm-tmtracker/issues";
         if (UI::Button(Icons::Github + " Issues")) OpenBrowserURL(linkGH);
 
         UI::Separator();
