@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-16
+m 2023-08-07
 */
 
 namespace Tabs {
@@ -12,7 +12,8 @@ namespace Tabs {
             "\uF061 C# \uF061 Angelscript (this), which will probably be the final version.\nThere are " +
             "more features planned, like:\n\n - adding other maps and campaigns, such as the current "   +
             "map or from TMX\n - tracking personal records on maps and campaigns" +
-            "\n - more, please suggest what you'd like!\n\nThis is by far my " +
+            "\n - setting a custom order for personal maps" +
+            "\n - more, please give me suggestions!\n\nThis is by far my " +
             "largest coding project with hundreds of hours put in, so I hope you find it useful! "
         );
 
@@ -20,7 +21,7 @@ namespace Tabs {
 
         UI::TextWrapped(
             "If you do have suggestions or problems, please submit an issue:\n" +
-            "It's very easy to add a setting, and probably easy to add a small feature!"
+            "It's very easy to add a setting, and probably easy to add a small feature."
         );
         UI::SameLine();
         string linkGH = "https://github.com/ezio416/TMTracker-Openplanet/issues";
@@ -35,15 +36,15 @@ namespace Tabs {
             IO::SetClipboard(Globals::storageFolder);
         if (UI::IsItemHovered()) {
             UI::BeginTooltip();
-            UI::Text("click to copy");
+                UI::Text("click to copy");
             UI::EndTooltip();
         }
 
-        // UI::TextWrapped("If you want to look in the database, I recommend DB Browser:");
+        UI::TextWrapped("If you want to look in the database, I recommend DB Browser:");
 
-        // UI::SameLine();
-        // string linkSQL = "sqlitebrowser.org";
-        // if (UI::Button(Icons::Database + " " + linkSQL)) OpenBrowserURL("https://" + linkSQL);
+        UI::SameLine();
+        string linkSQL = "sqlitebrowser.org";
+        if (UI::Button(Icons::Database + " " + linkSQL)) OpenBrowserURL("https://" + linkSQL);
 
 #if SIG_DEVELOPER
         UI::Separator();
@@ -52,7 +53,7 @@ namespace Tabs {
             Button_LockDebug();
         } else {
             if (UI::Button(Icons::Unlock + " Unlock Debug Tab")) {
-                Util::Trace("debug tab unlocked");
+                trace("debug tab unlocked");
                 Settings::debugHidden = false;
                 Globals::debug = true;
             }

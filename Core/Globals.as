@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-19
+m 2023-08-07
 */
 
 namespace Globals {
@@ -18,8 +18,10 @@ namespace Globals {
     dictionary        logTimers;
     string            clickedMapId;
     string            hiddenMapsFile = storageFolder + "hiddenMaps.json";
-    dictionary        hiddenMapsIndex;
+    Json::Value       hiddenMapsIndex = Json::Object();
     Models::Map[]     maps;
+    string            mapRecordsTimestampsFile = storageFolder + "mapRecordsTimestamps.json";
+    Json::Value       mapRecordsTimestampsIndex = Json::Object();
     string            mapSearch;
     dictionary        mapsIndex;
     Models::Record[]  records;
@@ -55,7 +57,7 @@ namespace Globals {
 
     void AddMap(Models::Map map) {
         if (mapsIndex.Exists(map.mapId)) return;
-        if (hiddenMapsIndex.Exists(map.mapId))
+        if (hiddenMapsIndex.HasKey(map.mapId))
             map.hidden = true;
         else
             shownMaps++;
@@ -75,23 +77,19 @@ namespace Globals {
     }
 
     void HideMap(Models::Map@ map) {
-        if (hiddenMapsIndex.Exists(map.mapId)) return;
-        hiddenMapsIndex.Set(map.mapId, "");
+        if (hiddenMapsIndex.HasKey(map.mapId)) return;
+        hiddenMapsIndex[map.mapId] = 0;
         map.hidden = true;
         Globals::shownMaps--;
-        Util::JsonSaveFromDict(hiddenMapsIndex, hiddenMapsFile);
+        Json::ToFile(Globals::hiddenMapsFile, Globals::hiddenMapsIndex);
     }
 
     void ShowMap(Models::Map@ map) {
-        if (!hiddenMapsIndex.Exists(map.mapId)) return;
-        hiddenMapsIndex.Delete(map.mapId);
+        if (!hiddenMapsIndex.HasKey(map.mapId)) return;
+        hiddenMapsIndex.Remove(map.mapId);
         map.hidden = false;
         Globals::shownMaps++;
-        Util::JsonSaveFromDict(hiddenMapsIndex, hiddenMapsFile);
-    }
-
-    void ClearHiddenMaps() {
-        hiddenMapsIndex.DeleteAll();
+        Json::ToFile(Globals::hiddenMapsFile, Globals::hiddenMapsIndex);
     }
 
     void ClearMaps() {
@@ -102,15 +100,23 @@ namespace Globals {
     }
 
     void AddRecord(Models::Record record) {
+        if (record.timestampIso == "")
+            record.timestampIso = Time::FormatString("%Y-%m-%dT%H:%M:%S+00:00", record.timestampUnix);
         records.InsertLast(record);
         auto storedRecord = @records[records.Length - 1];
         recordsIndex.Set(record.recordFakeId, storedRecord);
+
         auto map = cast<Models::Map@>(mapsIndex[record.mapId]);
+        storedRecord.SetMedals(map);
+        storedRecord.mapName = map.mapNameText;
         map.records.InsertLast(storedRecord);
         map.recordsIndex.Set(record.accountId, storedRecord);
     }
 
     void SortRecordsCoro() {
+        while (Locks::sortRecords) yield();
+        Locks::sortRecords = true;
+
         auto timerId = Util::LogTimerBegin("sorting records");
 
         recordsSorted.RemoveRange(0, recordsSorted.Length);
@@ -137,6 +143,7 @@ namespace Globals {
 
         Globals::status.Delete("sort-records");
         Util::LogTimerEnd(timerId);
+        Locks::sortRecords = false;
     }
 
     void ClearMapRecords(Models::Map@ map) {

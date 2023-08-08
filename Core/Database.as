@@ -1,6 +1,6 @@
 /*
 c 2023-07-14
-m 2023-07-16
+m 2023-08-07
 */
 
 namespace Database {
@@ -50,14 +50,86 @@ namespace Database {
         Util::LogTimerEnd(timerId);
     }
 
-    void Load() {
+    void LoadCoro() {
+        while (Locks::myMaps) yield();
+        Locks::myMaps = true;
+
         string timerId = Util::LogTimerBegin("loading database");
         Globals::status.Set("db-load", "loading database...");
 
-        @db = SQLite::Database(dbFile);
+        auto mapsCoro = startnew(CoroutineFunc(LoadMapsCoro));
+        while (mapsCoro.IsRunning()) yield();
+
+        auto accountsCoro = startnew(CoroutineFunc(LoadAccountsCoro));
+        while (accountsCoro.IsRunning()) yield();
+
+        auto recordsCoro = startnew(CoroutineFunc(LoadRecordsCoro));
+        while (recordsCoro.IsRunning()) yield();
 
         Globals::status.Delete("db-load");
         Util::LogTimerEnd(timerId);
+        Locks::myMaps = false;
+    }
+
+    void LoadMapsCoro() {
+        @db = SQLite::Database(dbFile);
+        SQLite::Statement@ s;
+
+        Globals::ClearMaps();
+        try {
+            @s = db.Prepare("SELECT * FROM Maps");
+        } catch {
+            warn("no Maps table in database");
+            return;
+        }
+        uint i = 0;
+        while (s.NextRow()) {
+            i++;
+            Globals::AddMap(Models::Map(s));
+            if (i % sqlLoadBatch == 0) yield();
+        }
+        Globals::maps.Reverse();
+        startnew(CoroutineFunc(Bulk::LoadMyMapsThumbnailsCoro));
+    }
+
+    void LoadAccountsCoro() {
+        @db = SQLite::Database(dbFile);
+        SQLite::Statement@ s;
+
+        Globals::ClearAccounts();
+        try {
+            @s = db.Prepare("SELECT * FROM Accounts");
+        } catch {
+            warn("no Accounts table in database");
+            return;
+        }
+        uint i = 0;
+        while (s.NextRow()) {
+            i++;
+            Globals::AddAccount(Models::Account(s));
+            if (i % sqlLoadBatch == 0) yield();
+        }
+    }
+
+    void LoadRecordsCoro() {
+        @db = SQLite::Database(dbFile);
+        SQLite::Statement@ s;
+
+        Globals::ClearRecords();
+        try {
+            @s = db.Prepare("SELECT * FROM Records");
+        } catch {
+            warn("no Records table in database");
+            return;
+        }
+        uint i = 0;
+        while (s.NextRow()) {
+            i++;
+            Globals::AddRecord(Models::Record(s));
+            if (i % sqlLoadBatch == 0) yield();
+        }
+
+        startnew(CoroutineFunc(Globals::SortRecordsCoro));
     }
 
     void SaveCoro() {
@@ -156,6 +228,8 @@ namespace Database {
 
     string[] MapGroups(Models::Map[] maps) {
         string[] ret;
+
+        maps.Reverse();
 
         while (maps.Length > 0) {
             uint mapsToAdd = Math::Min(maps.Length, maxSqlValues);

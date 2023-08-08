@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-07-16
+m 2023-08-07
 */
 
 void Main() {
@@ -13,15 +13,29 @@ void Main() {
 
     Zones::Load();
 
-    try { Globals::hiddenMapsIndex = Util::JsonLoadToDict(Globals::hiddenMapsFile); } catch { }
+    string timerId = Util::LogTimerBegin("loading hiddenMaps.json");
+    if (IO::FileExists(Globals::hiddenMapsFile)) {
+        Globals::hiddenMapsIndex = Json::FromFile(Globals::hiddenMapsFile);
+    } else {
+        warn("hiddenMaps.json not found!");
+    }
+    Util::LogTimerEnd(timerId);
+
+    timerId = Util::LogTimerBegin("loading mapRecordsTimestamps.json");
+    if (IO::FileExists(Globals::mapRecordsTimestampsFile)) {
+        Globals::mapRecordsTimestampsIndex = Json::FromFile(Globals::mapRecordsTimestampsFile);
+    } else {
+        warn("mapRecordsTimestamps.json not found!");
+    }
+    Util::LogTimerEnd(timerId);
 
     IO::CreateFolder(Globals::thumbnailFolder);
 
     NadeoServices::AddAudience("NadeoServices");
     NadeoServices::AddAudience("NadeoLiveServices");
 
-    if (Settings::startupMyMaps)
-        startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
+    startnew(CoroutineFunc(Database::LoadAccountsCoro));
+    startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
 }
 
 void RenderMenu() {

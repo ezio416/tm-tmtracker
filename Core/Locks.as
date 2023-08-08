@@ -1,6 +1,6 @@
 /*
 c 2023-07-11
-m 2023-07-16
+m 2023-08-07
 */
 
 namespace Locks {
@@ -9,5 +9,6 @@ namespace Locks {
     bool myMaps = false;
     bool playMap = false;
     bool singleRecords = false;
+    bool sortRecords = false;
     bool tmx = false;
 }
