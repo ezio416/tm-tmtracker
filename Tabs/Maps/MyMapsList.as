@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-16
+m 2023-08-07
 */
 
 namespace Tabs { namespace Maps {
@@ -25,7 +25,7 @@ namespace Tabs { namespace Maps {
         UI::EndDisabled();
 
         UI::SameLine();
-        int hiddenMapCount = Globals::hiddenMapsIndex.GetSize();
+        int hiddenMapCount = Globals::hiddenMapsIndex.GetKeys().Length;
         if (Globals::showHidden) {
             if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + hiddenMapCount + ")"))
                 Globals::showHidden = false;
@@ -50,7 +50,7 @@ namespace Tabs { namespace Maps {
 
         if (UI::BeginChild("MyMapsList")) {
             uint curX = 0;
-            auto size = UI::GetWindowSize();
+            vec2 size = UI::GetWindowSize();
 
             for (uint i = 0; i < Globals::maps.Length; i++) {
                 auto map = @Globals::maps[i];
@@ -70,7 +70,7 @@ namespace Tabs { namespace Maps {
                 }
 
                 UI::BeginGroup();
-                    auto pos = UI::GetCursorPos();
+                    vec2 pos = UI::GetCursorPos();
                     auto thumbSize = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
                     catch { UI::Image(Globals::defaultTexture, thumbSize); }

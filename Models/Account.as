@@ -1,13 +1,13 @@
 /*
 c 2023-05-16
-m 2023-07-16
+m 2023-08-07
 */
 
 namespace Models {
     class Account {
         string accountId;
         string accountName = "";
-        uint64 nameExpire = 0;
+        int64  nameExpire = 0;
         string zoneId;
 
         string get_zoneName() { return Zones::Get(zoneId); }
@@ -17,6 +17,12 @@ namespace Models {
         Account(Record@ record) {
             accountId = record.accountId;
             zoneId = record.zoneId;
+        }
+        Account(SQLite::Statement@ s) {
+            accountId   = s.GetColumnString("accountId");
+            accountName = s.GetColumnString("accountName");
+            nameExpire  = s.GetColumnInt("nameExpire");
+            zoneId      = s.GetColumnString("zoneId");
         }
 
         bool IsNameExpired() {

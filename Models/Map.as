@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-07-11
+m 2023-08-07
 */
 
 namespace Models {
@@ -29,7 +29,7 @@ namespace Models {
         Map() { }
         Map(Json::Value map) {
             mapUid        = map["uid"];
-            thumbnailFile = Globals::thumbnailFolder + "/" + mapUid + ".jpg";
+            thumbnailFile = Globals::thumbnailFolder + "/" + mapUid + ".jpg";  // needs to be Uid
             mapId         = map["mapId"];
             mapNameRaw    = map["name"];
             mapNameColor  = ColoredString(mapNameRaw);
@@ -42,6 +42,23 @@ namespace Models {
             bronzeTime    = map["bronzeTime"];
             downloadUrl   = string(map["downloadUrl"]).Replace("\\", "");
             thumbnailUrl  = string(map["thumbnailUrl"]).Replace("\\", "");
+        }
+        Map(SQLite::Statement@ s) {
+            authorId         = s.GetColumnString("authorId");
+            authorTime       = s.GetColumnInt("authorTime");
+            bronzeTime       = s.GetColumnInt("bronzeTime");
+            downloadUrl      = s.GetColumnString("downloadUrl");
+            goldTime         = s.GetColumnInt("goldTime");
+            mapId            = s.GetColumnString("mapId");
+            mapNameRaw       = s.GetColumnString("mapNameRaw");
+            mapNameColor     = ColoredString(mapNameRaw);
+            mapNameText      = StripFormatCodes(mapNameRaw);
+            logName          = "MAP[ " + mapNameText + " ] - ";
+            mapUid           = s.GetColumnString("mapUid");
+            recordsTimestamp = s.GetColumnInt("recordsTimestamp");
+            silverTime       = s.GetColumnInt("silverTime");
+            thumbnailFile    = Globals::thumbnailFolder + "/" + mapUid + ".jpg";
+            thumbnailUrl     = s.GetColumnString("thumbnailUrl");
         }
 
         void GetRecordsCoro() {
@@ -86,8 +103,6 @@ namespace Models {
                     record.mapUid       = mapUid;
                     record.recordFakeId = mapId + "-" + record.accountId;
 
-                    record.SetMedals(this);
-
                     Globals::AddAccount(Account(record));
                     accountIds.InsertLast(record.accountId);
                     tmpRecords.InsertLast(record);
@@ -130,6 +145,8 @@ namespace Models {
             }
 
             recordsTimestamp = Time::Stamp;
+            Globals::mapRecordsTimestampsIndex[mapId] = recordsTimestamp;
+            Json::ToFile(Globals::mapRecordsTimestampsFile, Globals::mapRecordsTimestampsIndex);
 
             auto namesCoro = startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
             while (namesCoro.IsRunning()) yield();
@@ -149,7 +166,7 @@ namespace Models {
             uint max_timeout = 3000;
             uint max_wait = 2000;
             while (true) {
-                auto nowTimeout = Time::Now;
+                uint64 nowTimeout = Time::Now;
                 bool timedOut = false;
 
                 auto req = Net::HttpGet(thumbnailUrl);
@@ -161,8 +178,8 @@ namespace Models {
                     yield();
                 }
                 if (timedOut) {
-                    Util::Trace(logName + "timed out, waiting " + max_wait + " ms");
-                    auto nowWait = Time::Now;
+                    trace(logName + "timed out, waiting " + max_wait + " ms");
+                    uint64 nowWait = Time::Now;
                     while (Time::Now - nowWait < max_wait) yield();
                     continue;
                 }
@@ -205,7 +222,7 @@ namespace Models {
             Locks::playMap = true;
 
             if (!Permissions::PlayLocalMap()) {
-                Util::Warn("Refusing to load map because you lack the necessary permissions. Standard or Club access required.");
+                Util::NotifyWarn("Refusing to load map because you lack the necessary permissions. Standard or Club access required.");
                 return;
             }
             // change the menu page to avoid main menu bug where 3d scene not redrawn correctly (which can lead to a script error and `recovery restart...`)
@@ -217,7 +234,7 @@ namespace Models {
             app.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
 
             uint64 waitToPlayAgain = 5000;
-            auto now = Time::Now;
+            uint64 now = Time::Now;
             while (Time::Now - now < waitToPlayAgain) yield();
 
             Locks::playMap = false;
@@ -235,7 +252,7 @@ namespace Models {
             req.Start();
             while (!req.Finished()) yield();
             if (req.ResponseCode() >= 400 || req.ResponseCode() < 200 || req.Error().Length > 0) {
-                Util::Warn("[status:" + req.ResponseCode() + "] Error getting map by UID from TMX: " + req.Error());
+                warn("[status:" + req.ResponseCode() + "] Error getting map by UID from TMX: " + req.Error());
                 return;
             }
             try {

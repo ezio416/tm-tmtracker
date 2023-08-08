@@ -1,6 +1,6 @@
 /*
 c 2023-07-06
-m 2023-07-17
+m 2023-08-07
 */
 
 namespace Bulk {
@@ -48,8 +48,8 @@ namespace Bulk {
         bool tooManyMaps;
 
         do {
-            auto wait = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
-            while (wait.IsRunning()) yield();
+            auto waitCoro = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
+            while (waitCoro.IsRunning()) yield();
 
             auto req = NadeoServices::Get(
                 "NadeoLiveServices",
@@ -62,8 +62,11 @@ namespace Bulk {
 
             auto mapList = Json::Parse(req.String())["mapList"];
             tooManyMaps = mapList.Length == 1000;
-            for (uint i = 0; i < mapList.Length; i++)
-                Globals::AddMap(Models::Map(mapList[i]));
+            for (uint i = 0; i < mapList.Length; i++) {
+                auto map = Models::Map(mapList[i]);
+                try { map.recordsTimestamp = uint(Globals::mapRecordsTimestampsIndex.Get(map.mapId)); } catch { }
+                Globals::AddMap(map);
+            }
         } while (tooManyMaps);
 
         Globals::status.Delete("get-my-maps");
@@ -71,7 +74,7 @@ namespace Bulk {
         Locks::myMaps = false;
 
         startnew(CoroutineFunc(LoadMyMapsThumbnailsCoro));
-        startnew(CoroutineFunc(Database::SaveCoro));
+        startnew(CoroutineFunc(Database::LoadRecordsCoro));
     }
 
     void GetMyMapsRecordsCoro() {
@@ -87,7 +90,7 @@ namespace Bulk {
             while (recordsCoro.IsRunning()) yield();
             if (Globals::cancelAllRecords) {
                 Globals::cancelAllRecords = false;
-                Util::Trace("getting records cancelled by user");
+                trace("getting records cancelled by user");
                 break;
             }
         }

@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-16
+m 2023-08-07
 */
 
 namespace Tabs {
@@ -160,7 +160,7 @@ namespace Tabs {
 
     void Button_LockDebug() {
         if (UI::Button(Icons::Lock + " Lock Debug Tab")) {
-            Util::Trace("debug tab locked");
+            trace("debug tab locked");
             Settings::debugHidden = true;
             Globals::debug = false;
         }
