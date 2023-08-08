@@ -7,7 +7,7 @@ namespace Tabs { namespace Records {
     void Tab_MyMapsRecords() {
         if (!UI::BeginTabItem(Icons::MapO + " My Maps")) return;
 
-        auto now = Time::Stamp;
+        int64 now = Time::Stamp;
 
         if (Settings::recordsEstimate)
             UI::TextWrapped(

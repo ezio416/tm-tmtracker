@@ -20,7 +20,7 @@ namespace Bulk {
             }
         }
 
-        auto ret = NadeoServices::GetDisplayNamesAsync(missing);
+        dictionary ret = NadeoServices::GetDisplayNamesAsync(missing);
         for (uint i = 0; i < missing.Length; i++) {
             string id = missing[i];
             auto account = cast<Models::Account@>(Globals::accountsIndex[id]);

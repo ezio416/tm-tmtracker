@@ -58,7 +58,7 @@ void RenderInterface() {
     UI::Begin(Globals::title, Settings::windowOpen, flags);
         if (Settings::statusBar && UI::BeginMenuBar()) {
             UI::Text("v3.0.0   |");
-            auto keys = Globals::status.GetKeys();
+            string[] keys = Globals::status.GetKeys();
             if (keys.Length > 0) {
                 for (uint i = 0; i < keys.Length; i++) {
                     string statusText;
