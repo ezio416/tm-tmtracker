@@ -1,12 +1,26 @@
 /*
 c 2023-07-16
-m 2023-08-07
+m 2023-08-11
 */
 
 namespace Tabs {
     void Tab_Settings() {
         if (!UI::BeginTabItem(Icons::Cog + " Settings")) return;
 
+        if (UI::Button(Icons::FloppyO + " Save"))
+            Meta::SaveSettings();
+        Util::HoverTooltip("shouldn't be necessary, but here just in case");
+
+        UI::SameLine();
+        if (UI::Button(Icons::Refresh + " Reset all to defaults")) {
+            Settings::Reset(Settings::Category::General, false);
+            Settings::Reset(Settings::Category::Startup, false);
+            Settings::Reset(Settings::Category::MyMapsList, false);
+            Settings::Reset(Settings::Category::MyMapsTabs, false);
+            Settings::Reset(Settings::Category::Records);
+        }
+
+        UI::SameLine();
         if (Settings::settingsWindow) {
             if (UI::Button(Icons::WindowClose + " Close settings window")) {
                 Settings::settingsWindow = false;
@@ -19,8 +33,9 @@ namespace Tabs {
             }
         }
 
+        UI::Separator();
+
         if (UI::BeginChild("settings")) {
-            UI::Separator();
             Settings::Group_Settings();
             UI::EndChild();
         }
@@ -30,26 +45,77 @@ namespace Tabs {
 }
 
 namespace Settings {
+    enum Category {
+        General,
+        Startup,
+        MyMapsList,
+        MyMapsTabs,
+        Records
+    }
+
+    void Reset(Category cat, bool save = true) {
+        auto plugin = Meta::ExecutingPlugin();
+        switch (cat) {
+            case Category::General:
+                plugin.GetSetting("statusBar").Reset();
+                plugin.GetSetting("welcomeText").Reset();
+                plugin.GetSetting("infoTab").Reset();
+                plugin.GetSetting("accountNameValidDays").Reset();
+                break;
+            case Category::Startup:
+                plugin.GetSetting("rememberOpen").Reset();
+                break;
+            case Category::MyMapsList:
+                plugin.GetSetting("myMapsListHint").Reset();
+                plugin.GetSetting("myMapsListColor").Reset();
+                plugin.GetSetting("myMapsListThumbWidth").Reset();
+                break;
+            case Category::MyMapsTabs:
+                plugin.GetSetting("myMapsTabsColor").Reset();
+                plugin.GetSetting("myMapsSwitchOnClicked").Reset();
+                plugin.GetSetting("mapRecordsMedalColors").Reset();
+                plugin.GetSetting("myMapsCurrentThumbWidth").Reset();
+                plugin.GetSetting("maxRecordsPerMap").Reset();
+                break;
+            case Category::Records:
+                plugin.GetSetting("recordsEstimate").Reset();
+                plugin.GetSetting("recordsMedalColors").Reset();
+                plugin.GetSetting("recordsHighlight5").Reset();
+                plugin.GetSetting("recordsHighlightColor").Reset();
+                break;
+            default: break;
+        }
+        if (save) Meta::SaveSettings();
+    }
+
     void Group_Settings() {
         UI::BeginGroup();
-            UI::Text("\\$2F3" + Icons::Cogs + " General");
+            if (UI::Selectable("\\$2F3" + Icons::Cogs + " General", false))
+                Reset(Category::General);
+            Util::HoverTooltip("click to reset section to defaults");
             statusBar = UI::Checkbox("Show status bar", statusBar);
             welcomeText = UI::Checkbox("Show welcome text", welcomeText);
             infoTab = UI::Checkbox("Show info tab", infoTab);
             accountNameValidDays = UI::SliderInt("Account name valid time (days)", accountNameValidDays, 0, 60);
 
             UI::Separator();
-            UI::Text("\\$2F3" + Icons::PlayCircle + " Startup");
+            if (UI::Selectable("\\$2F3" + Icons::PlayCircle + " Startup", false))
+                Reset(Category::Startup);
+            Util::HoverTooltip("click to reset section to defaults");
             rememberOpen = UI::Checkbox("Remember if window was open", rememberOpen);
 
             UI::Separator();
-            UI::Text("\\$2F3" + Icons::MapO + " My Maps");
+            if (UI::Selectable("\\$2F3" + Icons::MapO + " My Maps List", false))
+                Reset(Category::MyMapsList);
+            Util::HoverTooltip("click to reset section to defaults");
             myMapsListHint = UI::Checkbox("Show help text", myMapsListHint);
             myMapsListColor = UI::Checkbox("Show map names with color", myMapsListColor);
             myMapsListThumbWidth = UI::SliderInt("Thumbnail size (list)", myMapsListThumbWidth, 10, 1000);
 
             UI::Separator();
-            UI::Text("\\$2F3" + Icons::Map + " My Map Tabs");
+            if (UI::Selectable("\\$2F3" + Icons::Map + " My Map Tabs", false))
+                Reset(Category::MyMapsTabs);
+            Util::HoverTooltip("click to reset section to defaults");
             myMapsTabsColor = UI::Checkbox("Show map names with color (tab label)", myMapsTabsColor);
             myMapsSwitchOnClicked = UI::Checkbox("Switch to map when clicked", myMapsSwitchOnClicked);
             mapRecordsMedalColors = UI::Checkbox("Show map record times with medal colors", mapRecordsMedalColors);
@@ -57,7 +123,9 @@ namespace Settings {
             maxRecordsPerMap = UI::SliderInt("Max records to get per map", maxRecordsPerMap, 100, 1000);
 
             UI::Separator();
-            UI::Text("\\$2F3" + Icons::Trophy + " Records");
+            if (UI::Selectable("\\$2F3" + Icons::Trophy + " Records", false))
+                Reset(Category::Records);
+            Util::HoverTooltip("click to reset section to defaults");
             recordsEstimate = UI::Checkbox("Show time estimate", recordsEstimate);
             recordsMedalColors = UI::Checkbox("Show record times with medal colors", recordsMedalColors);
             recordsHighlight5 = UI::Checkbox("Highlight top 5 world", recordsHighlight5);
@@ -76,28 +144,28 @@ namespace Settings {
         UI::End();
     }
 
-    [Setting hidden] uint   accountNameValidDays = 7;
-    [Setting hidden] bool   infoTab = true;
-    [Setting hidden] bool   mapRecordsMedalColors = true;
-    [Setting hidden] uint   maxRecordsPerMap = 100;
-    [Setting hidden] uint   myMapsCurrentThumbWidth = 400;
-    [Setting hidden] bool   myMapsListHint = true;
-    [Setting hidden] bool   myMapsListColor = true;
-    [Setting hidden] uint   myMapsListThumbWidth = 200;
-    [Setting hidden] bool   myMapsSwitchOnClicked = true;
-    [Setting hidden] bool   myMapsTabsColor = true;
-    [Setting hidden] bool   recordsEstimate = true;
-    [Setting hidden] bool   recordsHighlight5 = true;
-    [Setting hidden] string recordsHighlightColor = "F71";
-    [Setting hidden] bool   recordsMedalColors = true;
-    [Setting hidden] bool   rememberOpen = false;
-    [Setting hidden] bool   settingsResize = true;
-    [Setting hidden] bool   statusBar = true;
-    [Setting hidden] bool   welcomeText = true;
+    [Setting hidden] uint   accountNameValidDays     = 7;
+    [Setting hidden] bool   infoTab                  = true;
+    [Setting hidden] bool   mapRecordsMedalColors    = true;
+    [Setting hidden] uint   maxRecordsPerMap         = 100;
+    [Setting hidden] uint   myMapsCurrentThumbWidth  = 400;
+    [Setting hidden] bool   myMapsListHint           = true;
+    [Setting hidden] bool   myMapsListColor          = true;
+    [Setting hidden] uint   myMapsListThumbWidth     = 200;
+    [Setting hidden] bool   myMapsSwitchOnClicked    = true;
+    [Setting hidden] bool   myMapsTabsColor          = true;
+    [Setting hidden] bool   recordsEstimate          = true;
+    [Setting hidden] bool   recordsHighlight5        = true;
+    [Setting hidden] string recordsHighlightColor    = "F71";
+    [Setting hidden] bool   recordsMedalColors       = true;
+    [Setting hidden] bool   rememberOpen             = false;
+    [Setting hidden] bool   settingsResize           = true;
+    [Setting hidden] bool   statusBar                = true;
+    [Setting hidden] bool   welcomeText              = true;
 
-    [Setting hidden] string dateFormat = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
-    [Setting hidden] bool   debugHidden = true;
-    [Setting hidden] bool   settingsWindow = false;
+    [Setting hidden] string dateFormat               = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
+    [Setting hidden] bool   debugHidden              = true;
+    [Setting hidden] bool   settingsWindow           = false;
     [Setting hidden] uint   timeBetweenNadeoRequests = 500;
-    [Setting hidden] bool   windowOpen = false;
+    [Setting hidden] bool   windowOpen               = false;
 }
