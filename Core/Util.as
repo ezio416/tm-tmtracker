@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-08-07
+m 2023-08-11
 */
 
 namespace Util {
@@ -19,6 +19,13 @@ namespace Util {
         if (minutes > 0)
             return (day ? "0d " : "") + (hour ? "0h " : "") + minutes + "m " + seconds + "s";
         return (day ? "0d " : "") + (hour ? "0h " : "") + (minute ? "0m " : "") + seconds + "s";
+    }
+
+    void HoverTooltip(const string &in msg) {
+        if (!UI::IsItemHovered()) return;
+        UI::BeginTooltip();
+            UI::Text(msg);
+        UI::EndTooltip();
     }
 
     // courtesy of MisfitMaid
