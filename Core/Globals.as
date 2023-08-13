@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-08-07
+m 2023-08-12
 */
 
 namespace Globals {
@@ -21,16 +21,15 @@ namespace Globals {
     Json::Value       hiddenMapsIndex = Json::Object();
     Models::Map[]     maps;
     string            mapRecordsTimestampsFile = storageFolder + "mapRecordsTimestamps.json";
-    Json::Value       mapRecordsTimestampsIndex = Json::Object();
     string            mapSearch;
     dictionary        mapsIndex;
     Models::Record[]  records;
-    // string            recordsAccountSearch;
     dictionary        recordsIndex;
-    // string            recordsMapSearch;
     Models::Record@[] recordsSorted;
-    uint              recordsTimestamp = 0;
+    Json::Value       recordsTimestampsIndex = Json::Object();
     bool              requesting = false;
+    float             scale = UI::GetScale();
+    bool              saveSettings = false;
     bool              showHidden = false;
     uint              shownMaps = 0;
     bool              singleMapRecordStatus = true;

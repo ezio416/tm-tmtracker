@@ -1,26 +1,21 @@
 /*
 c 2023-07-16
-m 2023-08-11
+m 2023-08-12
 */
 
 namespace Tabs {
     void Tab_Settings() {
         if (!UI::BeginTabItem(Icons::Cog + " Settings")) return;
 
-        if (UI::Button(Icons::FloppyO + " Save"))
-            Meta::SaveSettings();
-        Util::HoverTooltip("shouldn't be necessary, but here just in case");
+        // UI::SameLine();
+        // if (UI::Button(Icons::Refresh + " Reset all to defaults")) {
+        //     Settings::Reset(Settings::Category::General);
+        //     Settings::Reset(Settings::Category::Startup);
+        //     Settings::Reset(Settings::Category::MyMapsList);
+        //     Settings::Reset(Settings::Category::MyMapsTabs);
+        //     Settings::Reset(Settings::Category::Records);
+        // }
 
-        UI::SameLine();
-        if (UI::Button(Icons::Refresh + " Reset all to defaults")) {
-            Settings::Reset(Settings::Category::General, false);
-            Settings::Reset(Settings::Category::Startup, false);
-            Settings::Reset(Settings::Category::MyMapsList, false);
-            Settings::Reset(Settings::Category::MyMapsTabs, false);
-            Settings::Reset(Settings::Category::Records);
-        }
-
-        UI::SameLine();
         if (Settings::settingsWindow) {
             if (UI::Button(Icons::WindowClose + " Close settings window")) {
                 Settings::settingsWindow = false;
@@ -53,7 +48,7 @@ namespace Settings {
         Records
     }
 
-    void Reset(Category cat, bool save = true) {
+    void Reset(Category cat) {
         auto plugin = Meta::ExecutingPlugin();
         switch (cat) {
             case Category::General:
@@ -85,11 +80,16 @@ namespace Settings {
                 break;
             default: break;
         }
-        if (save) Meta::SaveSettings();
     }
 
     void Group_Settings() {
         UI::BeginGroup();
+            if (UI::Button(Icons::FloppyO + " Save"))
+                Meta::SaveSettings();
+            Util::HoverTooltip("shouldn't be necessary, but here just in case");
+
+            UI::Separator();
+
             if (UI::Selectable("\\$2F3" + Icons::Cogs + " General", false))
                 Reset(Category::General);
             Util::HoverTooltip("click to reset section to defaults");
@@ -134,7 +134,15 @@ namespace Settings {
     }
 
     void Window_Settings() {
-        if (!settingsWindow) return;
+        if (!settingsWindow) {
+            if (Globals::saveSettings) {
+                Meta::SaveSettings();
+                Globals::saveSettings = false;
+            }
+            return;
+        }
+
+        Globals::saveSettings = true;
 
         int flags = UI::WindowFlags::None;
         if (settingsResize) flags |= UI::WindowFlags::AlwaysAutoResize;
@@ -148,10 +156,10 @@ namespace Settings {
     [Setting hidden] bool   infoTab                  = true;
     [Setting hidden] bool   mapRecordsMedalColors    = true;
     [Setting hidden] uint   maxRecordsPerMap         = 100;
-    [Setting hidden] uint   myMapsCurrentThumbWidth  = 400;
+    [Setting hidden] uint   myMapsCurrentThumbWidth  = uint(Globals::scale * 200);
     [Setting hidden] bool   myMapsListHint           = true;
     [Setting hidden] bool   myMapsListColor          = true;
-    [Setting hidden] uint   myMapsListThumbWidth     = 200;
+    [Setting hidden] uint   myMapsListThumbWidth     = uint(Globals::scale * 120);
     [Setting hidden] bool   myMapsSwitchOnClicked    = true;
     [Setting hidden] bool   myMapsTabsColor          = true;
     [Setting hidden] bool   recordsEstimate          = true;

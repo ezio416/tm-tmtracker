@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-07-16
+m 2023-08-12
 */
 
 namespace Tabs { namespace Maps {
@@ -73,11 +73,11 @@ namespace Tabs { namespace Maps {
 
                     if (UI::BeginTable("table_records", 5, UI::TableFlags::ScrollY)) {
                         UI::TableSetupScrollFreeze(0, 1);
-                        UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 50);
-                        UI::TableSetupColumn("Time", UI::TableColumnFlags::WidthFixed, 100);
-                        UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthFixed, 200);
-                        UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, 300);
-                        UI::TableSetupColumn("Recency", UI::TableColumnFlags::WidthFixed, 200);
+                        UI::TableSetupColumn("Pos",       UI::TableColumnFlags::WidthFixed, Globals::scale * 25);
+                        UI::TableSetupColumn("Time",      UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+                        UI::TableSetupColumn("Name",      UI::TableColumnFlags::WidthFixed, Globals::scale * 150);
+                        UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
+                        UI::TableSetupColumn("Recency",   UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
                         UI::TableHeadersRow();
 
                         UI::ListClipper clipper(map.records.Length);
@@ -104,6 +104,7 @@ namespace Tabs { namespace Maps {
                                 UI::TableNextColumn();
                                 if (UI::Selectable((account.accountName != "") ? account.accountName : account.accountId, false))
                                     OpenBrowserURL("https://trackmania.io/#/player/" + account.accountId);
+                                Util::HoverTooltip("Trackmania.io profile");
 
                                 UI::TableNextColumn();
                                 UI::Text(Time::FormatString("%Y-%m-%d %H:%M:%S \\$AAA(%a)", record.timestampUnix));

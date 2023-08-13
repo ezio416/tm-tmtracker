@@ -1,6 +1,6 @@
 /*
 c 2023-07-06
-m 2023-08-07
+m 2023-08-12
 */
 
 namespace Bulk {
@@ -64,7 +64,7 @@ namespace Bulk {
             tooManyMaps = mapList.Length == 1000;
             for (uint i = 0; i < mapList.Length; i++) {
                 auto map = Models::Map(mapList[i]);
-                try { map.recordsTimestamp = uint(Globals::mapRecordsTimestampsIndex.Get(map.mapId)); } catch { }
+                try { map.recordsTimestamp = uint(Globals::recordsTimestampsIndex.Get(map.mapId)); } catch { }
                 Globals::AddMap(map);
             }
         } while (tooManyMaps);
@@ -100,7 +100,8 @@ namespace Bulk {
         auto nameCoro = startnew(CoroutineFunc(GetAccountNamesCoro));
         while (nameCoro.IsRunning()) yield();
 
-        Globals::recordsTimestamp = Time::Stamp;
+        Globals::recordsTimestampsIndex["all"] = Time::Stamp;
+        Json::ToFile(Globals::mapRecordsTimestampsFile, Globals::recordsTimestampsIndex);
 
         Globals::status.Delete("get-all-records");
         Util::LogTimerEnd(timerId);

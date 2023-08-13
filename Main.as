@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-08-07
+m 2023-08-12
 */
 
 void Main() {
@@ -23,7 +23,7 @@ void Main() {
 
     timerId = Util::LogTimerBegin("loading mapRecordsTimestamps.json");
     if (IO::FileExists(Globals::mapRecordsTimestampsFile)) {
-        Globals::mapRecordsTimestampsIndex = Json::FromFile(Globals::mapRecordsTimestampsFile);
+        Globals::recordsTimestampsIndex = Json::FromFile(Globals::mapRecordsTimestampsFile);
     } else {
         warn("mapRecordsTimestamps.json not found!");
     }

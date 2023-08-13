@@ -1,6 +1,6 @@
 /*
 c 2023-07-12
-m 2023-07-16
+m 2023-08-12
 */
 
 namespace Tabs { namespace Records {
@@ -13,9 +13,8 @@ namespace Tabs { namespace Records {
             UI::TextWrapped(
                 "Getting records for \\$F71" + Globals::shownMaps + " \\$Gmaps should take between \\$F71" +
                 Util::FormatSeconds(uint(0.6 * Globals::shownMaps)) + " - " + Util::FormatSeconds(uint(1.8 * Globals::shownMaps)) +
-                "\\$G.\nIt could be faster, but each map takes 2+ API requests and we don't want to spam." +
-                "\nMaps with no records only take 1 request, and are therefore faster." +
-                "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate."
+                "\\$G.\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate." +
+                "\nMaps with no records are faster and hidden maps are skipped."
             );
 
         UI::BeginDisabled(Locks::allRecords);
@@ -30,27 +29,26 @@ namespace Tabs { namespace Records {
         }
 
         if (!Locks::allRecords) {
+            uint timestamp;
+            try { timestamp = uint(Globals::recordsTimestampsIndex.Get("all")); } catch { timestamp = 0; }
+
             UI::SameLine();
             UI::Text("Last Updated: " + (
-                Globals::recordsTimestamp > 0 ?
-                    Time::FormatString(Settings::dateFormat + "Local\\$G", Globals::recordsTimestamp) +
-                        " (" + Util::FormatSeconds(now - Globals::recordsTimestamp) + " ago)" :
+                timestamp > 0 ?
+                    Time::FormatString(Settings::dateFormat + "Local\\$G", timestamp) +
+                        " (" + Util::FormatSeconds(now - timestamp) + " ago)" :
                     "never"
             ));
         }
 
-        // Globals::recordsMapSearch = UI::InputText("search maps", Globals::recordsMapSearch, false);
-
-        // Globals::recordsAccountSearch = UI::InputText("search accounts", Globals::recordsAccountSearch, false);
-
         if (UI::BeginTable("records-table", 6, UI::TableFlags::ScrollY)) {
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("Pos", UI::TableColumnFlags::WidthFixed, 50);
-            UI::TableSetupColumn("Time", UI::TableColumnFlags::WidthFixed, 100);
-            UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthFixed, 200);
-            UI::TableSetupColumn("Timestamp " + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, 300);
-            UI::TableSetupColumn("Recency " + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, 200);
+            UI::TableSetupColumn("Pos",                             UI::TableColumnFlags::WidthFixed, Globals::scale * 25);
+            UI::TableSetupColumn("Time",                            UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+            UI::TableSetupColumn("Name",                            UI::TableColumnFlags::WidthFixed, Globals::scale * 150);
+            UI::TableSetupColumn("Timestamp " + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
+            UI::TableSetupColumn("Recency "   + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
             UI::TableHeadersRow();
 
             UI::ListClipper clipper(Globals::recordsSorted.Length);
@@ -58,9 +56,6 @@ namespace Tabs { namespace Records {
                 for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
                     auto record = Globals::recordsSorted[i];
                     auto account = Globals::accounts.Length > 0 ? cast<Models::Account@>(Globals::accountsIndex[record.accountId]) : Models::Account();
-
-                    // if (!record.mapName.ToLower().Contains(Globals::recordsMapSearch.ToLower())) continue;
-                    // if (!account.accountName.ToLower().Contains(Globals::recordsAccountSearch.ToLower())) continue;
 
                     UI::TableNextRow();
                     UI::TableNextColumn();
