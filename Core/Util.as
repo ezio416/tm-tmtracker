@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-08-12
+m 2023-08-13
 */
 
 namespace Util {
@@ -83,9 +83,9 @@ namespace Util {
             return;
         }
 
-        while (Globals::requesting)
+        while (Locks::requesting)
             yield();
-        Globals::requesting = true;
+        Locks::requesting = true;
 
         while (Time::Now - Globals::latestNadeoRequest < Settings::timeBetweenNadeoRequests)
             yield();
