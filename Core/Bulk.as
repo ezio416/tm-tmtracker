@@ -1,6 +1,6 @@
 /*
 c 2023-07-06
-m 2023-08-12
+m 2023-08-13
 */
 
 namespace Bulk {
@@ -57,7 +57,7 @@ namespace Bulk {
             );
             req.Start();
             while (!req.Finished()) yield();
-            Globals::requesting = false;
+            Locks::requesting = false;
             offset += 1000;
 
             auto mapList = Json::Parse(req.String())["mapList"];

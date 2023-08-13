@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-08-12
+m 2023-08-13
 */
 
 namespace Models {
@@ -91,7 +91,7 @@ namespace Models {
                 );
                 req.Start();
                 while (!req.Finished()) yield();
-                Globals::requesting = false;
+                Locks::requesting = false;
                 offset += 100;
 
                 auto top = Json::Parse(req.String())["tops"][0]["top"];
@@ -129,7 +129,7 @@ namespace Models {
                 );
                 req.Start();
                 while (!req.Finished()) yield();
-                Globals::requesting = false;
+                Locks::requesting = false;
 
                 auto coreRecords = Json::Parse(req.String());
                 for (uint i = 0; i < coreRecords.Length; i++) {

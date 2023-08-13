@@ -27,9 +27,8 @@ namespace Globals {
     dictionary        recordsIndex;
     Models::Record@[] recordsSorted;
     Json::Value       recordsTimestampsIndex = Json::Object();
-    bool              requesting = false;
-    float             scale = UI::GetScale();
     bool              saveSettings = false;
+    float             scale = UI::GetScale();
     bool              showHidden = false;
     uint              shownMaps = 0;
     bool              singleMapRecordStatus = true;
