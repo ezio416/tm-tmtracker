@@ -4,6 +4,33 @@ m 2023-08-13
 */
 
 namespace Util {
+    void CheckFileVersion() {
+        string timerId = LogTimerBegin("checking version.json");
+        int3 version = GetFileVersion();
+
+        // TO CHANGE WHEN TMTRACKER IS UPDATED
+        // only if files are considered incompatible with new versions
+        if (
+            version.x < Globals::version.x ||
+            version.y < Globals::version.y ||
+            version.z < Globals::version.z
+        ) {
+            warn("old version detected");
+            DeleteFiles();
+        }
+
+        LogTimerEnd(timerId);
+        SetFileVersion();
+    }
+
+    void DeleteFiles() {
+        warn("deleting TMTracker files for safety...");
+        try { IO::Delete(Globals::hiddenMapsFile); } catch { }
+        try { IO::Delete(Globals::mapRecordsTimestampsFile); } catch { }
+        try { IO::Delete(Database::dbFile); } catch { }
+        try { IO::Delete(Globals::versionFile); } catch { }
+    }
+
     string FormatSeconds(int seconds, bool day = false, bool hour = false, bool minute = false) {
         int minutes = seconds / 60;
         seconds %= 60;
@@ -19,6 +46,27 @@ namespace Util {
         if (minutes > 0)
             return (day ? "0d " : "") + (hour ? "0h " : "") + minutes + "m " + seconds + "s";
         return (day ? "0d " : "") + (hour ? "0h " : "") + (minute ? "0m " : "") + seconds + "s";
+    }
+
+    int3 GetFileVersion() {
+        bool bad = false;
+        if (IO::FileExists(Globals::versionFile)) {
+            try {
+                Json::Value read = Json::FromFile(Globals::versionFile);
+                return int3(int(read["major"]), int(read["minor"]), int(read["patch"]));
+            } catch {
+                warn("error reading version.json!");
+                bad = true;
+            }
+        } else {
+            warn("version.json not found!");
+            bad = true;
+        }
+        if (bad) {
+            DeleteFiles();
+            return Globals::version;
+        }
+        return int3(0, 0, 0);
     }
 
     void HoverTooltip(const string &in msg) {
@@ -71,6 +119,18 @@ namespace Util {
 
     void NotifyWarn(const string &in msg) {
         UI::ShowNotification("TMTracker", msg, UI::HSV(0.02, 0.8, 0.9));
+    }
+
+    void SetFileVersion() {
+        string timerId = LogTimerBegin("setting version.json");
+
+        Json::Value write = Json::Object();
+        write["major"] = Globals::version.x;
+        write["minor"] = Globals::version.y;
+        write["patch"] = Globals::version.z;
+        Json::ToFile(Globals::versionFile, write);
+
+        LogTimerEnd(timerId);
     }
 
     string StrWrap(const string &in input, const string &in wrapper = "'") {

@@ -4,6 +4,8 @@ m 2023-08-13
 */
 
 namespace Globals {
+    int3              version = int3(3, 0, 0);
+
     Models::Account[] accounts;
     dictionary        accountsIndex;
     bool              cancelAllRecords = false;
@@ -39,6 +41,7 @@ namespace Globals {
     dictionary        thumbnailTextures;
     SQLite::Database@ timeDB = SQLite::Database(":memory:");
     string            title = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
+    string            versionFile = storageFolder + "version.json";
     Json::Value       zones;
     string            zonesFile = "Assets/zones.json";
     bool              zonesFileMissing = true;
