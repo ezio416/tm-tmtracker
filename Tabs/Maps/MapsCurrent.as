@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-08-12
+m 2023-08-13
 */
 
 namespace Tabs { namespace Maps {
@@ -71,7 +71,9 @@ namespace Tabs { namespace Maps {
                             "never"
                     ));
 
-                    if (UI::BeginTable("table_records", 5, UI::TableFlags::ScrollY)) {
+                    if (UI::BeginTable("table_records", 5, UI::TableFlags::ScrollY | UI::TableFlags::RowBg)) {
+                        UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
+
                         UI::TableSetupScrollFreeze(0, 1);
                         UI::TableSetupColumn("Pos",       UI::TableColumnFlags::WidthFixed, Globals::scale * 25);
                         UI::TableSetupColumn("Time",      UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
@@ -113,6 +115,7 @@ namespace Tabs { namespace Maps {
                                 UI::Text(Util::FormatSeconds(now - record.timestampUnix));
                             }
                         }
+                        UI::PopStyleColor();
                         UI::EndTable();
                     }
                 UI::EndGroup();
