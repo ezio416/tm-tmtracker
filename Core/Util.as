@@ -69,7 +69,7 @@ namespace Util {
             DeleteFiles();
             return Globals::version;
         }
-        return int3(0, 0, 0);
+        return int3(0, 0, 0);  // impossible, only here so "all paths return a value"
     }
 
     void HoverTooltip(const string &in msg) {
