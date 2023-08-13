@@ -7,36 +7,39 @@ void Main() {
     if (!Settings::rememberOpen)
         Settings::windowOpen = false;
 
+    NadeoServices::AddAudience("NadeoServices");
+    NadeoServices::AddAudience("NadeoLiveServices");
+
 #if SIG_DEVELOPER
     Globals::debug = !Settings::debugHidden;
 #endif
 
     Zones::Load();
 
-    Util::CheckFileVersion();
-
-    string timerId = Util::LogTimerBegin("loading hiddenMaps.json");
-    if (IO::FileExists(Globals::hiddenMapsFile)) {
-        Globals::hiddenMapsIndex = Json::FromFile(Globals::hiddenMapsFile);
-    } else {
-        warn("hiddenMaps.json not found!");
-    }
-    Util::LogTimerEnd(timerId);
-
-    timerId = Util::LogTimerBegin("loading mapRecordsTimestamps.json");
-    if (IO::FileExists(Globals::mapRecordsTimestampsFile)) {
-        Globals::recordsTimestampsIndex = Json::FromFile(Globals::mapRecordsTimestampsFile);
-    } else {
-        warn("mapRecordsTimestamps.json not found!");
-    }
-    Util::LogTimerEnd(timerId);
-
     IO::CreateFolder(Globals::thumbnailFolder);
 
-    NadeoServices::AddAudience("NadeoServices");
-    NadeoServices::AddAudience("NadeoLiveServices");
+    if (Util::CheckFileVersion()) {
+        string timerId = Util::LogTimerBegin("loading hiddenMaps.json");
+        if (IO::FileExists(Globals::hiddenMapsFile)) {
+            try   { Globals::hiddenMapsIndex = Json::FromFile(Globals::hiddenMapsFile); }
+            catch { warn("error loading hiddenMaps.json!"); }
+        } else {
+            warn("hiddenMaps.json not found!");
+        }
+        Util::LogTimerEnd(timerId);
 
-    startnew(CoroutineFunc(Database::LoadAccountsCoro));
+        timerId = Util::LogTimerBegin("loading mapRecordsTimestamps.json");
+        if (IO::FileExists(Globals::mapRecordsTimestampsFile)) {
+            try   { Globals::recordsTimestampsIndex = Json::FromFile(Globals::mapRecordsTimestampsFile); }
+            catch { warn("error loading mapRecordsTimestamps.json!"); }
+        } else {
+            warn("mapRecordsTimestamps.json not found!");
+        }
+        Util::LogTimerEnd(timerId);
+
+        startnew(CoroutineFunc(Database::LoadAccountsCoro));
+    }
+
     startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
 }
 
