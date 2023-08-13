@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-08-12
+m 2023-08-13
 */
 
 namespace Globals {
@@ -35,6 +35,7 @@ namespace Globals {
     bool              singleMapRecordStatus = true;
     dictionary        status;
     string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
+    vec4              tableRowBgAltColor = vec4(0, 0, 0, 0.5);
     string            thumbnailFolder = storageFolder + "thumbnails";
     dictionary        thumbnailTextures;
     SQLite::Database@ timeDB = SQLite::Database(":memory:");
