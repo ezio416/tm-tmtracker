@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-08-12
+m 2023-08-13
 */
 
 void Main() {
@@ -12,6 +12,8 @@ void Main() {
 #endif
 
     Zones::Load();
+
+    Util::CheckFileVersion();
 
     string timerId = Util::LogTimerBegin("loading hiddenMaps.json");
     if (IO::FileExists(Globals::hiddenMapsFile)) {
