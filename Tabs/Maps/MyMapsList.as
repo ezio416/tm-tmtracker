@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-08-07
+m 2023-08-12
 */
 
 namespace Tabs { namespace Maps {
@@ -13,9 +13,9 @@ namespace Tabs { namespace Maps {
         if (Settings::myMapsListHint) {
             UI::TextWrapped(
                 "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
-                "\nHidden maps are totally excluded from record-getting." +
                 "\nClick on a thumbnail to open a tab for that map." +
-                "\nClose map tabs with a middle click or the \uE997"
+                "\nClose map tabs with a middle click or the \uE997" +
+                "\nYou cannot get records for hidden maps."
             );
         }
 
@@ -86,8 +86,8 @@ namespace Tabs { namespace Maps {
                         Globals::clickedMapId = map.mapId;
                     }
 
-                    uint scrollbarPixels = 44;  // works on 4K, 1.5x scaling
-                    curX = uint(UI::GetCursorPos().x) + Settings::myMapsListThumbWidth + scrollbarPixels;
+                    int scrollbarPixels = int(Globals::scale * 30);
+                    curX = int(UI::GetCursorPos().x) + Settings::myMapsListThumbWidth + scrollbarPixels;
                     UI::PushTextWrapPos(curX - scrollbarPixels);
                     UI::Text((Settings::myMapsListColor) ? map.mapNameColor : map.mapNameText);
                     UI::PopTextWrapPos();

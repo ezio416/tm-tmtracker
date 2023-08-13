@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-08-07
+m 2023-08-12
 */
 
 namespace Models {
@@ -145,8 +145,8 @@ namespace Models {
             }
 
             recordsTimestamp = Time::Stamp;
-            Globals::mapRecordsTimestampsIndex[mapId] = recordsTimestamp;
-            Json::ToFile(Globals::mapRecordsTimestampsFile, Globals::mapRecordsTimestampsIndex);
+            Globals::recordsTimestampsIndex[mapId] = recordsTimestamp;
+            Json::ToFile(Globals::mapRecordsTimestampsFile, Globals::recordsTimestampsIndex);
 
             auto namesCoro = startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
             while (namesCoro.IsRunning()) yield();
