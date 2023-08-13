@@ -4,7 +4,7 @@ m 2023-08-13
 */
 
 namespace Util {
-    void CheckFileVersion() {
+    bool CheckFileVersion() {
         string timerId = LogTimerBegin("checking version.json");
         int3 version = GetFileVersion();
 
@@ -17,10 +17,13 @@ namespace Util {
         ) {
             warn("old version detected");
             DeleteFiles();
+            LogTimerEnd(timerId);
+            return false;
         }
 
         LogTimerEnd(timerId);
         SetFileVersion();
+        return true;
     }
 
     void DeleteFiles() {
