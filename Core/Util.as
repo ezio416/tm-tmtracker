@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-08-11
+m 2023-08-12
 */
 
 namespace Util {
@@ -50,12 +50,13 @@ namespace Util {
         try { Globals::logTimers.Delete(timerId); } catch { }
     }
 
-    void LogTimerEnd(const string &in timerId, bool logNow = true) {
+    uint64 LogTimerEnd(const string &in timerId, bool logNow = true) {
+        uint64 dur;
         if (logNow) {
             string text = timerId.Split("_LogTimer_")[1];
             uint64 start;
             if (Globals::logTimers.Get(timerId, start)) {
-                uint64 dur = Time::Now - start;
+                dur = Time::Now - start;
                 if (dur == 0)
                     trace(text + " took 0s");
                 else
@@ -65,6 +66,7 @@ namespace Util {
             }
         }
         LogTimerDelete(timerId);
+        return dur;
     }
 
     void NotifyWarn(const string &in msg) {
