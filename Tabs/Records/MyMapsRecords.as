@@ -1,6 +1,6 @@
 /*
 c 2023-07-12
-m 2023-08-13
+m 2023-08-16
 */
 
 namespace Tabs { namespace Records {
@@ -12,8 +12,9 @@ namespace Tabs { namespace Records {
         if (Settings::recordsEstimate)
             UI::TextWrapped(
                 "Getting records for \\$F71" + Globals::shownMaps + " \\$Gmaps should take between \\$F71" +
-                Util::FormatSeconds(uint(0.6 * Globals::shownMaps)) + " - " + Util::FormatSeconds(uint(1.8 * Globals::shownMaps)) +
-                "\\$G.\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate." +
+                Util::FormatSeconds(uint(1.2 * Globals::shownMaps)) + " - " + Util::FormatSeconds(uint(3.6 * Globals::shownMaps)) +
+                "\\$G.\nIt could be shorter, but we don't want to spam Nadeo with API requests. This action does 2 per map." +
+                "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate." +
                 "\nMaps with no records are faster and hidden maps are skipped."
             );
 
