@@ -1,6 +1,6 @@
 /*
 c 2023-07-16
-m 2023-08-12
+m 2023-08-16
 */
 
 namespace Tabs {
@@ -174,6 +174,6 @@ namespace Settings {
     [Setting hidden] string dateFormat               = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
     [Setting hidden] bool   debugHidden              = true;
     [Setting hidden] bool   settingsWindow           = false;
-    [Setting hidden] uint   timeBetweenNadeoRequests = 500;
+    [Setting hidden] uint   timeBetweenNadeoRequests = 1000;
     [Setting hidden] bool   windowOpen               = false;
 }
