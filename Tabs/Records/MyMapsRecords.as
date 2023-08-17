@@ -13,7 +13,7 @@ namespace Tabs { namespace Records {
             UI::TextWrapped(
                 "Getting records for \\$F71" + Globals::shownMaps + " \\$Gmaps should take between \\$F71" +
                 Util::FormatSeconds(uint(1.2 * Globals::shownMaps)) + " - " + Util::FormatSeconds(uint(3.6 * Globals::shownMaps)) +
-                "\\$G.\nIt could be shorter, but we don't want to spam Nadeo with API requests. This action does 2 per map." +
+                "\\$G.\nIt could be shorter, but we don't want to spam Nadeo with API requests. This action does 2+ per map." +
                 "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate." +
                 "\nMaps with no records are faster and hidden maps are skipped."
             );
