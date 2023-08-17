@@ -4,7 +4,7 @@ m 2023-08-16
 */
 
 namespace Globals {
-    int3              version = int3(3, 0, 1);
+    int3              version = int3(3, 0, 0);
 
     Models::Account[] accounts;
     dictionary        accountsIndex;
