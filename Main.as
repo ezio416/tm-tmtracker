@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-08-13
+m 2023-08-16
 */
 
 void Main() {
@@ -62,7 +62,7 @@ void RenderInterface() {
 
     UI::Begin(Globals::title, Settings::windowOpen, flags);
         if (Settings::statusBar && UI::BeginMenuBar()) {
-            UI::Text("v3.0.0   |");
+            UI::Text("v" + Globals::version.x + "." + Globals::version.y + "." + Globals::version.z + "   |");
             string[] keys = Globals::status.GetKeys();
             if (keys.Length > 0) {
                 for (uint i = 0; i < keys.Length; i++) {
