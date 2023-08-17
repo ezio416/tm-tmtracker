@@ -2,7 +2,7 @@
 name     = "TMTracker"
 author   = "Ezio414"
 category = "Utilities"
-version  = "3.0.0"
+version  = "3.0.1"
 
 [script]
 dependencies = [ "NadeoServices" ]

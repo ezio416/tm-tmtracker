@@ -1,10 +1,10 @@
 /*
 c 2023-05-16
-m 2023-08-13
+m 2023-08-16
 */
 
 namespace Globals {
-    int3              version = int3(3, 0, 0);
+    int3              version = int3(3, 0, 1);
 
     Models::Account[] accounts;
     dictionary        accountsIndex;
