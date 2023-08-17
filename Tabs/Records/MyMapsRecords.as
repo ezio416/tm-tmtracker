@@ -47,7 +47,7 @@ namespace Tabs { namespace Records {
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("Pos",                             UI::TableColumnFlags::WidthFixed, Globals::scale * 25);
+            UI::TableSetupColumn("Pos",                             UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
             UI::TableSetupColumn("Time",                            UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
             UI::TableSetupColumn("Name",                            UI::TableColumnFlags::WidthFixed, Globals::scale * 150);
             UI::TableSetupColumn("Timestamp " + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 180);

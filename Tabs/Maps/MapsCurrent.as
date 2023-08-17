@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-08-13
+m 2023-08-16
 */
 
 namespace Tabs { namespace Maps {
@@ -75,7 +75,7 @@ namespace Tabs { namespace Maps {
                         UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
 
                         UI::TableSetupScrollFreeze(0, 1);
-                        UI::TableSetupColumn("Pos",       UI::TableColumnFlags::WidthFixed, Globals::scale * 25);
+                        UI::TableSetupColumn("Pos",       UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
                         UI::TableSetupColumn("Time",      UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
                         UI::TableSetupColumn("Name",      UI::TableColumnFlags::WidthFixed, Globals::scale * 150);
                         UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
