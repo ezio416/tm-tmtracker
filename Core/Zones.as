@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-08-07
+m 2023-09-19
 */
 
 namespace Zones {
@@ -15,17 +15,17 @@ namespace Zones {
             return;
         } catch { }
 
-        string timerId = Util::LogTimerBegin("loading zones.json");
+        string timerId = Log::TimerBegin("loading zones.json");
 
         try {
             Globals::zones = Json::FromFile(Globals::zonesFile);
             Globals::zonesFileMissing = false;
         } catch {
             trace("zones.json not found! ");
-            Util::LogTimerEnd(timerId, false);
+            Log::TimerEnd(timerId, false);
             return;
         }
 
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
     }
 }

@@ -1,11 +1,9 @@
 /*
 c 2023-05-16
-m 2023-08-16
+m 2023-09-19
 */
 
 namespace Globals {
-    int3              version = int3(3, 0, 0);
-
     Models::Account[] accounts;
     dictionary        accountsIndex;
     bool              cancelAllRecords = false;
@@ -41,6 +39,7 @@ namespace Globals {
     dictionary        thumbnailTextures;
     SQLite::Database@ timeDB = SQLite::Database(":memory:");
     string            title = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
+    int3              version;
     string            versionFile = storageFolder + "version.json";
     Json::Value       zones;
     string            zonesFile = "Assets/zones.json";
@@ -119,7 +118,7 @@ namespace Globals {
         while (Locks::sortRecords) yield();
         Locks::sortRecords = true;
 
-        string timerId = Util::LogTimerBegin("sorting records");
+        string timerId = Log::TimerBegin("sorting records");
 
         recordsSorted.RemoveRange(0, recordsSorted.Length);
 
@@ -144,7 +143,7 @@ namespace Globals {
         startnew(CoroutineFunc(Database::SaveCoro));
 
         Globals::status.Delete("sort-records");
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
         Locks::sortRecords = false;
     }
 
