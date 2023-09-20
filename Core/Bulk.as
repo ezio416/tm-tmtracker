@@ -63,6 +63,8 @@ namespace Bulk {
             auto mapList = Json::Parse(req.String())["mapList"];
             tooManyMaps = mapList.Length == 1000;
             for (uint i = 0; i < mapList.Length; i++) {
+                if (Settings::maxMaps >= 0 && Globals::maps.Length >= Settings::maxMaps)
+                    break;
                 auto map = Models::Map(mapList[i]);
                 try { map.recordsTimestamp = uint(Globals::recordsTimestampsIndex.Get(map.mapId)); } catch { }
                 Globals::AddMap(map);

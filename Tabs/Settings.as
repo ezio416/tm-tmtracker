@@ -36,6 +36,7 @@ namespace Settings {
     [Setting hidden] uint   accountNameValidDays     = 7;
     [Setting hidden] bool   autoThumbnails           = false;
     [Setting hidden] bool   infoTab                  = true;
+    [Setting hidden] int    maxMaps                  = -1;
     [Setting hidden] bool   mapRecordsMedalColors    = true;
     [Setting hidden] uint   maxRecordsPerMap         = 100;
     [Setting hidden] uint   myMapsCurrentThumbWidth  = uint(Globals::scale * 150);
@@ -88,6 +89,7 @@ namespace Settings {
                 break;
             case Category::MyMapsList:
                 plugin.GetSetting("myMapsListHint").Reset();
+                plugin.GetSetting("maxMaps").Reset();
                 plugin.GetSetting("myMapsListThumbnails").Reset();
                 plugin.GetSetting("myMapsListThumbWidth").Reset();
                 plugin.GetSetting("myMapsListColor").Reset();
@@ -150,6 +152,7 @@ namespace Settings {
                 Reset(Category::MyMapsList);
             Util::HoverTooltip("click to reset section to defaults");
             myMapsListHint           = UI::Checkbox("Show help text", myMapsListHint);
+            maxMaps                  = UI::InputInt("Total maps to get (-1 means all)", maxMaps);
             myMapsListThumbnails     = UI::Checkbox("Show thumbnails", myMapsListThumbnails);
             UI::BeginDisabled(!myMapsListThumbnails);
             myMapsListThumbWidth     = UI::SliderInt("Thumbnail size##thumbList", myMapsListThumbWidth, 10, 150);
