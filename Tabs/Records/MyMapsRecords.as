@@ -1,6 +1,6 @@
 /*
 c 2023-07-12
-m 2023-08-16
+m 2023-09-19
 */
 
 namespace Tabs { namespace Records {
@@ -79,7 +79,10 @@ namespace Tabs { namespace Records {
                     UI::Text(timeColor + Time::Format(record.time));
 
                     UI::TableNextColumn();
-                    UI::Text((account.accountName != "") ? account.accountName : account.accountId);
+                    if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : account.accountId) + "##" + i, false)) {
+                        OpenBrowserURL("https://trackmania.io/#/player/" + account.accountId);
+                    }
+                    Util::HoverTooltip("Trackmania.io profile");
 
                     UI::TableNextColumn();
                     UI::Text(Time::FormatString("%Y-%m-%d %H:%M:%S \\$AAA(%a)", record.timestampUnix));
