@@ -55,6 +55,8 @@ namespace Version {
     void SetFile() {
         string timerId = Log::TimerBegin("setting version.json");
 
+        FromToml();
+
         Json::Value write = Json::Object();
         write["major"] = version.x;
         write["minor"] = version.y;
