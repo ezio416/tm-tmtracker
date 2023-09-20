@@ -15,9 +15,9 @@ namespace Files {
 
     void Delete() {
         warn("deleting TMTracker files for safety...");
-        try { IO::Delete(hiddenMaps); } catch { }
+        try { IO::Delete(db);                   } catch { }
+        try { IO::Delete(hiddenMaps);           } catch { }
         try { IO::Delete(mapRecordsTimestamps); } catch { }
-        try { IO::Delete(db); } catch { }
-        try { IO::Delete(version); } catch { }
+        try { IO::Delete(version);              } catch { }
     }
 }
