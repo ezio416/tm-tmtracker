@@ -1,8 +1,9 @@
 [meta]
-name     = "TMTracker"
-author   = "Ezio414"
+name = "TMTracker"
+author = "Ezio414"
 category = "Utilities"
-version  = "3.1.0"
+version = "3.1.0"
+siteid = 426
 
 [script]
 dependencies = [ "NadeoServices" ]
