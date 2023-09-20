@@ -13,7 +13,7 @@ namespace Tabs { namespace Maps {
         if (Settings::myMapsListHint) {
             UI::TextWrapped(
                 "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
-                "\nClick on a thumbnail to open a tab for that map." +
+                "\nClick on a map name to open a tab for that map." +
                 "\nClose map tabs with a middle click or the \uE997" +
                 "\nYou cannot get records for hidden maps."
             );
@@ -107,15 +107,19 @@ namespace Tabs { namespace Maps {
 
         for (uint i = 0; i < Globals::maps.Length; i++) {
             auto map = @Globals::maps[i];
+            if (map.hidden && !Globals::showHidden) continue;
             if (map.mapNameText.ToLower().Contains(Globals::mapSearch.ToLower()))
                 maps.InsertLast(map);
         }
 
         int flags =
             UI::TableFlags::Resizable |
+            UI::TableFlags::RowBg |
             UI::TableFlags::ScrollY;
 
         if (UI::BeginTable("my-maps-table", 2, flags)) {
+            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
+
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Name");
             UI::TableSetupColumn("Record Count");
@@ -137,6 +141,7 @@ namespace Tabs { namespace Maps {
                     UI::Text("" + map.records.Length);
                 }
             }
+            UI::PopStyleColor();
             UI::EndTable();
         }
     }
