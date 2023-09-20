@@ -1,11 +1,10 @@
 /*
 c 2023-09-19
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Files {
     string db                   = storageFolder + "TMTracker.db";
-    string eye                  = "Assets/eye.png";
     string hiddenMaps           = storageFolder + "hiddenMaps.json";
     string mapRecordsTimestamps = storageFolder + "mapRecordsTimestamps.json";
     string storageFolder        = IO::FromStorageFolder("").Replace("\\", "/");
