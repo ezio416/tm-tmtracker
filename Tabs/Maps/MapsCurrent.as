@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-08-16
+m 2023-09-19
 */
 
 namespace Tabs { namespace Maps {
@@ -23,7 +23,7 @@ namespace Tabs { namespace Maps {
                 UI::BeginGroup();
                     vec2 thumbSize = vec2(Settings::myMapsCurrentThumbWidth, Settings::myMapsCurrentThumbWidth);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
-                    catch { UI::Image(Globals::defaultTexture, thumbSize); }
+                    catch { UI::Dummy(thumbSize); }
 
                     UI::Text(map.mapNameText);
                     UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
