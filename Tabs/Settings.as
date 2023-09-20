@@ -1,6 +1,6 @@
 /*
 c 2023-07-16
-m 2023-08-16
+m 2023-09-19
 */
 
 namespace Tabs {
@@ -40,6 +40,33 @@ namespace Tabs {
 }
 
 namespace Settings {
+    bool save = false;
+
+    [Setting hidden] uint   accountNameValidDays     = 7;
+    [Setting hidden] bool   infoTab                  = true;
+    [Setting hidden] bool   mapRecordsMedalColors    = true;
+    [Setting hidden] uint   maxRecordsPerMap         = 100;
+    [Setting hidden] uint   myMapsCurrentThumbWidth  = uint(Globals::scale * 200);
+    [Setting hidden] bool   myMapsListHint           = true;
+    [Setting hidden] bool   myMapsListColor          = true;
+    [Setting hidden] uint   myMapsListThumbWidth     = uint(Globals::scale * 120);
+    [Setting hidden] bool   myMapsSwitchOnClicked    = true;
+    [Setting hidden] bool   myMapsTabsColor          = true;
+    [Setting hidden] bool   recordsEstimate          = true;
+    [Setting hidden] bool   recordsHighlight5        = true;
+    [Setting hidden] string recordsHighlightColor    = "F71";
+    [Setting hidden] bool   recordsMedalColors       = true;
+    [Setting hidden] bool   rememberOpen             = false;
+    [Setting hidden] bool   settingsResize           = true;
+    [Setting hidden] bool   statusBar                = true;
+    [Setting hidden] bool   welcomeText              = true;
+
+    [Setting hidden] string dateFormat               = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
+    [Setting hidden] bool   debugHidden              = true;
+    [Setting hidden] bool   settingsWindow           = false;
+    [Setting hidden] uint   timeBetweenNadeoRequests = 1000;
+    [Setting hidden] bool   windowOpen               = false;
+
     enum Category {
         General,
         Startup,
@@ -135,14 +162,14 @@ namespace Settings {
 
     void Window_Settings() {
         if (!settingsWindow) {
-            if (Globals::saveSettings) {
+            if (save) {
                 Meta::SaveSettings();
-                Globals::saveSettings = false;
+                save = false;
             }
             return;
         }
 
-        Globals::saveSettings = true;
+        save = true;
 
         int flags = UI::WindowFlags::None;
         if (settingsResize) flags |= UI::WindowFlags::AlwaysAutoResize;
@@ -151,29 +178,4 @@ namespace Settings {
             Group_Settings();
         UI::End();
     }
-
-    [Setting hidden] uint   accountNameValidDays     = 7;
-    [Setting hidden] bool   infoTab                  = true;
-    [Setting hidden] bool   mapRecordsMedalColors    = true;
-    [Setting hidden] uint   maxRecordsPerMap         = 100;
-    [Setting hidden] uint   myMapsCurrentThumbWidth  = uint(Globals::scale * 200);
-    [Setting hidden] bool   myMapsListHint           = true;
-    [Setting hidden] bool   myMapsListColor          = true;
-    [Setting hidden] uint   myMapsListThumbWidth     = uint(Globals::scale * 120);
-    [Setting hidden] bool   myMapsSwitchOnClicked    = true;
-    [Setting hidden] bool   myMapsTabsColor          = true;
-    [Setting hidden] bool   recordsEstimate          = true;
-    [Setting hidden] bool   recordsHighlight5        = true;
-    [Setting hidden] string recordsHighlightColor    = "F71";
-    [Setting hidden] bool   recordsMedalColors       = true;
-    [Setting hidden] bool   rememberOpen             = false;
-    [Setting hidden] bool   settingsResize           = true;
-    [Setting hidden] bool   statusBar                = true;
-    [Setting hidden] bool   welcomeText              = true;
-
-    [Setting hidden] string dateFormat               = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
-    [Setting hidden] bool   debugHidden              = true;
-    [Setting hidden] bool   settingsWindow           = false;
-    [Setting hidden] uint   timeBetweenNadeoRequests = 1000;
-    [Setting hidden] bool   windowOpen               = false;
 }

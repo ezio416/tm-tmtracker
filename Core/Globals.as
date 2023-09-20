@@ -7,27 +7,24 @@ namespace Globals {
     Models::Account[] accounts;
     dictionary        accountsIndex;
     bool              cancelAllRecords = false;
+    string            clickedMapId;
     Models::Map@[]    currentMaps;
     dictionary        currentMapsIndex;
     bool              debug = false;
     UI::Texture@      defaultTexture = UI::LoadTexture("Assets/1x1.png");
     UI::Texture@      eyeTexture = UI::LoadTexture("Assets/eye.png");
     bool              getAccountNames = true;
-    uint64            latestNadeoRequest = 0;
-    uint64            logTimerIndex = 0;
-    dictionary        logTimers;
-    string            clickedMapId;
     string            hiddenMapsFile = storageFolder + "hiddenMaps.json";
     Json::Value       hiddenMapsIndex = Json::Object();
-    Models::Map[]     maps;
+    uint64            latestNadeoRequest = 0;
     string            mapRecordsTimestampsFile = storageFolder + "mapRecordsTimestamps.json";
+    Models::Map[]     maps;
     string            mapSearch;
     dictionary        mapsIndex;
     Models::Record[]  records;
     dictionary        recordsIndex;
     Models::Record@[] recordsSorted;
     Json::Value       recordsTimestampsIndex = Json::Object();
-    bool              saveSettings = false;
     float             scale = UI::GetScale();
     bool              showHidden = false;
     uint              shownMaps = 0;
@@ -37,13 +34,7 @@ namespace Globals {
     vec4              tableRowBgAltColor = vec4(0, 0, 0, 0.5);
     string            thumbnailFolder = storageFolder + "thumbnails";
     dictionary        thumbnailTextures;
-    SQLite::Database@ timeDB = SQLite::Database(":memory:");
     string            title = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
-    int3              version;
-    string            versionFile = storageFolder + "version.json";
-    Json::Value       zones;
-    string            zonesFile = "Assets/zones.json";
-    bool              zonesFileMissing = true;
 
     void AddAccount(Models::Account account) {
         if (accountsIndex.Exists(account.accountId)) return;
