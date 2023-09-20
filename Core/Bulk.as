@@ -1,13 +1,13 @@
 /*
 c 2023-07-06
-m 2023-08-13
+m 2023-09-19
 */
 
 namespace Bulk {
     void GetAccountNamesCoro() {
         if (!Globals::getAccountNames) return;
 
-        string timerId = Util::LogTimerBegin("getting account names");
+        string timerId = Log::TimerBegin("getting account names");
         Globals::status.Set("account-names", "getting account names...");
 
         string[] missing;
@@ -31,13 +31,13 @@ namespace Bulk {
         startnew(CoroutineFunc(Globals::SortRecordsCoro));
 
         Globals::status.Delete("account-names");
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
     }
 
     void GetMyMapsCoro() {
         while (Locks::myMaps) yield();
         Locks::myMaps = true;
-        string timerId = Util::LogTimerBegin("updating my maps");
+        string timerId = Log::TimerBegin("updating my maps");
         Globals::status.Set("get-my-maps", "getting maps...");
 
         Globals::ClearMaps();
@@ -70,7 +70,7 @@ namespace Bulk {
         } while (tooManyMaps);
 
         Globals::status.Delete("get-my-maps");
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
         Locks::myMaps = false;
 
         startnew(CoroutineFunc(LoadMyMapsThumbnailsCoro));
@@ -80,7 +80,7 @@ namespace Bulk {
     void GetMyMapsRecordsCoro() {
         if (Locks::allRecords) return;
         Locks::allRecords = true;
-        string timerId = Util::LogTimerBegin("getting records");
+        string timerId = Log::TimerBegin("getting records");
 
         Globals::getAccountNames = false;
         Globals::singleMapRecordStatus = false;
@@ -104,12 +104,12 @@ namespace Bulk {
         Json::ToFile(Globals::mapRecordsTimestampsFile, Globals::recordsTimestampsIndex);
 
         Globals::status.Delete("get-all-records");
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
         Locks::allRecords = false;
     }
 
     void LoadMyMapsThumbnailsCoro() {
-        string timerId = Util::LogTimerBegin("loading my map thumbnails");
+        string timerId = Log::TimerBegin("loading my map thumbnails");
 
         for (uint i = 0; i < Globals::maps.Length; i++) {
             Globals::status.Set("load-thumbs", "loading thumbnails... (" + (i + 1) + "/" + Globals::maps.Length + ")");
@@ -119,6 +119,6 @@ namespace Bulk {
         }
 
         Globals::status.Delete("load-thumbs");
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
     }
 }

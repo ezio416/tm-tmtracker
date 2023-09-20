@@ -1,31 +1,9 @@
 /*
 c 2023-05-20
-m 2023-08-13
+m 2023-09-19
 */
 
 namespace Util {
-    bool CheckFileVersion() {
-        string timerId = LogTimerBegin("checking version.json");
-        int3 version = GetFileVersion();
-
-        // TO CHANGE WHEN TMTRACKER IS UPDATED
-        // only if files are considered incompatible with new versions
-        if (
-            version.x < Globals::version.x ||
-            version.y < Globals::version.y ||
-            version.z < Globals::version.z
-        ) {
-            warn("old version detected");
-            DeleteFiles();
-            LogTimerEnd(timerId);
-            return false;
-        }
-
-        LogTimerEnd(timerId);
-        SetFileVersion();
-        return true;
-    }
-
     void DeleteFiles() {
         warn("deleting TMTracker files for safety...");
         try { IO::Delete(Globals::hiddenMapsFile); } catch { }
@@ -51,27 +29,6 @@ namespace Util {
         return (day ? "0d " : "") + (hour ? "0h " : "") + (minute ? "0m " : "") + seconds + "s";
     }
 
-    int3 GetFileVersion() {
-        bool bad = false;
-        if (IO::FileExists(Globals::versionFile)) {
-            try {
-                Json::Value read = Json::FromFile(Globals::versionFile);
-                return int3(int(read["major"]), int(read["minor"]), int(read["patch"]));
-            } catch {
-                warn("error reading version.json!");
-                bad = true;
-            }
-        } else {
-            warn("version.json not found!");
-            bad = true;
-        }
-        if (bad) {
-            DeleteFiles();
-            return Globals::version;
-        }
-        return int3(0, 0, 0);  // impossible, only here so "all paths return a value"
-    }
-
     void HoverTooltip(const string &in msg) {
         if (!UI::IsItemHovered()) return;
         UI::BeginTooltip();
@@ -89,51 +46,8 @@ namespace Util {
         return s.GetColumnInt64("x");
     }
 
-    string LogTimerBegin(const string &in text, bool logNow = true) {
-        if (logNow) trace(text + "...");
-        string timerId = Globals::logTimerIndex + "_LogTimer_" + text;
-        Globals::logTimerIndex++;
-        Globals::logTimers.Set(timerId, Time::Now);
-        return timerId;
-    }
-
-    void LogTimerDelete(const string &in timerId) {
-        try { Globals::logTimers.Delete(timerId); } catch { }
-    }
-
-    uint64 LogTimerEnd(const string &in timerId, bool logNow = true) {
-        uint64 dur;
-        if (logNow) {
-            string text = timerId.Split("_LogTimer_")[1];
-            uint64 start;
-            if (Globals::logTimers.Get(timerId, start)) {
-                dur = Time::Now - start;
-                if (dur == 0)
-                    trace(text + " took 0s");
-                else
-                    trace(text + " took " + (dur / 1000) + "." + (dur % 1000) + "s");
-            } else {
-                trace("timerId not found: " + timerId);
-            }
-        }
-        LogTimerDelete(timerId);
-        return dur;
-    }
-
     void NotifyWarn(const string &in msg) {
         UI::ShowNotification("TMTracker", msg, UI::HSV(0.02, 0.8, 0.9));
-    }
-
-    void SetFileVersion() {
-        string timerId = LogTimerBegin("setting version.json");
-
-        Json::Value write = Json::Object();
-        write["major"] = Globals::version.x;
-        write["minor"] = Globals::version.y;
-        write["patch"] = Globals::version.z;
-        Json::ToFile(Globals::versionFile, write);
-
-        LogTimerEnd(timerId);
     }
 
     string StrWrap(const string &in input, const string &in wrapper = "'") {
@@ -146,8 +60,7 @@ namespace Util {
             return;
         }
 
-        while (Locks::requesting)
-            yield();
+        while (Locks::requesting) yield();
         Locks::requesting = true;
 
         while (Time::Now - Globals::latestNadeoRequest < Settings::timeBetweenNadeoRequests)

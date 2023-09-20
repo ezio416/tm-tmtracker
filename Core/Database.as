@@ -1,6 +1,6 @@
 /*
 c 2023-07-14
-m 2023-08-07
+m 2023-09-19
 */
 
 namespace Database {
@@ -42,19 +42,19 @@ namespace Database {
     ); """;
 
     void Clear() {
-        string timerId = Util::LogTimerBegin("clearing database");
+        string timerId = Log::TimerBegin("clearing database");
         @db = SQLite::Database(dbFile);
         try { db.Execute("DELETE FROM Accounts"); } catch { }
         try { db.Execute("DELETE FROM Maps");     } catch { }
         try { db.Execute("DELETE FROM Records");  } catch { }
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
     }
 
     void LoadCoro() {
         while (Locks::myMaps) yield();
         Locks::myMaps = true;
 
-        string timerId = Util::LogTimerBegin("loading database");
+        string timerId = Log::TimerBegin("loading database");
         Globals::status.Set("db-load", "loading database...");
 
         auto mapsCoro = startnew(CoroutineFunc(LoadMapsCoro));
@@ -67,7 +67,7 @@ namespace Database {
         while (recordsCoro.IsRunning()) yield();
 
         Globals::status.Delete("db-load");
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
         Locks::myMaps = false;
     }
 
@@ -136,7 +136,7 @@ namespace Database {
         while (Locks::dbSave) yield();
         Locks::dbSave = true;
 
-        string timerId = Util::LogTimerBegin("saving database");
+        string timerId = Log::TimerBegin("saving database");
         Globals::status.Set("db-save", "saving database...");
 
         @db = SQLite::Database(dbFile);
@@ -196,7 +196,7 @@ namespace Database {
         }
 
         Globals::status.Delete("db-save");
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
         Locks::dbSave = false;
     }
 

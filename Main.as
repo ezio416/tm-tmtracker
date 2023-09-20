@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-08-16
+m 2023-09-19
 */
 
 void Main() {
@@ -18,24 +18,24 @@ void Main() {
 
     IO::CreateFolder(Globals::thumbnailFolder);
 
-    if (Util::CheckFileVersion()) {
-        string timerId = Util::LogTimerBegin("loading hiddenMaps.json");
+    if (Version::CheckFile()) {
+        string timerId = Log::TimerBegin("loading hiddenMaps.json");
         if (IO::FileExists(Globals::hiddenMapsFile)) {
             try   { Globals::hiddenMapsIndex = Json::FromFile(Globals::hiddenMapsFile); }
             catch { warn("error loading hiddenMaps.json!"); }
         } else {
             warn("hiddenMaps.json not found!");
         }
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
 
-        timerId = Util::LogTimerBegin("loading mapRecordsTimestamps.json");
+        timerId = Log::TimerBegin("loading mapRecordsTimestamps.json");
         if (IO::FileExists(Globals::mapRecordsTimestampsFile)) {
             try   { Globals::recordsTimestampsIndex = Json::FromFile(Globals::mapRecordsTimestampsFile); }
             catch { warn("error loading mapRecordsTimestamps.json!"); }
         } else {
             warn("mapRecordsTimestamps.json not found!");
         }
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
 
         startnew(CoroutineFunc(Database::LoadAccountsCoro));
     }

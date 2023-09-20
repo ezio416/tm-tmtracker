@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-08-13
+m 2023-09-19
 */
 
 namespace Models {
@@ -65,7 +65,7 @@ namespace Models {
             if (hidden || Locks::singleRecords) return;
             Locks::singleRecords = true;
 
-            string timerId = Util::LogTimerBegin(logName + "getting records");
+            string timerId = Log::TimerBegin(logName + "getting records");
 
             string statusId = "map-records-" + mapId;
             if (Globals::singleMapRecordStatus)
@@ -154,14 +154,14 @@ namespace Models {
             if (Globals::singleMapRecordStatus)
                 Globals::status.Delete(statusId);
 
-            Util::LogTimerEnd(timerId);
+            Log::TimerEnd(timerId);
             Locks::singleRecords = false;
         }
 
         void GetThumbnailCoro() {
             if (IO::FileExists(thumbnailFile)) return;
 
-            string timerId = Util::LogTimerBegin(logName + "downloading thumbnail");
+            string timerId = Log::TimerBegin(logName + "downloading thumbnail");
 
             uint max_timeout = 3000;
             uint max_wait = 2000;
@@ -187,18 +187,18 @@ namespace Models {
                 break;
             }
 
-            Util::LogTimerEnd(timerId);
+            Log::TimerEnd(timerId);
         }
 
         void LoadThumbnailCoro() {
-            string timerId = Util::LogTimerBegin(logName + "loading thumbnail", false);
+            string timerId = Log::TimerBegin(logName + "loading thumbnail", false);
 
             if (Globals::thumbnailTextures.Exists(mapId)) {
                 UI::Texture@ tex;
                 @tex = cast<UI::Texture@>(Globals::thumbnailTextures[mapId]);
                 if (@thumbnailTexture == null)
                     @thumbnailTexture = tex;
-                Util::LogTimerEnd(timerId, false);
+                Log::TimerEnd(timerId, false);
                 return;
             }
 
@@ -213,7 +213,7 @@ namespace Models {
 
             Globals::thumbnailTextures.Set(mapId, @thumbnailTexture);
 
-            Util::LogTimerEnd(timerId, false);
+            Log::TimerEnd(timerId, false);
         }
 
         // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
@@ -229,7 +229,8 @@ namespace Models {
             auto app = cast<CGameManiaPlanet>(GetApp());
             app.BackToMainMenu();
             while (!app.ManiaTitleControlScriptAPI.IsReady) yield();
-            while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null) yield();
+            while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null)
+                yield();
             yield();
             app.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
 
@@ -245,7 +246,7 @@ namespace Models {
             if (Locks::tmx) return;
             Locks::tmx = true;
 
-            auto req = Net::HttpRequest();
+            Net::HttpRequest@ req = Net::HttpRequest();
             req.Url = "https://trackmania.exchange/api/maps/get_map_info/uid/" + mapUid;
             req.Headers['User-Agent'] = "TMTracker v3 Plugin / contact=Ezio416";
             req.Method = Net::HttpMethod::Get;
