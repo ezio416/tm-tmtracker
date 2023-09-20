@@ -8,7 +8,7 @@ namespace Tabs { namespace Maps {
         if (!UI::BeginTabItem(Icons::MapO + " My Maps")) return;
 
         Globals::clickedMapId = "";
-        bool firstMapExcluded = false;
+        // bool firstMapExcluded = false;
 
         if (Settings::myMapsListHint) {
             UI::TextWrapped(
@@ -40,7 +40,7 @@ namespace Tabs { namespace Maps {
                 Globals::ClearCurrentMaps();
         }
 
-        Globals::mapSearch = UI::InputText("search", Globals::mapSearch, false).ToLower();
+        Globals::mapSearch = UI::InputText("search", Globals::mapSearch, false);
 
         if (Globals::mapSearch != "") {
             UI::SameLine();
@@ -48,55 +48,96 @@ namespace Tabs { namespace Maps {
                 Globals::mapSearch = "";
         }
 
-        if (UI::BeginChild("MyMapsList")) {
-            uint curX = 0;
-            vec2 size = UI::GetWindowSize();
+        Table_MyMapsList();
 
-            for (uint i = 0; i < Globals::maps.Length; i++) {
-                auto map = @Globals::maps[i];
+        // if (UI::BeginChild("MyMapsList")) {
+            // uint curX = 0;
+            // vec2 size = UI::GetWindowSize();
 
-                if (map.hidden && !Globals::showHidden) continue;
-                if (!map.mapNameText.ToLower().Contains(Globals::mapSearch)) {
-                    if (i == 0) firstMapExcluded = true;
-                    continue;
-                }
+            // for (uint i = 0; i < Globals::maps.Length; i++) {
+            //     auto map = @Globals::maps[i];
 
-                curX += Settings::myMapsListThumbWidth;
-                if (i > 0) {
-                    if (curX < uint(size.x) && !firstMapExcluded)
-                        UI::SameLine();
-                    else
-                        firstMapExcluded = false;
-                }
+            //     if (map.hidden && !Globals::showHidden) continue;
+            //     if (!map.mapNameText.ToLower().Contains(Globals::mapSearch)) {
+            //         if (i == 0) firstMapExcluded = true;
+            //         continue;
+            //     }
 
-                UI::BeginGroup();
-                    vec2 pos = UI::GetCursorPos();
-                    vec2 thumbSize = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
-                    try   { UI::Image(map.thumbnailTexture, thumbSize); }
-                    catch { UI::Dummy(thumbSize); }
+            //     curX += Settings::myMapsListThumbWidth;
+            //     if (i > 0) {
+            //         if (curX < uint(size.x) && !firstMapExcluded)
+            //             UI::SameLine();
+            //         else
+            //             firstMapExcluded = false;
+            //     }
 
-                    if (map.hidden) {
-                        UI::SetCursorPos(pos);
-                        UI::Image(Globals::eyeTexture, thumbSize);
-                    }
+            //     UI::BeginGroup();
+            //         vec2 pos = UI::GetCursorPos();
+            //         vec2 thumbSize = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
+            //         try   { UI::Image(map.thumbnailTexture, thumbSize); }
+            //         catch { UI::Dummy(thumbSize); }
 
-                    UI::SetCursorPos(pos);
-                    if (UI::InvisibleButton("invis_" + map.mapId, thumbSize)) {
+            //         if (map.hidden) {
+            //             UI::SetCursorPos(pos);
+            //             UI::Image(Globals::eyeTexture, thumbSize);
+            //         }
+
+            //         UI::SetCursorPos(pos);
+            //         if (UI::InvisibleButton("invis_" + map.mapId, thumbSize)) {
+            //             Globals::AddCurrentMap(map);
+            //             Globals::clickedMapId = map.mapId;
+            //         }
+
+            //         int scrollbarPixels = int(Globals::scale * 30);
+            //         curX = int(UI::GetCursorPos().x) + Settings::myMapsListThumbWidth + scrollbarPixels;
+            //         UI::PushTextWrapPos(curX - scrollbarPixels);
+            //         UI::Text((Settings::myMapsListColor) ? map.mapNameColor : map.mapNameText);
+            //         UI::PopTextWrapPos();
+            //         UI::Text("\n");
+            //     UI::EndGroup();
+            // }
+        // }
+        // UI::EndChild();
+
+        UI::EndTabItem();
+    }
+
+    void Table_MyMapsList() {
+        Models::Map@[] maps;
+
+        for (uint i = 0; i < Globals::maps.Length; i++) {
+            auto map = @Globals::maps[i];
+            if (map.mapNameText.ToLower().Contains(Globals::mapSearch.ToLower()))
+                maps.InsertLast(map);
+        }
+
+        int flags =
+            UI::TableFlags::Resizable |
+            UI::TableFlags::ScrollY;
+
+        if (UI::BeginTable("my-maps-table", 2, flags)) {
+            UI::TableSetupScrollFreeze(0, 1);
+            UI::TableSetupColumn("Name");
+            UI::TableSetupColumn("Record Count");
+            UI::TableHeadersRow();
+
+            UI::ListClipper clipper(maps.Length);
+            while (clipper.Step()) {
+                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+                    auto map = maps[i];
+
+                    UI::TableNextRow();
+                    UI::TableNextColumn();
+                    if (UI::Selectable((Settings::myMapsListColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false)) {
                         Globals::AddCurrentMap(map);
                         Globals::clickedMapId = map.mapId;
                     }
 
-                    int scrollbarPixels = int(Globals::scale * 30);
-                    curX = int(UI::GetCursorPos().x) + Settings::myMapsListThumbWidth + scrollbarPixels;
-                    UI::PushTextWrapPos(curX - scrollbarPixels);
-                    UI::Text((Settings::myMapsListColor) ? map.mapNameColor : map.mapNameText);
-                    UI::PopTextWrapPos();
-                    UI::Text("\n");
-                UI::EndGroup();
+                    UI::TableNextColumn();
+                    UI::Text("" + map.records.Length);
+                }
             }
+            UI::EndTable();
         }
-        UI::EndChild();
-
-        UI::EndTabItem();
     }
 }}
