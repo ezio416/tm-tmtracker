@@ -1,6 +1,6 @@
 /*
 c 2023-09-19
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Version {
@@ -10,21 +10,21 @@ namespace Version {
         // TO CHANGE WHEN TMTRACKER IS UPDATED
         // only if files are considered incompatible with new versions
 
-        // string timerId = Log::TimerBegin("checking version.json");
+        string timerId = Log::TimerBegin("checking version.json");
 
-        // int3 fileVersion = GetFile();
-        // if (
-        //     fileVersion.x < version.x ||
-        //     fileVersion.y < version.y ||
-        //     fileVersion.z < version.z
-        // ) {
-        //     warn("old version detected");
-        //     Util::DeleteFiles();
-        //     Log::TimerEnd(timerId);
-        //     return false;
-        // }
+        int3 fileVersion = GetFile();
+        if (
+            fileVersion.x < 3 ||
+            fileVersion.y < 1 ||
+            fileVersion.z < 0
+        ) {
+            warn("old version detected");
+            Files::Delete();
+            Log::TimerEnd(timerId);
+            return false;
+        }
 
-        // Log::TimerEnd(timerId);
+        Log::TimerEnd(timerId);
         SetFile();
         return true;
     }
@@ -35,22 +35,24 @@ namespace Version {
         return version;
     }
 
-    // int3 GetFile() {
-    //     if (IO::FileExists(Globals::versionFile)) {
-    //         try {
-    //             Json::Value@ read = Json::FromFile(Globals::versionFile);
-    //             return int3(int(read["major"]), int(read["minor"]), int(read["patch"]));
-    //         } catch {
-    //             warn("error reading version.json!");
-    //             Util::DeleteFiles();
-    //             return FromToml();
-    //         }
-    //     } else {
-    //         warn("version.json not found!");
-    //         Util::DeleteFiles();
-    //         return FromToml();
-    //     }
-    // }
+    int3 GetFile() {
+        FromToml();
+
+        if (IO::FileExists(Files::version)) {
+            try {
+                Json::Value@ read = Json::FromFile(Files::version);
+                return int3(int(read["major"]), int(read["minor"]), int(read["patch"]));
+            } catch {
+                warn("error reading version.json!");
+                Files::Delete();
+                return version;
+            }
+        } else {
+            warn("version.json not found!");
+            Files::Delete();
+            return version;
+        }
+    }
 
     void SetFile() {
         string timerId = Log::TimerBegin("setting version.json");
