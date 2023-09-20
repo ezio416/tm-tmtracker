@@ -11,7 +11,7 @@ namespace Globals {
     Models::Map@[]    currentMaps;
     dictionary        currentMapsIndex;
     bool              debug                  = false;
-    UI::Texture@      eyeTexture             = UI::LoadTexture("Assets/eye.png");
+    UI::Texture@      eyeTexture             = UI::LoadTexture(Files::eye);
     bool              getAccountNames        = true;
     Json::Value       hiddenMapsIndex        = Json::Object();
     uint64            latestNadeoRequest     = 0;
