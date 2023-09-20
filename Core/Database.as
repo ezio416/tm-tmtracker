@@ -4,10 +4,9 @@ m 2023-09-19
 */
 
 namespace Database {
-    SQLite::Database@ db;
-    string            file = Globals::storageFolder + "TMTracker.db";
-    uint              maxSqlValues = 1000;
-    uint              sqlLoadBatch = 100;
+    string file         = Globals::storageFolder + "TMTracker.db";
+    uint   maxSqlValues = 1000;
+    uint   sqlLoadBatch = 100;
 
     string accountColumns = """ (
         accountId   CHAR(36) PRIMARY KEY,
@@ -43,10 +42,12 @@ namespace Database {
 
     void Clear() {
         string timerId = Log::TimerBegin("clearing database");
-        @db = SQLite::Database(file);
+
+        SQLite::Database@ db = SQLite::Database(file);
         try { db.Execute("DELETE FROM Accounts"); } catch { }
         try { db.Execute("DELETE FROM Maps");     } catch { }
         try { db.Execute("DELETE FROM Records");  } catch { }
+
         Log::TimerEnd(timerId);
     }
 
@@ -72,7 +73,7 @@ namespace Database {
     }
 
     void LoadMapsCoro() {
-        @db = SQLite::Database(file);
+        SQLite::Database@ db = SQLite::Database(file);
         SQLite::Statement@ s;
 
         Globals::ClearMaps();
@@ -93,7 +94,7 @@ namespace Database {
     }
 
     void LoadAccountsCoro() {
-        @db = SQLite::Database(file);
+        SQLite::Database@ db = SQLite::Database(file);
         SQLite::Statement@ s;
 
         Globals::ClearAccounts();
@@ -112,7 +113,7 @@ namespace Database {
     }
 
     void LoadRecordsCoro() {
-        @db = SQLite::Database(file);
+        SQLite::Database@ db = SQLite::Database(file);
         SQLite::Statement@ s;
 
         Globals::ClearRecords();
@@ -139,7 +140,7 @@ namespace Database {
         string timerId = Log::TimerBegin("saving database");
         Globals::status.Set("db-save", "saving database...");
 
-        @db = SQLite::Database(file);
+        SQLite::Database@ db = SQLite::Database(file);
         SQLite::Statement@ s;
 
         db.Execute("CREATE TABLE IF NOT EXISTS Accounts" + accountColumns);

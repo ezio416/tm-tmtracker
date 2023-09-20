@@ -6,17 +6,17 @@ m 2023-09-19
 namespace Globals {
     Models::Account[] accounts;
     dictionary        accountsIndex;
-    bool              cancelAllRecords = false;
+    bool              cancelAllRecords         = false;
     string            clickedMapId;
     Models::Map@[]    currentMaps;
     dictionary        currentMapsIndex;
-    bool              debug = false;
-    UI::Texture@      defaultTexture = UI::LoadTexture("Assets/1x1.png");
-    UI::Texture@      eyeTexture = UI::LoadTexture("Assets/eye.png");
-    bool              getAccountNames = true;
-    string            hiddenMapsFile = storageFolder + "hiddenMaps.json";
-    Json::Value       hiddenMapsIndex = Json::Object();
-    uint64            latestNadeoRequest = 0;
+    bool              debug                    = false;
+    UI::Texture@      defaultTexture           = UI::LoadTexture("Assets/1x1.png");
+    UI::Texture@      eyeTexture               = UI::LoadTexture("Assets/eye.png");
+    bool              getAccountNames          = true;
+    string            hiddenMapsFile           = storageFolder + "hiddenMaps.json";
+    Json::Value       hiddenMapsIndex          = Json::Object();
+    uint64            latestNadeoRequest       = 0;
     string            mapRecordsTimestampsFile = storageFolder + "mapRecordsTimestamps.json";
     Models::Map[]     maps;
     string            mapSearch;
@@ -24,17 +24,17 @@ namespace Globals {
     Models::Record[]  records;
     dictionary        recordsIndex;
     Models::Record@[] recordsSorted;
-    Json::Value       recordsTimestampsIndex = Json::Object();
-    float             scale = UI::GetScale();
-    bool              showHidden = false;
-    uint              shownMaps = 0;
-    bool              singleMapRecordStatus = true;
+    Json::Value       recordsTimestampsIndex   = Json::Object();
+    float             scale                    = UI::GetScale();
+    bool              showHidden               = false;
+    uint              shownMaps                = 0;
+    bool              singleMapRecordStatus    = true;
     dictionary        status;
-    string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
-    vec4              tableRowBgAltColor = vec4(0, 0, 0, 0.5);
-    string            thumbnailFolder = storageFolder + "thumbnails";
+    string            storageFolder            = IO::FromStorageFolder("").Replace("\\", "/");
+    vec4              tableRowBgAltColor       = vec4(0, 0, 0, 0.5);
+    string            thumbnailFolder          = storageFolder + "thumbnails";
     dictionary        thumbnailTextures;
-    string            title = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
+    string            title                    = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
 
     void AddAccount(Models::Account account) {
         if (accountsIndex.Exists(account.accountId)) return;
