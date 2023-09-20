@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-08-12
+m 2023-09-19
 */
 
 namespace Tabs { namespace Maps {
@@ -73,7 +73,7 @@ namespace Tabs { namespace Maps {
                     vec2 pos = UI::GetCursorPos();
                     vec2 thumbSize = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
-                    catch { UI::Image(Globals::defaultTexture, thumbSize); }
+                    catch { UI::Dummy(thumbSize); }
 
                     if (map.hidden) {
                         UI::SetCursorPos(pos);

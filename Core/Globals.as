@@ -11,7 +11,6 @@ namespace Globals {
     Models::Map@[]    currentMaps;
     dictionary        currentMapsIndex;
     bool              debug                  = false;
-    UI::Texture@      defaultTexture         = UI::LoadTexture("Assets/1x1.png");
     UI::Texture@      eyeTexture             = UI::LoadTexture("Assets/eye.png");
     bool              getAccountNames        = true;
     Json::Value       hiddenMapsIndex        = Json::Object();
