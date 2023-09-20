@@ -62,7 +62,7 @@ void RenderInterface() {
 
     UI::Begin(Globals::title, Settings::windowOpen, flags);
         if (Settings::statusBar && UI::BeginMenuBar()) {
-            UI::Text("v" + Globals::version.x + "." + Globals::version.y + "." + Globals::version.z + "   |");
+            UI::Text("v" + Version::version.x + "." + Version::version.y + "." + Version::version.z + "   |");
             string[] keys = Globals::status.GetKeys();
             if (keys.Length > 0) {
                 for (uint i = 0; i < keys.Length; i++) {

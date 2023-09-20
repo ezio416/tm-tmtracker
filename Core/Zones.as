@@ -4,22 +4,24 @@ m 2023-09-19
 */
 
 namespace Zones {
+    string      file = "Assets/zones.json";
+    Json::Value zones;
+
     string Get(const string &in zoneId) {
-        try   { return string(Globals::zones.Get(zoneId)); }
+        try   { return string(zones.Get(zoneId)); }
         catch { return "unknown-zone"; }
     }
 
     void Load() {
         try {
-            Globals::zones.Length;
+            zones.Length;
             return;
         } catch { }
 
         string timerId = Log::TimerBegin("loading zones.json");
 
         try {
-            Globals::zones = Json::FromFile(Globals::zonesFile);
-            Globals::zonesFileMissing = false;
+            zones = Json::FromFile(file);
         } catch {
             trace("zones.json not found! ");
             Log::TimerEnd(timerId, false);

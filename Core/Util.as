@@ -4,12 +4,14 @@ m 2023-09-19
 */
 
 namespace Util {
+    SQLite::Database@ timeDB = SQLite::Database(":memory:");
+
     void DeleteFiles() {
         warn("deleting TMTracker files for safety...");
         try { IO::Delete(Globals::hiddenMapsFile); } catch { }
         try { IO::Delete(Globals::mapRecordsTimestampsFile); } catch { }
-        try { IO::Delete(Database::dbFile); } catch { }
-        try { IO::Delete(Globals::versionFile); } catch { }
+        try { IO::Delete(Database::file); } catch { }
+        try { IO::Delete(Version::file); } catch { }
     }
 
     string FormatSeconds(int seconds, bool day = false, bool hour = false, bool minute = false) {
@@ -38,7 +40,7 @@ namespace Util {
 
     // courtesy of MisfitMaid
     int64 IsoToUnix(const string &in inTime) {
-        auto s = Globals::timeDB.Prepare("SELECT unixepoch(?) as x");
+        auto s = timeDB.Prepare("SELECT unixepoch(?) as x");
         s.Bind(1, inTime);
         s.Execute();
         s.NextRow();
