@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-08-16
+m 2023-09-19
 */
 
 namespace Tabs {
@@ -28,8 +28,8 @@ namespace Tabs {
         UI::TextWrapped("Files are kept in: ");
 
         UI::SameLine();
-        if (UI::Selectable("\\$1F1" + Globals::storageFolder, false))
-            IO::SetClipboard(Globals::storageFolder);
+        if (UI::Selectable("\\$1F1" + Files::storageFolder, false))
+            IO::SetClipboard(Files::storageFolder);
         if (UI::IsItemHovered()) {
             UI::BeginTooltip();
                 UI::Text("click to copy");

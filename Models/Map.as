@@ -29,7 +29,7 @@ namespace Models {
         Map() { }
         Map(Json::Value map) {
             mapUid        = map["uid"];
-            thumbnailFile = Globals::thumbnailFolder + "/" + mapUid + ".jpg";  // needs to be Uid
+            thumbnailFile = Files::thumbnailFolder + "/" + mapUid + ".jpg";  // needs to be Uid
             mapId         = map["mapId"];
             mapNameRaw    = map["name"];
             mapNameColor  = ColoredString(mapNameRaw);
@@ -57,7 +57,7 @@ namespace Models {
             mapUid           = s.GetColumnString("mapUid");
             recordsTimestamp = s.GetColumnInt("recordsTimestamp");
             silverTime       = s.GetColumnInt("silverTime");
-            thumbnailFile    = Globals::thumbnailFolder + "/" + mapUid + ".jpg";
+            thumbnailFile    = Files::thumbnailFolder + "/" + mapUid + ".jpg";
             thumbnailUrl     = s.GetColumnString("thumbnailUrl");
         }
 
@@ -146,7 +146,7 @@ namespace Models {
 
             recordsTimestamp = Time::Stamp;
             Globals::recordsTimestampsIndex[mapId] = recordsTimestamp;
-            Json::ToFile(Globals::mapRecordsTimestampsFile, Globals::recordsTimestampsIndex);
+            Json::ToFile(Files::mapRecordsTimestamps, Globals::recordsTimestampsIndex);
 
             auto namesCoro = startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
             while (namesCoro.IsRunning()) yield();

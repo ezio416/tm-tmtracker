@@ -16,12 +16,12 @@ void Main() {
 
     Zones::Load();
 
-    IO::CreateFolder(Globals::thumbnailFolder);
+    IO::CreateFolder(Files::thumbnailFolder);
 
     if (Version::CheckFile()) {
         string timerId = Log::TimerBegin("loading hiddenMaps.json");
-        if (IO::FileExists(Globals::hiddenMapsFile)) {
-            try   { Globals::hiddenMapsIndex = Json::FromFile(Globals::hiddenMapsFile); }
+        if (IO::FileExists(Files::hiddenMaps)) {
+            try   { Globals::hiddenMapsIndex = Json::FromFile(Files::hiddenMaps); }
             catch { warn("error loading hiddenMaps.json!"); }
         } else {
             warn("hiddenMaps.json not found!");
@@ -29,8 +29,8 @@ void Main() {
         Log::TimerEnd(timerId);
 
         timerId = Log::TimerBegin("loading mapRecordsTimestamps.json");
-        if (IO::FileExists(Globals::mapRecordsTimestampsFile)) {
-            try   { Globals::recordsTimestampsIndex = Json::FromFile(Globals::mapRecordsTimestampsFile); }
+        if (IO::FileExists(Files::mapRecordsTimestamps)) {
+            try   { Globals::recordsTimestampsIndex = Json::FromFile(Files::mapRecordsTimestamps); }
             catch { warn("error loading mapRecordsTimestamps.json!"); }
         } else {
             warn("mapRecordsTimestamps.json not found!");

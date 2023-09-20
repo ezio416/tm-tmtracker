@@ -4,8 +4,7 @@ m 2023-09-19
 */
 
 namespace Version {
-    string file = Globals::storageFolder + "version.json";
-    int3   version;
+    int3 version;
 
     bool CheckFile() {
         // TO CHANGE WHEN TMTRACKER IS UPDATED
@@ -60,7 +59,7 @@ namespace Version {
         write["major"] = version.x;
         write["minor"] = version.y;
         write["patch"] = version.z;
-        Json::ToFile(file, write);
+        Json::ToFile(Files::version, write);
 
         Log::TimerEnd(timerId);
     }

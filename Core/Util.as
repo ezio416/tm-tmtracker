@@ -6,14 +6,6 @@ m 2023-09-19
 namespace Util {
     SQLite::Database@ timeDB = SQLite::Database(":memory:");
 
-    void DeleteFiles() {
-        warn("deleting TMTracker files for safety...");
-        try { IO::Delete(Globals::hiddenMapsFile); } catch { }
-        try { IO::Delete(Globals::mapRecordsTimestampsFile); } catch { }
-        try { IO::Delete(Database::file); } catch { }
-        try { IO::Delete(Version::file); } catch { }
-    }
-
     string FormatSeconds(int seconds, bool day = false, bool hour = false, bool minute = false) {
         int minutes = seconds / 60;
         seconds %= 60;
