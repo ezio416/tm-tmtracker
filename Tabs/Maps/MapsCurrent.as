@@ -58,7 +58,7 @@ namespace Tabs { namespace Maps {
                         startnew(CoroutineFunc(map.TmxCoro));
                     UI::EndDisabled();
 
-                    UI::BeginDisabled(map.hidden || Locks::singleRecords);
+                    UI::BeginDisabled(map.hidden || Locks::singleRecords || Locks::allRecords);
                     if (UI::Button(Icons::Download + " Get Records (" + map.records.Length + ")"))
                         startnew(CoroutineFunc(map.GetRecordsCoro));
                     UI::EndDisabled();
