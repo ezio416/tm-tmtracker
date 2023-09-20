@@ -1,12 +1,13 @@
 /*
 c 2023-05-16
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Globals {
     Models::Account[] accounts;
     dictionary        accountsIndex;
     bool              cancelAllRecords       = false;
+    bool              cancelThumbnails       = false;
     string            clickedMapId;
     Models::Map@[]    currentMaps;
     dictionary        currentMapsIndex;
@@ -56,6 +57,7 @@ namespace Globals {
         if (currentMapsIndex.Exists(map.mapId)) return;
         currentMaps.InsertLast(map);
         currentMapsIndex.Set(map.mapId, map);
+        clickedMapId = map.mapId;
     }
 
     void ClearCurrentMaps() {

@@ -1,6 +1,6 @@
 /*
 c 2023-07-12
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Tabs { namespace Records {
@@ -23,11 +23,11 @@ namespace Tabs { namespace Records {
             startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
         UI::EndDisabled();
 
-        if (Locks::allRecords && !Globals::cancelAllRecords) {
-            UI::SameLine();
-            if (UI::Button(Icons::Times + " Cancel"))
-                Globals::cancelAllRecords = true;
-        }
+        UI::BeginDisabled(!Locks::allRecords || Globals::cancelAllRecords);
+        UI::SameLine();
+        if (UI::Button(Icons::Times + " Cancel"))
+            Globals::cancelAllRecords = true;
+        UI::EndDisabled();
 
         if (!Locks::allRecords) {
             uint timestamp;
@@ -62,7 +62,9 @@ namespace Tabs { namespace Records {
 
                     UI::TableNextRow();
                     UI::TableNextColumn();
-                    UI::Text(record.mapName);
+                    if (UI::Selectable(record.mapName + "##" + i, false))
+                        Globals::AddCurrentMap(cast<Models::Map@>(Globals::mapsIndex[record.mapId]));
+                    Util::HoverTooltip("view map (switch to Maps tab above to view)");
 
                     UI::TableNextColumn();
                     UI::Text(((Settings::recordsHighlight5 && record.position < 6) ? "\\$" + Settings::recordsHighlightColor : "") + record.position);
@@ -79,13 +81,12 @@ namespace Tabs { namespace Records {
                     UI::Text(timeColor + Time::Format(record.time));
 
                     UI::TableNextColumn();
-                    if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : account.accountId) + "##" + i, false)) {
-                        OpenBrowserURL("https://trackmania.io/#/player/" + account.accountId);
-                    }
+                    if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : account.accountId) + "##" + i, false))
+                        Util::Tmio(account.accountId);
                     Util::HoverTooltip("Trackmania.io profile");
 
                     UI::TableNextColumn();
-                    UI::Text(Time::FormatString("%Y-%m-%d %H:%M:%S \\$AAA(%a)", record.timestampUnix));
+                    UI::Text(Util::UnixToIso(record.timestampUnix));
 
                     UI::TableNextColumn();
                     UI::Text(Util::FormatSeconds(now - record.timestampUnix));

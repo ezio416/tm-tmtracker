@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-09-19
+m 2023-09-20
 */
 
 void Main() {
@@ -40,7 +40,8 @@ void Main() {
         startnew(CoroutineFunc(Database::LoadAccountsCoro));
     }
 
-    startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
+    if (Settings::refreshMaps)
+        startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
 }
 
 void RenderMenu() {

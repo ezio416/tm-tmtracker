@@ -1,20 +1,11 @@
 /*
 c 2023-07-16
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Tabs {
     void Tab_Settings() {
         if (!UI::BeginTabItem(Icons::Cog + " Settings")) return;
-
-        // UI::SameLine();
-        // if (UI::Button(Icons::Refresh + " Reset all to defaults")) {
-        //     Settings::Reset(Settings::Category::General);
-        //     Settings::Reset(Settings::Category::Startup);
-        //     Settings::Reset(Settings::Category::MyMapsList);
-        //     Settings::Reset(Settings::Category::MyMapsTabs);
-        //     Settings::Reset(Settings::Category::Records);
-        // }
 
         if (Settings::settingsWindow) {
             if (UI::Button(Icons::WindowClose + " Close settings window")) {
@@ -43,19 +34,25 @@ namespace Settings {
     bool save = false;
 
     [Setting hidden] uint   accountNameValidDays     = 7;
+    [Setting hidden] bool   autoThumbnails           = false;
     [Setting hidden] bool   infoTab                  = true;
     [Setting hidden] bool   mapRecordsMedalColors    = true;
     [Setting hidden] uint   maxRecordsPerMap         = 100;
-    [Setting hidden] uint   myMapsCurrentThumbWidth  = uint(Globals::scale * 200);
+    [Setting hidden] uint   myMapsCurrentThumbWidth  = uint(Globals::scale * 150);
     [Setting hidden] bool   myMapsListHint           = true;
     [Setting hidden] bool   myMapsListColor          = true;
-    // [Setting hidden] uint   myMapsListThumbWidth     = uint(Globals::scale * 120);
+    [Setting hidden] bool   myMapsListColRecords     = true;
+    [Setting hidden] bool   myMapsListColRecordsTime = true;
+    [Setting hidden] bool   myMapsListColUpload      = true;
+    [Setting hidden] bool   myMapsListThumbnails     = true;
+    [Setting hidden] uint   myMapsListThumbWidth     = uint(Globals::scale * 16);
     [Setting hidden] bool   myMapsSwitchOnClicked    = true;
     [Setting hidden] bool   myMapsTabsColor          = true;
     [Setting hidden] bool   recordsEstimate          = true;
     [Setting hidden] bool   recordsHighlight5        = true;
     [Setting hidden] string recordsHighlightColor    = "F71";
     [Setting hidden] bool   recordsMedalColors       = true;
+    [Setting hidden] bool   refreshMaps              = false;
     [Setting hidden] bool   rememberOpen             = false;
     [Setting hidden] bool   settingsResize           = true;
     [Setting hidden] bool   statusBar                = true;
@@ -82,15 +79,21 @@ namespace Settings {
                 plugin.GetSetting("statusBar").Reset();
                 plugin.GetSetting("welcomeText").Reset();
                 plugin.GetSetting("infoTab").Reset();
+                plugin.GetSetting("autoThumbnails").Reset();
                 plugin.GetSetting("accountNameValidDays").Reset();
                 break;
             case Category::Startup:
+                plugin.GetSetting("refreshMaps").Reset();
                 plugin.GetSetting("rememberOpen").Reset();
                 break;
             case Category::MyMapsList:
                 plugin.GetSetting("myMapsListHint").Reset();
+                plugin.GetSetting("myMapsListThumbnails").Reset();
+                plugin.GetSetting("myMapsListThumbWidth").Reset();
                 plugin.GetSetting("myMapsListColor").Reset();
-                // plugin.GetSetting("myMapsListThumbWidth").Reset();
+                plugin.GetSetting("myMapsListColRecords").Reset();
+                plugin.GetSetting("myMapsListColRecordsTime").Reset();
+                plugin.GetSetting("myMapsListColUpload").Reset();
                 break;
             case Category::MyMapsTabs:
                 plugin.GetSetting("myMapsTabsColor").Reset();
@@ -115,48 +118,69 @@ namespace Settings {
                 Meta::SaveSettings();
             Util::HoverTooltip("shouldn't be necessary, but here just in case");
 
+            UI::SameLine();
+            if (UI::Button(Icons::Refresh + " Reset all to defaults")) {
+                Settings::Reset(Settings::Category::General);
+                Settings::Reset(Settings::Category::Startup);
+                Settings::Reset(Settings::Category::MyMapsList);
+                Settings::Reset(Settings::Category::MyMapsTabs);
+                Settings::Reset(Settings::Category::Records);
+            }
+
             UI::Separator();
 
             if (UI::Selectable("\\$2F3" + Icons::Cogs + " General", false))
                 Reset(Category::General);
             Util::HoverTooltip("click to reset section to defaults");
-            statusBar = UI::Checkbox("Show status bar", statusBar);
-            welcomeText = UI::Checkbox("Show welcome text", welcomeText);
-            infoTab = UI::Checkbox("Show info tab", infoTab);
+            statusBar            = UI::Checkbox("Show status bar", statusBar);
+            welcomeText          = UI::Checkbox("Show welcome text", welcomeText);
+            infoTab              = UI::Checkbox("Show info tab", infoTab);
+            autoThumbnails       = UI::Checkbox("Load thumbnails automatically", autoThumbnails);
             accountNameValidDays = UI::SliderInt("Account name valid time (days)", accountNameValidDays, 0, 60);
 
             UI::Separator();
             if (UI::Selectable("\\$2F3" + Icons::PlayCircle + " Startup", false))
                 Reset(Category::Startup);
             Util::HoverTooltip("click to reset section to defaults");
+            refreshMaps  = UI::Checkbox("Refresh map list", refreshMaps);
             rememberOpen = UI::Checkbox("Remember if window was open", rememberOpen);
 
             UI::Separator();
             if (UI::Selectable("\\$2F3" + Icons::MapO + " My Maps List", false))
                 Reset(Category::MyMapsList);
             Util::HoverTooltip("click to reset section to defaults");
-            myMapsListHint = UI::Checkbox("Show help text", myMapsListHint);
-            myMapsListColor = UI::Checkbox("Show map names with color", myMapsListColor);
-            // myMapsListThumbWidth = UI::SliderInt("Thumbnail size (list)", myMapsListThumbWidth, 10, 1000);
+            myMapsListHint           = UI::Checkbox("Show help text", myMapsListHint);
+            myMapsListThumbnails     = UI::Checkbox("Show thumbnails", myMapsListThumbnails);
+            UI::BeginDisabled(!myMapsListThumbnails);
+            myMapsListThumbWidth     = UI::SliderInt("Thumbnail size##thumbList", myMapsListThumbWidth, 10, 150);
+            UI::EndDisabled();
+            myMapsListColor          = UI::Checkbox("Show map names with color##colorList", myMapsListColor);
+            myMapsListColRecords     = UI::Checkbox("Show number of records", myMapsListColRecords);
+            myMapsListColRecordsTime = UI::Checkbox("Show latest record update time", myMapsListColRecordsTime);
+            myMapsListColUpload      = UI::Checkbox("Show latest map upload time", myMapsListColUpload);
 
             UI::Separator();
             if (UI::Selectable("\\$2F3" + Icons::Map + " My Map Tabs", false))
                 Reset(Category::MyMapsTabs);
             Util::HoverTooltip("click to reset section to defaults");
-            myMapsTabsColor = UI::Checkbox("Show map names with color (tab label)", myMapsTabsColor);
-            myMapsSwitchOnClicked = UI::Checkbox("Switch to map when clicked", myMapsSwitchOnClicked);
-            mapRecordsMedalColors = UI::Checkbox("Show map record times with medal colors", mapRecordsMedalColors);
-            myMapsCurrentThumbWidth = UI::SliderInt("Thumbnail size (tab)", myMapsCurrentThumbWidth, 10, 1000);
-            maxRecordsPerMap = UI::SliderInt("Max records to get per map", maxRecordsPerMap, 100, 1000);
+            myMapsTabsColor         = UI::Checkbox("Show map names with color##colorTab", myMapsTabsColor);
+            myMapsSwitchOnClicked   = UI::Checkbox("Switch to map when clicked", myMapsSwitchOnClicked);
+            mapRecordsMedalColors   = UI::Checkbox("Show map record times with medal colors", mapRecordsMedalColors);
+            myMapsCurrentThumbWidth = UI::SliderInt("Thumbnail size##thumbTab", myMapsCurrentThumbWidth, 10, 1000);
+            maxRecordsPerMap        = UI::SliderInt("Max records to get per map", maxRecordsPerMap, 100, 1000);
 
             UI::Separator();
             if (UI::Selectable("\\$2F3" + Icons::Trophy + " Records", false))
                 Reset(Category::Records);
             Util::HoverTooltip("click to reset section to defaults");
-            recordsEstimate = UI::Checkbox("Show time estimate", recordsEstimate);
-            recordsMedalColors = UI::Checkbox("Show record times with medal colors", recordsMedalColors);
-            recordsHighlight5 = UI::Checkbox("Highlight top 5 world", recordsHighlight5);
-            recordsHighlightColor = UI::InputText("Highlight color", recordsHighlightColor, false);
+            recordsEstimate       = UI::Checkbox("Show time estimate", recordsEstimate);
+            recordsMedalColors    = UI::Checkbox("Show record times with medal colors", recordsMedalColors);
+            recordsHighlight5     = UI::Checkbox("Highlight top 5 world", recordsHighlight5);
+            UI::BeginDisabled(!recordsHighlight5);
+            recordsHighlightColor = UI::InputText("Highlight color", recordsHighlightColor, false, UI::InputTextFlags::CharsHexadecimal | UI::InputTextFlags::CharsUppercase);
+            if (recordsHighlightColor.Length > 3)
+                recordsHighlightColor = recordsHighlightColor.SubStr(0, 3);
+            UI::EndDisabled();
         UI::EndGroup();
     }
 
@@ -172,7 +196,8 @@ namespace Settings {
         save = true;
 
         int flags = UI::WindowFlags::None;
-        if (settingsResize) flags |= UI::WindowFlags::AlwaysAutoResize;
+        if (settingsResize)
+            flags |= UI::WindowFlags::AlwaysAutoResize;
 
         UI::Begin("TMTracker Settings", settingsWindow, flags);
             Group_Settings();

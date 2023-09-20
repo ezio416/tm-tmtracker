@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Tabs { namespace Maps {
@@ -24,6 +24,11 @@ namespace Tabs { namespace Maps {
                     vec2 thumbSize = vec2(Settings::myMapsCurrentThumbWidth, Settings::myMapsCurrentThumbWidth);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
                     catch { UI::Dummy(thumbSize); }
+
+                    UI::BeginDisabled(Locks::thumbs || map.thumbnailLoaded || map.thumbnailLoading);
+                    if (UI::Button(Icons::PictureO + " Load Thumbnail"))
+                        startnew(CoroutineFunc(map.LoadThumbnailCoro));
+                    UI::EndDisabled();
 
                     UI::Text(map.mapNameText);
                     UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
@@ -105,11 +110,11 @@ namespace Tabs { namespace Maps {
 
                                 UI::TableNextColumn();
                                 if (UI::Selectable((account.accountName != "") ? account.accountName : account.accountId, false))
-                                    OpenBrowserURL("https://trackmania.io/#/player/" + account.accountId);
+                                    Util::Tmio(account.accountId);
                                 Util::HoverTooltip("Trackmania.io profile");
 
                                 UI::TableNextColumn();
-                                UI::Text(Time::FormatString("%Y-%m-%d %H:%M:%S \\$AAA(%a)", record.timestampUnix));
+                                UI::Text(Util::UnixToIso(record.timestampUnix));
 
                                 UI::TableNextColumn();
                                 UI::Text(Util::FormatSeconds(now - record.timestampUnix));

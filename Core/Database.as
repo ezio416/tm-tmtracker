@@ -1,6 +1,6 @@
 /*
 c 2023-07-14
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Database {
@@ -26,7 +26,9 @@ namespace Database {
         mapUid           VARCHAR(27),
         recordsTimestamp INT,
         silverTime       INT,
-        thumbnailUrl     CHAR(97)
+        thumbnailUrl     CHAR(97),
+        updateTimestamp  INT,
+        uploadTimestamp  INT
     ); """;
 
     string recordColumns = """ (
@@ -46,6 +48,15 @@ namespace Database {
         try { db.Execute("DELETE FROM Accounts"); } catch { }
         try { db.Execute("DELETE FROM Maps");     } catch { }
         try { db.Execute("DELETE FROM Records");  } catch { }
+
+        Log::TimerEnd(timerId);
+    }
+
+    void ClearMapRecords(Models::Map@ map) {
+        string timerId = Log::TimerBegin("clearing database records for " + map.mapNameText);
+
+        SQLite::Database@ db = SQLite::Database(Files::db);
+        try { db.Execute("DELETE FROM Records WHERE mapId = " + Util::StrWrap(map.mapId)); } catch { warn("couldn't clear records " + getExceptionInfo()); }
 
         Log::TimerEnd(timerId);
     }
@@ -172,7 +183,9 @@ namespace Database {
                     mapUid,
                     recordsTimestamp,
                     silverTime,
-                    thumbnailUrl
+                    thumbnailUrl,
+                    updateTimestamp,
+                    uploadTimestamp
                 ) VALUES """ + mapGroups[i]);
             s.Execute();
             yield();
@@ -244,12 +257,15 @@ namespace Database {
                     Util::StrWrap(map.downloadUrl) + "," +
                     map.goldTime + "," +
                     (map.hidden ? 1 : 0) + "," +
-                    Util::StrWrap(map.mapId) + "," +
+                    Util::StrWrap(map.mapId);
+                mapValue += "," +
                     Util::StrWrap(map.mapNameRaw.Replace("'", "''")) + "," +
                     Util::StrWrap(map.mapUid) + "," +
                     map.recordsTimestamp + "," +
                     map.silverTime + "," +
-                    Util::StrWrap(map.thumbnailUrl) + ")";
+                    Util::StrWrap(map.thumbnailUrl) + "," +
+                    map.updateTimestamp + "," +
+                    map.uploadTimestamp + ")";
 
                 if (i < mapsToAdd - 1)
                     mapValue += ",";
