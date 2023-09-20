@@ -1,6 +1,6 @@
 /*
 c 2023-07-06
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Bulk {
@@ -73,7 +73,9 @@ namespace Bulk {
         Log::TimerEnd(timerId);
         Locks::myMaps = false;
 
-        startnew(CoroutineFunc(LoadMyMapsThumbnailsCoro));
+        if (Settings::autoThumbnails)
+            startnew(CoroutineFunc(LoadMyMapsThumbnailsCoro));
+
         startnew(CoroutineFunc(Database::LoadRecordsCoro));
     }
 
@@ -109,15 +111,24 @@ namespace Bulk {
     }
 
     void LoadMyMapsThumbnailsCoro() {
+        if (Locks::thumbs) return;
+
         string timerId = Log::TimerBegin("loading my map thumbnails");
+        Locks::thumbs = true;
 
         for (uint i = 0; i < Globals::maps.Length; i++) {
+            if (Globals::cancelThumbnails) {
+                Globals::cancelThumbnails = false;
+                break;
+            }
+
             Globals::status.Set("load-thumbs", "loading thumbnails... (" + (i + 1) + "/" + Globals::maps.Length + ")");
             auto map = @Globals::maps[i];
             auto coro = startnew(CoroutineFunc(map.LoadThumbnailCoro));
             while (coro.IsRunning()) yield();
         }
 
+        Locks::thumbs = false;
         Globals::status.Delete("load-thumbs");
         Log::TimerEnd(timerId);
     }

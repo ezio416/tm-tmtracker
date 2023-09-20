@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Util {
@@ -46,6 +46,14 @@ namespace Util {
 
     string StrWrap(const string &in input, const string &in wrapper = "'") {
         return wrapper + input + wrapper;
+    }
+
+    void Tmio(const string &in accountId) {
+        OpenBrowserURL("https://trackmania.io/#/player/" + accountId);
+    }
+
+    string UnixToIso(uint timestamp, const string &in format = "%Y-%m-%d %H:%M:%S \\$AAA(%a)") {
+        return Time::FormatString(format, timestamp);
     }
 
     void WaitToDoNadeoRequestCoro() {

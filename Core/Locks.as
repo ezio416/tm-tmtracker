@@ -1,6 +1,6 @@
 /*
 c 2023-07-11
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Locks {
@@ -11,5 +11,6 @@ namespace Locks {
     bool requesting    = false;
     bool singleRecords = false;
     bool sortRecords   = false;
+    bool thumbs        = false;
     bool tmx           = false;
 }

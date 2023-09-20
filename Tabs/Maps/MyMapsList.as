@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Tabs { namespace Maps {
@@ -8,7 +8,6 @@ namespace Tabs { namespace Maps {
         if (!UI::BeginTabItem(Icons::MapO + " My Maps")) return;
 
         Globals::clickedMapId = "";
-        // bool firstMapExcluded = false;
 
         if (Settings::myMapsListHint) {
             UI::TextWrapped(
@@ -30,15 +29,28 @@ namespace Tabs { namespace Maps {
             if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + hiddenMapCount + ")"))
                 Globals::showHidden = false;
         } else {
+            UI::BeginDisabled(Globals::maps.Length == 0);
             if (UI::Button(Icons::Eye + " Show Hidden (" + hiddenMapCount + ")"))
                 Globals::showHidden = true;
+            UI::EndDisabled();
         }
 
-        if (Globals::currentMaps.Length > 0) {
-            UI::SameLine();
-            if (UI::Button(Icons::Times + " Clear Current Maps (" + Globals::currentMaps.Length + ")"))
-                Globals::ClearCurrentMaps();
-        }
+        UI::BeginDisabled(Globals::currentMaps.Length == 0);
+        UI::SameLine();
+        if (UI::Button(Icons::Times + " Clear Current (" + Globals::currentMaps.Length + ")"))
+            Globals::ClearCurrentMaps();
+        UI::EndDisabled();
+
+        UI::BeginDisabled(Locks::thumbs || Globals::maps.Length == 0);
+        if (UI::Button(Icons::PictureO + " Load Thumbnails"))
+            startnew(CoroutineFunc(Bulk::LoadMyMapsThumbnailsCoro));
+        UI::EndDisabled();
+
+        UI::SameLine();
+        UI::BeginDisabled(!Locks::thumbs);
+        if (UI::Button(Icons::Times + " Cancel Thumbnails"))
+            Globals::cancelThumbnails = true;
+        UI::EndDisabled();
 
         Globals::mapSearch = UI::InputText("search", Globals::mapSearch, false);
 
@@ -50,59 +62,11 @@ namespace Tabs { namespace Maps {
 
         Table_MyMapsList();
 
-        // if (UI::BeginChild("MyMapsList")) {
-            // uint curX = 0;
-            // vec2 size = UI::GetWindowSize();
-
-            // for (uint i = 0; i < Globals::maps.Length; i++) {
-            //     auto map = @Globals::maps[i];
-
-            //     if (map.hidden && !Globals::showHidden) continue;
-            //     if (!map.mapNameText.ToLower().Contains(Globals::mapSearch)) {
-            //         if (i == 0) firstMapExcluded = true;
-            //         continue;
-            //     }
-
-            //     curX += Settings::myMapsListThumbWidth;
-            //     if (i > 0) {
-            //         if (curX < uint(size.x) && !firstMapExcluded)
-            //             UI::SameLine();
-            //         else
-            //             firstMapExcluded = false;
-            //     }
-
-            //     UI::BeginGroup();
-            //         vec2 pos = UI::GetCursorPos();
-            //         vec2 thumbSize = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
-            //         try   { UI::Image(map.thumbnailTexture, thumbSize); }
-            //         catch { UI::Dummy(thumbSize); }
-
-            //         if (map.hidden) {
-            //             UI::SetCursorPos(pos);
-            //             UI::Image(Globals::eyeTexture, thumbSize);
-            //         }
-
-            //         UI::SetCursorPos(pos);
-            //         if (UI::InvisibleButton("invis_" + map.mapId, thumbSize)) {
-            //             Globals::AddCurrentMap(map);
-            //             Globals::clickedMapId = map.mapId;
-            //         }
-
-            //         int scrollbarPixels = int(Globals::scale * 30);
-            //         curX = int(UI::GetCursorPos().x) + Settings::myMapsListThumbWidth + scrollbarPixels;
-            //         UI::PushTextWrapPos(curX - scrollbarPixels);
-            //         UI::Text((Settings::myMapsListColor) ? map.mapNameColor : map.mapNameText);
-            //         UI::PopTextWrapPos();
-            //         UI::Text("\n");
-            //     UI::EndGroup();
-            // }
-        // }
-        // UI::EndChild();
-
         UI::EndTabItem();
     }
 
     void Table_MyMapsList() {
+        int64 now = Time::Stamp;
         Models::Map@[] maps;
 
         for (uint i = 0; i < Globals::maps.Length; i++) {
@@ -112,17 +76,27 @@ namespace Tabs { namespace Maps {
                 maps.InsertLast(map);
         }
 
+        int colCount = 1;
+        if (Settings::myMapsListColRecords)     colCount++;
+        if (Settings::myMapsListColRecordsTime) colCount++;
+        if (Settings::myMapsListColUpload)      colCount++;
+
         int flags =
             UI::TableFlags::Resizable |
             UI::TableFlags::RowBg |
             UI::TableFlags::ScrollY;
 
-        if (UI::BeginTable("my-maps-table", 2, flags)) {
+        if (UI::BeginTable("my-maps-table", colCount, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Name");
-            UI::TableSetupColumn("Record Count");
+            if (Settings::myMapsListColRecords)
+                UI::TableSetupColumn("# of Records");
+            if (Settings::myMapsListColRecordsTime)
+                UI::TableSetupColumn("Records Recency");
+            if (Settings::myMapsListColUpload)
+                UI::TableSetupColumn("Latest Upload");
             UI::TableHeadersRow();
 
             UI::ListClipper clipper(maps.Length);
@@ -132,15 +106,32 @@ namespace Tabs { namespace Maps {
 
                     UI::TableNextRow();
                     UI::TableNextColumn();
-                    if (UI::Selectable((Settings::myMapsListColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false)) {
+                    if (Settings::myMapsListThumbnails) {
+                        vec2 size = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
+                        try   { UI::Image(map.thumbnailTexture, size); }
+                        catch { UI::Dummy(size); }
+                        UI::SameLine();
+                    }
+                    if (UI::Selectable((Settings::myMapsListColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false, UI::SelectableFlags::SpanAllColumns))
                         Globals::AddCurrentMap(map);
-                        Globals::clickedMapId = map.mapId;
+
+                    if (Settings::myMapsListColRecords) {
+                        UI::TableNextColumn();
+                        UI::Text("" + map.records.Length);
                     }
 
-                    UI::TableNextColumn();
-                    UI::Text("" + map.records.Length);
+                    if (Settings::myMapsListColRecordsTime) {
+                        UI::TableNextColumn();
+                        UI::Text(map.recordsTimestamp > 0 ? Util::FormatSeconds(now - map.recordsTimestamp) : "never");
+                    }
+
+                    if (Settings::myMapsListColUpload) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::UnixToIso(Math::Max(map.uploadTimestamp, map.updateTimestamp)));
+                    }
                 }
             }
+
             UI::PopStyleColor();
             UI::EndTable();
         }

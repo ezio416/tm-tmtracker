@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Models {
@@ -22,26 +22,32 @@ namespace Models {
         uint              recordsTimestamp;
         uint              silverTime;
         string            thumbnailFile;
+        bool              thumbnailLoaded;
+        bool              thumbnailLoading;
         UI::Texture@      thumbnailTexture;
         string            thumbnailUrl;
+        uint              updateTimestamp;
+        uint              uploadTimestamp;
         bool              viewing;
 
         Map() { }
         Map(Json::Value map) {
-            mapUid        = map["uid"];
-            thumbnailFile = Files::thumbnailFolder + "/" + mapUid + ".jpg";  // needs to be Uid
-            mapId         = map["mapId"];
-            mapNameRaw    = map["name"];
-            mapNameColor  = ColoredString(mapNameRaw);
-            mapNameText   = StripFormatCodes(mapNameRaw);
-            logName       = "MAP[" + mapNameText + "] - ";
-            authorId      = map["author"];
-            authorTime    = map["authorTime"];
-            goldTime      = map["goldTime"];
-            silverTime    = map["silverTime"];
-            bronzeTime    = map["bronzeTime"];
-            downloadUrl   = string(map["downloadUrl"]).Replace("\\", "");
-            thumbnailUrl  = string(map["thumbnailUrl"]).Replace("\\", "");
+            mapUid          = map["uid"];
+            thumbnailFile   = Files::thumbnailFolder + "/" + mapUid + ".jpg";  // needs to be Uid
+            mapId           = map["mapId"];
+            mapNameRaw      = map["name"];
+            mapNameColor    = ColoredString(mapNameRaw);
+            mapNameText     = StripFormatCodes(mapNameRaw);
+            logName         = "MAP[" + mapNameText + "] - ";
+            authorId        = map["author"];
+            authorTime      = map["authorTime"];
+            goldTime        = map["goldTime"];
+            silverTime      = map["silverTime"];
+            bronzeTime      = map["bronzeTime"];
+            downloadUrl     = string(map["downloadUrl"]).Replace("\\", "");
+            thumbnailUrl    = string(map["thumbnailUrl"]).Replace("\\", "");
+            uploadTimestamp = map["uploadTimestamp"];
+            updateTimestamp = map["updateTimestamp"];
         }
         Map(SQLite::Statement@ s) {
             authorId         = s.GetColumnString("authorId");
@@ -59,6 +65,8 @@ namespace Models {
             silverTime       = s.GetColumnInt("silverTime");
             thumbnailFile    = Files::thumbnailFolder + "/" + mapUid + ".jpg";
             thumbnailUrl     = s.GetColumnString("thumbnailUrl");
+            updateTimestamp  = s.GetColumnInt("updateTimestamp");
+            uploadTimestamp  = s.GetColumnInt("uploadTimestamp");
         }
 
         void GetRecordsCoro() {
@@ -76,6 +84,9 @@ namespace Models {
             Models::Record[] tmpRecords;
             dictionary tmpRecordsIndex;
             bool tooManyRecords;
+
+            if (records.Length > Settings::maxRecordsPerMap)
+                Database::ClearMapRecords(this);
 
             Globals::ClearMapRecords(this);
 
@@ -192,6 +203,7 @@ namespace Models {
 
         void LoadThumbnailCoro() {
             string timerId = Log::TimerBegin(logName + "loading thumbnail", false);
+            thumbnailLoading = true;
 
             if (Globals::thumbnailTextures.Exists(mapId)) {
                 UI::Texture@ tex;
@@ -213,6 +225,8 @@ namespace Models {
 
             Globals::thumbnailTextures.Set(mapId, @thumbnailTexture);
 
+            thumbnailLoading = false;
+            thumbnailLoaded = true;
             Log::TimerEnd(timerId, false);
         }
 
