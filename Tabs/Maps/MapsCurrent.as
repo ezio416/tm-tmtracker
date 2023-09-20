@@ -19,7 +19,7 @@ namespace Tabs { namespace Maps {
                 Globals::clickedMapId = "";
             }
 
-            if (UI::BeginTabItem(Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText, map.viewing, flags)) {
+            if (UI::BeginTabItem((Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, map.viewing, flags)) {
                 UI::BeginGroup();
                     vec2 thumbSize = vec2(Settings::myMapsCurrentThumbWidth, Settings::myMapsCurrentThumbWidth);
                     try   { UI::Image(map.thumbnailTexture, thumbSize); }
