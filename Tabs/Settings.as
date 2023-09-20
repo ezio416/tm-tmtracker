@@ -49,7 +49,7 @@ namespace Settings {
     [Setting hidden] uint   myMapsCurrentThumbWidth  = uint(Globals::scale * 200);
     [Setting hidden] bool   myMapsListHint           = true;
     [Setting hidden] bool   myMapsListColor          = true;
-    [Setting hidden] uint   myMapsListThumbWidth     = uint(Globals::scale * 120);
+    // [Setting hidden] uint   myMapsListThumbWidth     = uint(Globals::scale * 120);
     [Setting hidden] bool   myMapsSwitchOnClicked    = true;
     [Setting hidden] bool   myMapsTabsColor          = true;
     [Setting hidden] bool   recordsEstimate          = true;
@@ -90,7 +90,7 @@ namespace Settings {
             case Category::MyMapsList:
                 plugin.GetSetting("myMapsListHint").Reset();
                 plugin.GetSetting("myMapsListColor").Reset();
-                plugin.GetSetting("myMapsListThumbWidth").Reset();
+                // plugin.GetSetting("myMapsListThumbWidth").Reset();
                 break;
             case Category::MyMapsTabs:
                 plugin.GetSetting("myMapsTabsColor").Reset();
@@ -137,7 +137,7 @@ namespace Settings {
             Util::HoverTooltip("click to reset section to defaults");
             myMapsListHint = UI::Checkbox("Show help text", myMapsListHint);
             myMapsListColor = UI::Checkbox("Show map names with color", myMapsListColor);
-            myMapsListThumbWidth = UI::SliderInt("Thumbnail size (list)", myMapsListThumbWidth, 10, 1000);
+            // myMapsListThumbWidth = UI::SliderInt("Thumbnail size (list)", myMapsListThumbWidth, 10, 1000);
 
             UI::Separator();
             if (UI::Selectable("\\$2F3" + Icons::Map + " My Map Tabs", false))
