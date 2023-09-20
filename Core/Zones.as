@@ -4,7 +4,6 @@ m 2023-09-19
 */
 
 namespace Zones {
-    string      file = "Assets/zones.json";
     Json::Value zones;
 
     string Get(const string &in zoneId) {
@@ -21,7 +20,7 @@ namespace Zones {
         string timerId = Log::TimerBegin("loading zones.json");
 
         try {
-            zones = Json::FromFile(file);
+            zones = Json::FromFile(Files::zones);
         } catch {
             trace("zones.json not found! ");
             Log::TimerEnd(timerId, false);
