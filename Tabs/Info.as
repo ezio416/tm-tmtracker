@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-09-19
+m 2023-09-20
 */
 
 namespace Tabs {
@@ -8,8 +8,8 @@ namespace Tabs {
         if (!UI::BeginTabItem(Icons::Info + " Info")) return;
 
         UI::TextWrapped(
-            "TMTracker is a project I started back in December of 2022.\nIt has moved from Python " +
-            "\uF061 C# \uF061 Angelscript (this), which will probably be the final version.\nThis is by far my " +
+            "TMTracker is a project I started back in December of 2022.\nIt has moved from Python " + Icons::ArrowRight +
+            " C# " + Icons::ArrowRight + " Angelscript (this), which will probably be the final version.\nThis is by far my " +
             "largest coding project with hundreds of hours put in, so I hope you find it useful! "
         );
 
