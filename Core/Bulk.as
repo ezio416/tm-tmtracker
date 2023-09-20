@@ -101,7 +101,7 @@ namespace Bulk {
         while (nameCoro.IsRunning()) yield();
 
         Globals::recordsTimestampsIndex["all"] = Time::Stamp;
-        Json::ToFile(Globals::mapRecordsTimestampsFile, Globals::recordsTimestampsIndex);
+        Json::ToFile(Files::mapRecordsTimestamps, Globals::recordsTimestampsIndex);
 
         Globals::status.Delete("get-all-records");
         Log::TimerEnd(timerId);
