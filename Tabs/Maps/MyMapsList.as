@@ -71,7 +71,7 @@ namespace Tabs { namespace Maps {
 
         for (uint i = 0; i < Globals::maps.Length; i++) {
             auto map = @Globals::maps[i];
-            if (map.hidden && !Globals::showHidden) continue;
+            if (map.hidden && !Globals::showHidden) continue;  // null pointer for AR 2023-09-21
             if (map.mapNameText.ToLower().Contains(Globals::mapSearch.ToLower()))
                 maps.InsertLast(map);
         }
