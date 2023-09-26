@@ -1,6 +1,6 @@
 /*
 c 2023-07-16
-m 2023-09-20
+m 2023-09-24
 */
 
 namespace Tabs {
@@ -138,7 +138,7 @@ namespace Settings {
             welcomeText          = UI::Checkbox("Show welcome text", welcomeText);
             infoTab              = UI::Checkbox("Show info tab", infoTab);
             autoThumbnails       = UI::Checkbox("Load thumbnails automatically", autoThumbnails);
-            accountNameValidDays = UI::SliderInt("Account name valid time (days)", accountNameValidDays, 0, 60);
+            accountNameValidDays = UI::SliderInt("Account name valid time (days)", accountNameValidDays, 0, 30);
 
             UI::Separator();
             if (UI::Selectable("\\$2F3" + Icons::PlayCircle + " Startup", false))
