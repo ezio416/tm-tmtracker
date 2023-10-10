@@ -41,10 +41,22 @@ namespace Files {
     }
 
     void SaveHiddenMaps() {
+        Log::Write(Log::Level::Debug, "saving hiddenMaps.json...");
+
         try {
-            Json::ToFile(hiddenMaps, Globals::hiddenMapsDict);
+            Json::ToFile(hiddenMaps, Globals::hiddenMapsJson);
         } catch {
-            Log::Write(Log::Level::Errors, "error writing to hiddenMaps.json! " + getExceptionInfo());
+            Log::Write(Log::Level::Errors, "error saving hiddenMaps.json! " + getExceptionInfo());
+        }
+    }
+
+    void SaveRecordsTimestamps() {
+        Log::Write(Log::Level::Debug, "saving mapRecordsTimestamps.json...");
+
+        try {
+            Json::ToFile(Files::mapRecordsTimestamps, Globals::recordsTimestampsJson);
+        } catch {
+            Log::Write(Log::Level::Errors, "error saving mapRecordsTimestamps.json! " + getExceptionInfo());
         }
     }
 }

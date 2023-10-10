@@ -75,10 +75,13 @@ namespace Bulk {
             for (uint i = 0; i < mapList.Length; i++) {
                 Models::Map map = Models::Map(mapList[i]);
                 try {
-                    map.recordsTimestamp = uint(Globals::recordsTimestampsDict.Get(map.mapId));
-                } catch { }  // error means no records gotten yet
+                    map.recordsTimestamp = uint(Globals::recordsTimestampsJson.Get(map.mapId));
+                } catch { }  // error should mean no records gotten yet
                 Globals::AddMap(map);
             }
+
+            if (tooManyMaps)
+                Log::Write(Log::Level::Debug, "tooManyMaps, getting more");
         } while (tooManyMaps);
 
         Log::Write(Log::Level::Debug, "number of maps gotten: " + Globals::maps.Length);
@@ -123,8 +126,8 @@ namespace Bulk {
         while (nameCoro.IsRunning())
             yield();
 
-        Globals::recordsTimestampsDict["all"] = Time::Stamp;
-        Json::ToFile(Files::mapRecordsTimestamps, Globals::recordsTimestampsDict);
+        Globals::recordsTimestampsJson["all"] = Time::Stamp;
+        Files::SaveRecordsTimestamps();
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
@@ -161,6 +164,7 @@ namespace Bulk {
         Locks::requesting = false;
 
         Json::Value@ records = Json::Parse(req.String());
+
         for (uint i = 0; i < records.Length; i++) {
             Models::Record record = Models::Record(records[i], true);
             Globals::myRecords.InsertLast(record);

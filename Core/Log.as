@@ -29,7 +29,7 @@ namespace Log {
         try {
             timers.Delete(timerId);
         } catch {
-            Write(Level::Debug, "delete timerId failed: " + timerId);
+            Write(Level::Debug, "delete timerId (" + timerId + ") failed: " + getExceptionInfo());
         }
     }
 

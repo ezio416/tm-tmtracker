@@ -97,7 +97,7 @@ namespace Models { class Map {
         app.BackToMainMenu();
         while (!app.ManiaTitleControlScriptAPI.IsReady)
             yield();
-        while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null)
+        while (app.Switcher.ModuleStack.Length == 0 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null)
             yield();
         yield();
         app.ManiaTitleControlScriptAPI.EditMap(downloadUrl, "", "");
@@ -111,8 +111,13 @@ namespace Models { class Map {
     }
 
     void GetRecordsCoro() {
-        if (hidden || Locks::singleRecords)
+        if (Locks::singleRecords)
             return;
+
+        if (hidden) {
+            Log::Write(Log::Level::Debug, logName + "map hidden, records skipped");
+            return;
+        }
 
         Locks::singleRecords = true;
         string timerId = Log::TimerBegin(logName + "getting records");
@@ -124,7 +129,7 @@ namespace Models { class Map {
         string[] accountIds;
         uint offset = 0;
         Record[] tmpRecords;
-        dictionary tmpRecordsIndex;
+        dictionary tmpRecordsDict;
         bool tooManyRecords;
 
         if (records.Length > Settings::maxRecordsPerMap)
@@ -169,7 +174,7 @@ namespace Models { class Map {
                 Globals::AddAccount(Account(record));
                 accountIds.InsertLast(record.accountId);
                 tmpRecords.InsertLast(record);
-                tmpRecordsIndex.Set(record.accountId, @tmpRecords[tmpRecords.Length - 1]);
+                tmpRecordsDict.Set(record.accountId, @tmpRecords[tmpRecords.Length - 1]);
             }
 
         } while (
@@ -200,9 +205,10 @@ namespace Models { class Map {
             Locks::requesting = false;
 
             Json::Value@ coreRecords = Json::Parse(req.String());
+
             for (uint i = 0; i < coreRecords.Length; i++) {
                 Json::Value@ coreRecord = @coreRecords[i];
-                Record@ tmpRecord = cast<Record@>(tmpRecordsIndex[coreRecord["accountId"]]);
+                Record@ tmpRecord = cast<Record@>(tmpRecordsDict[coreRecord["accountId"]]);
 
                 tmpRecord.recordId = coreRecord["mapRecordId"];
                 tmpRecord.timestampIso = coreRecord["timestamp"];
@@ -214,8 +220,8 @@ namespace Models { class Map {
         }
 
         recordsTimestamp = Time::Stamp;
-        Globals::recordsTimestampsDict[mapId] = recordsTimestamp;
-        Json::ToFile(Files::mapRecordsTimestamps, Globals::recordsTimestampsDict);
+        Globals::recordsTimestampsJson[mapId] = recordsTimestamp;
+        Files::SaveRecordsTimestamps();
 
         Meta::PluginCoroutine@ namesCoro = startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
         while (namesCoro.IsRunning())
@@ -232,9 +238,9 @@ namespace Models { class Map {
         if (IO::FileExists(thumbnailFile))
             return;
 
-        string timerId = Log::TimerBegin(logName + "downloading thumbnail");
+        string timerId = Log::TimerBegin(logName + "getting thumbnail");
         string statusId = "get-thumb" + mapUid;
-        Globals::status.Set(statusId, "Getting thumbnail for " + mapNameText);
+        Globals::status.Set(statusId, "getting thumbnail for " + mapNameText);
 
         uint maxTimeout = 3000;
         uint maxWait = 2000;
@@ -253,7 +259,7 @@ namespace Models { class Map {
             }
 
             if (timedOut) {
-                Log::Write(Log::Level::Normal, logName + "timed out, waiting " + maxWait + " ms");
+                Log::Write(Log::Level::Normal, logName + "getting thumbnail timed out, waiting " + maxWait + " ms");
                 uint64 nowWait = Time::Now;
                 while (Time::Now - nowWait < maxWait)
                     yield();
@@ -304,7 +310,7 @@ namespace Models { class Map {
         app.BackToMainMenu();
         while (!app.ManiaTitleControlScriptAPI.IsReady)
             yield();
-        while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null)
+        while (app.Switcher.ModuleStack.Length == 0 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null)
             yield();
         yield();
         app.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
@@ -338,7 +344,7 @@ namespace Models { class Map {
         while (!req.Finished()) {
             if (Time::Now - nowTimeout > maxTimeout && !timedOut) {
                 timedOut = true;
-                Util::NotifyError("TMX took longer than " + maxTimeout + "ms to respond, site is likely down");
+                Util::NotifyError("TMX took longer than " + maxTimeout + " ms to respond, site is likely down", 15000);
             }
             yield();
         }

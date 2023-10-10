@@ -74,7 +74,7 @@ namespace Database {
         while (Locks::db)
             yield();
         Locks::db = true;
-        string timerId = Log::TimerBegin("clearing database records for " + map.mapNameText);
+        string timerId = Log::TimerBegin(map.logName + "clearing database records...");
 
         SQLite::Database@ db = SQLite::Database(Files::db);
         try {
@@ -122,6 +122,7 @@ namespace Database {
         SQLite::Statement@ s;
 
         Globals::ClearMaps();
+
         try {
             @s = db.Prepare("SELECT * FROM Maps");
         } catch {
@@ -130,6 +131,7 @@ namespace Database {
             Locks::db = false;
             return;
         }
+
         uint i = 0;
         while (s.NextRow()) {
             i++;
@@ -153,6 +155,7 @@ namespace Database {
         SQLite::Statement@ s;
 
         Globals::ClearAccounts();
+
         try {
             @s = db.Prepare("SELECT * FROM Accounts");
         } catch {
@@ -161,6 +164,7 @@ namespace Database {
             Locks::db = false;
             return;
         }
+
         uint i = 0;
         while (s.NextRow()) {
             i++;
@@ -183,6 +187,7 @@ namespace Database {
         SQLite::Statement@ s;
 
         Globals::ClearRecords();
+
         try {
             @s = db.Prepare("SELECT * FROM Records");
         } catch {
@@ -191,6 +196,7 @@ namespace Database {
             Locks::db = false;
             return;
         }
+
         uint i = 0;
         while (s.NextRow()) {
             i++;

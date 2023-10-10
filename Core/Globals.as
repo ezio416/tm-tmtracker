@@ -19,7 +19,7 @@ namespace Globals {
     string            dateFormat             = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
     bool              debugTab               = false;
     bool              getAccountNames        = true;
-    Json::Value@      hiddenMapsDict         = Json::Object();
+    Json::Value@      hiddenMapsJson         = Json::Object();
     uint64            latestNandoRequest     = 0;
     Models::Map[]     maps;
     dictionary        mapsDict;
@@ -31,7 +31,7 @@ namespace Globals {
     Models::Record[]  records;
     dictionary        recordsDict;
     Models::Record@[] recordsSorted;
-    Json::Value@      recordsTimestampsDict  = Json::Object();
+    Json::Value@      recordsTimestampsJson  = Json::Object();
     float             scale                  = UI::GetScale();
     bool              showHidden             = false;
     uint              shownMaps              = 0;
@@ -49,6 +49,8 @@ namespace Globals {
     }
 
     void ClearAccounts() {
+        Log::Write(Log::Level::Debug, "clearing accounts...");
+
         accounts.RemoveRange(0, accounts.Length);
         accountsDict.DeleteAll();
     }
@@ -57,7 +59,7 @@ namespace Globals {
         if (mapsDict.Exists(map.mapId))
             return;
 
-        if (hiddenMapsDict.HasKey(map.mapId))
+        if (hiddenMapsJson.HasKey(map.mapId))
             map.hidden = true;
         else
             shownMaps++;
@@ -70,37 +72,47 @@ namespace Globals {
         if (currentMapsDict.Exists(map.mapId))
             return;
 
+        Log::Write(Log::Level::Debug, map.logName + "adding to current...");
+
         currentMaps.InsertLast(map);
         currentMapsDict.Set(map.mapId, map);
         clickedMapId = map.mapId;
     }
 
     void ClearCurrentMaps() {
+        Log::Write(Log::Level::Debug, "clearing current maps...");
+
         currentMaps.RemoveRange(0, currentMaps.Length);
         currentMapsDict.DeleteAll();
     }
 
     void HideMap(Models::Map@ map) {
-        if (hiddenMapsDict.HasKey(map.mapId))
+        if (hiddenMapsJson.HasKey(map.mapId))
             return;
 
-        hiddenMapsDict[map.mapId] = 0;
+        Log::Write(Log::Level::Debug, map.logName + "hiding...");
+
+        hiddenMapsJson[map.mapId] = 0;
         map.hidden = true;
         Globals::shownMaps--;
         Files::SaveHiddenMaps();
     }
 
     void ShowMap(Models::Map@ map) {
-        if (!hiddenMapsDict.HasKey(map.mapId))
+        if (!hiddenMapsJson.HasKey(map.mapId))
             return;
 
-        hiddenMapsDict.Remove(map.mapId);
+        Log::Write(Log::Level::Debug, map.logName + "showing...");
+
+        hiddenMapsJson.Remove(map.mapId);
         map.hidden = false;
         Globals::shownMaps++;
         Files::SaveHiddenMaps();
     }
 
     void ClearMaps() {
+        Log::Write(Log::Level::Debug, "clearing maps...");
+
         maps.RemoveRange(0, maps.Length);
         mapsDict.DeleteAll();
         ClearCurrentMaps();
@@ -170,11 +182,11 @@ namespace Globals {
         for (int i = records.Length - 1; i >= 0; i--)
             if (records[i].mapId == map.mapId)
                 records.RemoveAt(i);
-
-        Log::Write(Log::Level::Debug, map.logName + "cleared records");
     }
 
     void ClearRecords() {
+        Log::Write(Log::Level::Debug, "clearing records...");
+
         records.RemoveRange(0, records.Length);
         recordsDict.DeleteAll();
     }
