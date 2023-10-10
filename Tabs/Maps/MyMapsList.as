@@ -63,7 +63,7 @@ namespace Tabs { namespace Maps {
             Models::Map@ map = @Globals::maps[i];
             if (map is null) continue;
 
-            if (map.hidden && !Globals::showHidden) continue;  // null pointer for AR 2023-09-21
+            if (map.hidden && !Globals::showHidden) continue;
             if (map.mapNameText.ToLower().Contains(Globals::mapSearch.ToLower()))
                 maps.InsertLast(map);
         }
