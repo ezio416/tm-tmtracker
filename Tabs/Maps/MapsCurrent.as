@@ -30,7 +30,7 @@ namespace Tabs { namespace Maps {
 
                     if (Settings::myMapTabsLoadThumbs) {
                         startnew(CoroutineFunc(map.LoadThumbnailCoro));
-                    } else if (map.thumbnailTexture is null && !Locks::thumbs && !map.thumbnailLoading) {
+                    } else if (!Locks::thumbs && map.thumbnailTexture is null && !map.thumbnailLoading) {
                         if (UI::Button(Icons::PictureO + " Load Thumbnail"))
                             startnew(CoroutineFunc(map.LoadThumbnailCoro));
                     }
@@ -112,10 +112,10 @@ namespace Tabs { namespace Maps {
                                 string timeColor = "";
                                 if (Settings::mapRecordsMedalColors)
                                     switch (record.medals) {
-                                        case 1: timeColor = "\\$C80"; break;
-                                        case 2: timeColor = "\\$AAA"; break;
-                                        case 3: timeColor = "\\$DD1"; break;
-                                        case 4: timeColor = "\\$4B0"; break;
+                                        case 1: timeColor = Globals::colorBronze; break;
+                                        case 2: timeColor = Globals::colorSilver; break;
+                                        case 3: timeColor = Globals::colorGold;   break;
+                                        case 4: timeColor = Globals::colorAuthor; break;
                                     }
                                 UI::Text(timeColor + Time::Format(record.time));
 
@@ -131,9 +131,11 @@ namespace Tabs { namespace Maps {
                                 UI::Text(Util::FormatSeconds(now - record.timestampUnix));
                             }
                         }
+
                         UI::PopStyleColor();
                         UI::EndTable();
                     }
+
                 UI::EndGroup();
 
                 UI::EndTabItem();

@@ -26,6 +26,7 @@ namespace Util {
     void HoverTooltip(const string &in msg) {
         if (!UI::IsItemHovered())
             return;
+
         UI::BeginTooltip();
             UI::Text(msg);
         UI::EndTooltip();
@@ -57,8 +58,8 @@ namespace Util {
         Globals::latestNandoRequest = Time::Now;
     }
 
-    void NotifyError(const string &in msg) {
-        UI::ShowNotification("TMTracker", msg, UI::HSV(0.02, 0.8, 0.9));
+    void NotifyError(const string &in msg, int time = 5000) {
+        UI::ShowNotification("TMTracker", msg, UI::HSV(0.02, 0.8, 0.9), time);
         Log::Write(Log::Level::Errors, msg);
     }
 
@@ -67,10 +68,12 @@ namespace Util {
     }
 
     void TmioMap(const string &in mapUid) {
+        Log::Write(Log::Level::Debug, "opening Trackmania.io for map " + mapUid);
         OpenBrowserURL("https://trackmania.io/#/leaderboard/" + mapUid);
     }
 
     void TmioPlayer(const string &in accountId) {
+        Log::Write(Log::Level::Debug, "opening Trackmania.io for player " + accountId);
         OpenBrowserURL("https://trackmania.io/#/player/" + accountId);
     }
 

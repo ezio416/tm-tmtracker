@@ -42,7 +42,9 @@ namespace Models { class Account {
             return;
         }
 
-        if (now == 0) now = Time::Stamp;
+        if (now == 0)
+            now = Time::Stamp;
+
         nameExpire = Settings::accountNameValidDays * 86400 + now;
     }
 }}

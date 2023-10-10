@@ -25,7 +25,7 @@ void Main() {
         string timerId = Log::TimerBegin("loading hiddenMaps.json");
         if (IO::FileExists(Files::hiddenMaps)) {
             try {
-                Globals::hiddenMapsDict = Json::FromFile(Files::hiddenMaps);
+                Globals::hiddenMapsJson = Json::FromFile(Files::hiddenMaps);
             } catch {
                 Log::Write(Log::Level::Errors, "error loading hiddenMaps.json! " + getExceptionInfo());
             }
@@ -37,7 +37,7 @@ void Main() {
         timerId = Log::TimerBegin("loading mapRecordsTimestamps.json");
         if (IO::FileExists(Files::mapRecordsTimestamps)) {
             try {
-                Globals::recordsTimestampsDict = Json::FromFile(Files::mapRecordsTimestamps);
+                Globals::recordsTimestampsJson = Json::FromFile(Files::mapRecordsTimestamps);
             } catch {
                 Log::Write(Log::Level::Errors, "error loading mapRecordsTimestamps.json! " + getExceptionInfo());
             }
@@ -94,7 +94,7 @@ void RenderInterface() {
                 Tabs::Tab_Info();
             if (Globals::debugTab)
                 Tabs::Tab_Debug();
-            Tabs::Tab_Test();
+            // Tabs::Tab_Test();
         UI::EndTabBar();
     UI::End();
 }

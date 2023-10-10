@@ -14,7 +14,7 @@ namespace Tabs { namespace Maps {
             UI::TextWrapped(
                 "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
                 "\nClick on a map name to open a tab for that map." +
-                "\nClose map tabs with a middle click or the \uE997" +
+                "\nClose map tabs with a middle click or the " + Icons::Kenney::ButtonTimes +
                 "\nYou cannot get records for hidden maps."
             );
         }
@@ -25,7 +25,7 @@ namespace Tabs { namespace Maps {
         UI::EndDisabled();
 
         UI::SameLine();
-        int hiddenMapCount = Globals::hiddenMapsDict.GetKeys().Length;
+        int hiddenMapCount = Globals::hiddenMapsJson.GetKeys().Length;
         if (Globals::showHidden) {
             if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + hiddenMapCount + ")"))
                 Globals::showHidden = false;

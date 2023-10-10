@@ -33,7 +33,7 @@ namespace Tabs { namespace Records {
         if (!Locks::allRecords) {
             uint timestamp;
             try {
-                timestamp = uint(Globals::recordsTimestampsDict.Get("all"));
+                timestamp = uint(Globals::recordsTimestampsJson.Get("all"));
             } catch {
                 timestamp = 0;
             }
