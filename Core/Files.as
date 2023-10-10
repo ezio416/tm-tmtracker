@@ -1,6 +1,6 @@
 /*
 c 2023-09-19
-m 2023-09-20
+m 2023-10-09
 */
 
 namespace Files {
@@ -13,10 +13,38 @@ namespace Files {
     string zones                = "Assets/zones.json";
 
     void Delete() {
-        warn("deleting TMTracker files for safety...");
-        try { IO::Delete(db);                   } catch { }
-        try { IO::Delete(hiddenMaps);           } catch { }
-        try { IO::Delete(mapRecordsTimestamps); } catch { }
-        try { IO::Delete(version);              } catch { }
+        Log::Write(Log::Level::Warnings, "deleting TMTracker files for safety...");
+
+        try {
+            IO::Delete(db);
+        } catch {
+            Log::Write(Log::Level::Debug, "failed to delete database file - " + getExceptionInfo());
+        }
+
+        try {
+            IO::Delete(hiddenMaps);
+        } catch {
+            Log::Write(Log::Level::Debug, "failed to delete hidden maps file - " + getExceptionInfo());
+        }
+
+        try {
+            IO::Delete(mapRecordsTimestamps);
+        } catch {
+            Log::Write(Log::Level::Debug, "failed to delete record timestamp file - " + getExceptionInfo());
+        }
+
+        try {
+            IO::Delete(version);
+        } catch {
+            Log::Write(Log::Level::Debug, "failed to delete version file - " + getExceptionInfo());
+        }
+    }
+
+    void SaveHiddenMaps() {
+        try {
+            Json::ToFile(hiddenMaps, Globals::hiddenMapsDict);
+        } catch {
+            Log::Write(Log::Level::Errors, "error writing to hiddenMaps.json! " + getExceptionInfo());
+        }
     }
 }

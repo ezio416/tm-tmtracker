@@ -1,11 +1,12 @@
 /*
 c 2023-05-26
-m 2023-09-20
+m 2023-10-09
 */
 
 namespace Tabs {
     void Tab_Info() {
-        if (!UI::BeginTabItem(Icons::Info + " Info")) return;
+        if (!UI::BeginTabItem(Icons::Info + " Info"))
+            return;
 
         UI::TextWrapped(
             "TMTracker is a project I started back in December of 2022.\nIt has moved from Python " + Icons::ArrowRight +
@@ -21,7 +22,8 @@ namespace Tabs {
         );
         UI::SameLine();
         string linkGH = "https://github.com/ezio416/tm-tmtracker/issues";
-        if (UI::Button(Icons::Github + " Issues")) OpenBrowserURL(linkGH);
+        if (UI::Button(Icons::Github + " Issues"))
+            OpenBrowserURL(linkGH);
 
         UI::Separator();
 
@@ -30,31 +32,14 @@ namespace Tabs {
         UI::SameLine();
         if (UI::Selectable("\\$1F1" + Files::storageFolder, false))
             IO::SetClipboard(Files::storageFolder);
-        if (UI::IsItemHovered()) {
-            UI::BeginTooltip();
-                UI::Text("click to copy");
-            UI::EndTooltip();
-        }
+        Util::HoverTooltip("click to copy");
 
         UI::TextWrapped("If you want to look in the database, I recommend DB Browser:");
 
         UI::SameLine();
         string linkSQL = "sqlitebrowser.org";
-        if (UI::Button(Icons::Database + " " + linkSQL)) OpenBrowserURL("https://" + linkSQL);
-
-#if SIG_DEVELOPER
-        UI::Separator();
-
-        if (Globals::debug) {
-            Button_LockDebug();
-        } else {
-            if (UI::Button(Icons::Unlock + " Unlock Debug Tab")) {
-                trace("debug tab unlocked");
-                Settings::debugHidden = false;
-                Globals::debug = true;
-            }
-        }
-#endif
+        if (UI::Button(Icons::Database + " " + linkSQL))
+            OpenBrowserURL("https://" + linkSQL);
 
         UI::EndTabItem();
     }

@@ -1,15 +1,12 @@
 /*
 c 2023-09-19
-m 2023-09-20
+m 2023-10-09
 */
 
 namespace Version {
     int3 version;
 
     bool CheckFile() {
-        // TO CHANGE WHEN TMTRACKER IS UPDATED
-        // only if files are considered incompatible with new versions
-
         string timerId = Log::TimerBegin("checking version.json");
 
         int3 fileVersion = GetFile();
@@ -18,7 +15,7 @@ namespace Version {
             fileVersion.y < 1 ||
             fileVersion.z < 0
         ) {
-            warn("old version detected");
+            Log::Write(Log::Level::Warnings, "old version detected: " + tostring(fileVersion));
             Files::Delete();
             Log::TimerEnd(timerId);
             return false;
@@ -30,6 +27,9 @@ namespace Version {
     }
 
     int3 FromToml() {
+        if (version.x > 0)
+            return version;
+
         string[]@ parts = Meta::ExecutingPlugin().Version.Split(".");
         version = int3(Text::ParseInt(parts[0]), Text::ParseInt(parts[1]), Text::ParseInt(parts[2]));
         return version;
@@ -43,12 +43,12 @@ namespace Version {
                 Json::Value@ read = Json::FromFile(Files::version);
                 return int3(int(read["major"]), int(read["minor"]), int(read["patch"]));
             } catch {
-                warn("error reading version.json!");
+                Log::Write(Log::Level::Errors, "error reading version.json! " + getExceptionInfo());
                 Files::Delete();
                 return version;
             }
         } else {
-            warn("version.json not found!");
+            Log::Write(Log::Level::Warnings, "file not found: version.json");
             Files::Delete();
             return version;
         }
@@ -63,7 +63,13 @@ namespace Version {
         write["major"] = version.x;
         write["minor"] = version.y;
         write["patch"] = version.z;
-        Json::ToFile(Files::version, write);
+        try {
+            Json::ToFile(Files::version, write);
+        } catch {
+            Log::Write(Log::Level::Errors, "error setting version.json! " + getExceptionInfo());
+            Log::TimerDelete(timerId);
+            return;
+        }
 
         Log::TimerEnd(timerId);
     }

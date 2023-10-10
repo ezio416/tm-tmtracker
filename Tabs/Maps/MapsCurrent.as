@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-09-20
+m 2023-10-09
 */
 
 namespace Tabs { namespace Maps {
@@ -8,33 +8,38 @@ namespace Tabs { namespace Maps {
         int64 now = Time::Stamp;
 
         for (uint i = 0; i < Globals::currentMaps.Length; i++) {
-            auto map = @Globals::currentMaps[i];
+            Models::Map@ map = @Globals::currentMaps[i];
 
             int flags = UI::TabItemFlags::Trailing;
             if (
                 Globals::clickedMapId == map.mapId &&
-                Settings::myMapsSwitchOnClicked
+                Settings::myMapTabsSwitchOnClicked
             ) {
                 flags |= UI::TabItemFlags::SetSelected;
                 Globals::clickedMapId = "";
             }
 
-            if (UI::BeginTabItem((Settings::myMapsTabsColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, map.viewing, flags)) {
+            if (UI::BeginTabItem((Settings::myMapTabsColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, map.viewing, flags)) {
                 UI::BeginGroup();
-                    vec2 thumbSize = vec2(Settings::myMapsCurrentThumbWidth, Settings::myMapsCurrentThumbWidth);
-                    try   { UI::Image(map.thumbnailTexture, thumbSize); }
-                    catch { UI::Dummy(thumbSize); }
+                    vec2 thumbSize = vec2(Settings::myMapTabsThumbWidth, Settings::myMapTabsThumbWidth);
+                    try {
+                        UI::Image(map.thumbnailTexture, thumbSize);
+                    } catch {
+                        UI::Dummy(thumbSize);
+                    }
 
-                    UI::BeginDisabled(Locks::thumbs || map.thumbnailLoaded || map.thumbnailLoading);
-                    if (UI::Button(Icons::PictureO + " Load Thumbnail"))
+                    if (Settings::myMapTabsLoadThumbs) {
                         startnew(CoroutineFunc(map.LoadThumbnailCoro));
-                    UI::EndDisabled();
+                    } else if (map.thumbnailTexture is null && !Locks::thumbs && !map.thumbnailLoading) {
+                        if (UI::Button(Icons::PictureO + " Load Thumbnail"))
+                            startnew(CoroutineFunc(map.LoadThumbnailCoro));
+                    }
 
                     UI::Text(map.mapNameText);
-                    UI::Text("\\$4B0" + Icons::Circle + " " + Time::Format(map.authorTime));
-                    UI::Text("\\$DD1" + Icons::Circle + " " + Time::Format(map.goldTime));
-                    UI::Text("\\$AAA" + Icons::Circle + " " + Time::Format(map.silverTime));
-                    UI::Text("\\$C80" + Icons::Circle + " " + Time::Format(map.bronzeTime));
+                    UI::Text(Globals::colorAuthor + Icons::Circle + " " + Time::Format(map.authorTime));
+                    UI::Text(Globals::colorGold   + Icons::Circle + " " + Time::Format(map.goldTime));
+                    UI::Text(Globals::colorSilver + Icons::Circle + " " + Time::Format(map.silverTime));
+                    UI::Text(Globals::colorBronze + Icons::Circle + " " + Time::Format(map.bronzeTime));
                 UI::EndGroup();
 
                 UI::SameLine();
@@ -42,6 +47,12 @@ namespace Tabs { namespace Maps {
                     UI::BeginDisabled(Locks::playMap);
                     if (UI::Button(Icons::Play + " Play"))
                         startnew(CoroutineFunc(map.PlayCoro));
+                    UI::EndDisabled();
+
+                    UI::SameLine();
+                    UI::BeginDisabled(Locks::editMap);
+                    if (UI::Button(Icons::Pencil + " Edit"))
+                        startnew(CoroutineFunc(map.EditCoro));
                     UI::EndDisabled();
 
                     UI::SameLine();
@@ -55,7 +66,7 @@ namespace Tabs { namespace Maps {
 
                     UI::SameLine();
                     if (UI::Button(Icons::Heartbeat + " Trackmania.io"))
-                        OpenBrowserURL("https://trackmania.io/#/leaderboard/" + map.mapUid);
+                        Util::TmioMap(map.mapUid);
 
                     UI::BeginDisabled(Locks::tmx);
                     UI::SameLine();
@@ -71,7 +82,7 @@ namespace Tabs { namespace Maps {
                     UI::SameLine();
                     UI::Text("Last Updated: " + (
                         map.recordsTimestamp > 0 ?
-                            Time::FormatString(Settings::dateFormat + "Local\\$G", map.recordsTimestamp) +
+                            Time::FormatString(Globals::dateFormat + "Local\\$G", map.recordsTimestamp) +
                                 " (" + Util::FormatSeconds(now - map.recordsTimestamp) + " ago)" :
                             "never"
                     ));
@@ -90,8 +101,8 @@ namespace Tabs { namespace Maps {
                         UI::ListClipper clipper(map.records.Length);
                         while (clipper.Step()) {
                             for (int j = clipper.DisplayStart; j < clipper.DisplayEnd; j++) {
-                                auto record = @map.records[j];
-                                auto account = cast<Models::Account@>(Globals::accountsIndex[record.accountId]);
+                                Models::Record@ record = @map.records[j];
+                                Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.accountId]);
 
                                 UI::TableNextRow();
                                 UI::TableNextColumn();
@@ -110,7 +121,7 @@ namespace Tabs { namespace Maps {
 
                                 UI::TableNextColumn();
                                 if (UI::Selectable((account.accountName != "") ? account.accountName : account.accountId, false))
-                                    Util::Tmio(account.accountId);
+                                    Util::TmioPlayer(account.accountId);
                                 Util::HoverTooltip("Trackmania.io profile");
 
                                 UI::TableNextColumn();
@@ -130,7 +141,7 @@ namespace Tabs { namespace Maps {
 
             if (!map.viewing) {
                 Globals::currentMaps.RemoveAt(i);
-                Globals::currentMapsIndex.Delete(map.mapId);
+                Globals::currentMapsDict.Delete(map.mapId);
             }
         }
     }

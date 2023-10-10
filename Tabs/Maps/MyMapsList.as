@@ -1,11 +1,12 @@
 /*
 c 2023-05-26
-m 2023-09-20
+m 2023-10-09
 */
 
 namespace Tabs { namespace Maps {
     void Tab_MyMapsList() {
-        if (!UI::BeginTabItem(Icons::MapO + " My Maps")) return;
+        if (!UI::BeginTabItem(Icons::MapO + " My Maps"))
+            return;
 
         Globals::clickedMapId = "";
 
@@ -24,7 +25,7 @@ namespace Tabs { namespace Maps {
         UI::EndDisabled();
 
         UI::SameLine();
-        int hiddenMapCount = Globals::hiddenMapsIndex.GetKeys().Length;
+        int hiddenMapCount = Globals::hiddenMapsDict.GetKeys().Length;
         if (Globals::showHidden) {
             if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + hiddenMapCount + ")"))
                 Globals::showHidden = false;
@@ -39,17 +40,6 @@ namespace Tabs { namespace Maps {
         UI::SameLine();
         if (UI::Button(Icons::Times + " Clear Current (" + Globals::currentMaps.Length + ")"))
             Globals::ClearCurrentMaps();
-        UI::EndDisabled();
-
-        UI::BeginDisabled(Locks::thumbs || Globals::maps.Length == 0);
-        if (UI::Button(Icons::PictureO + " Load Thumbnails"))
-            startnew(CoroutineFunc(Bulk::LoadMyMapsThumbnailsCoro));
-        UI::EndDisabled();
-
-        UI::SameLine();
-        UI::BeginDisabled(!Locks::thumbs);
-        if (UI::Button(Icons::Times + " Cancel Thumbnails"))
-            Globals::cancelThumbnails = true;
         UI::EndDisabled();
 
         Globals::mapSearch = UI::InputText("search", Globals::mapSearch, false);
@@ -70,7 +60,9 @@ namespace Tabs { namespace Maps {
         Models::Map@[] maps;
 
         for (uint i = 0; i < Globals::maps.Length; i++) {
-            auto map = @Globals::maps[i];
+            Models::Map@ map = @Globals::maps[i];
+            if (map is null) continue;
+
             if (map.hidden && !Globals::showHidden) continue;  // null pointer for AR 2023-09-21
             if (map.mapNameText.ToLower().Contains(Globals::mapSearch.ToLower()))
                 maps.InsertLast(map);
@@ -102,16 +94,10 @@ namespace Tabs { namespace Maps {
             UI::ListClipper clipper(maps.Length);
             while (clipper.Step()) {
                 for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                    auto map = maps[i];
+                    Models::Map@ map = maps[i];
 
                     UI::TableNextRow();
                     UI::TableNextColumn();
-                    if (Settings::myMapsListThumbnails) {
-                        vec2 size = vec2(Settings::myMapsListThumbWidth, Settings::myMapsListThumbWidth);
-                        try   { UI::Image(map.thumbnailTexture, size); }
-                        catch { UI::Dummy(size); }
-                        UI::SameLine();
-                    }
                     if (UI::Selectable((Settings::myMapsListColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false, UI::SelectableFlags::SpanAllColumns))
                         Globals::AddCurrentMap(map);
 

@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-09-20
+m 2023-10-09
 */
 
 namespace Util {
@@ -24,7 +24,8 @@ namespace Util {
     }
 
     void HoverTooltip(const string &in msg) {
-        if (!UI::IsItemHovered()) return;
+        if (!UI::IsItemHovered())
+            return;
         UI::BeginTooltip();
             UI::Text(msg);
         UI::EndTooltip();
@@ -40,15 +41,36 @@ namespace Util {
         return s.GetColumnInt64("x");
     }
 
-    void NotifyWarn(const string &in msg) {
+    void NandoRequestWaitCoro() {
+        if (Globals::latestNandoRequest == 0) {
+            Globals::latestNandoRequest = Time::Now;
+            return;
+        }
+
+        while (Locks::requesting)
+            yield();
+        Locks::requesting = true;
+
+        while (Time::Now - Globals::latestNandoRequest < Settings::nandoRequestWait)
+            yield();
+
+        Globals::latestNandoRequest = Time::Now;
+    }
+
+    void NotifyError(const string &in msg) {
         UI::ShowNotification("TMTracker", msg, UI::HSV(0.02, 0.8, 0.9));
+        Log::Write(Log::Level::Errors, msg);
     }
 
     string StrWrap(const string &in input, const string &in wrapper = "'") {
         return wrapper + input + wrapper;
     }
 
-    void Tmio(const string &in accountId) {
+    void TmioMap(const string &in mapUid) {
+        OpenBrowserURL("https://trackmania.io/#/leaderboard/" + mapUid);
+    }
+
+    void TmioPlayer(const string &in accountId) {
         OpenBrowserURL("https://trackmania.io/#/player/" + accountId);
     }
 
@@ -56,23 +78,9 @@ namespace Util {
         return Time::FormatString(format, timestamp);
     }
 
-    void WaitToDoNadeoRequestCoro() {
-        if (Globals::latestNadeoRequest == 0) {
-            Globals::latestNadeoRequest = Time::Now;
-            return;
-        }
-
-        while (Locks::requesting) yield();
-        Locks::requesting = true;
-
-        while (Time::Now - Globals::latestNadeoRequest < Settings::timeBetweenNadeoRequests)
-            yield();
-
-        Globals::latestNadeoRequest = Time::Now;
-    }
-
     string Zpad2(int num) {
-        if (num > 9) return "" + num;
+        if (num > 9)
+            return "" + num;
         return "0" + num;
     }
 }

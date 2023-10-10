@@ -1,14 +1,17 @@
 /*
 c 2023-05-16
-m 2023-09-19
+m 2023-10-09
 */
 
 namespace Zones {
     Json::Value zones;
 
     string Get(const string &in zoneId) {
-        try   { return string(zones.Get(zoneId)); }
-        catch { return "unknown-zone"; }
+        try {
+            return string(zones.Get(zoneId));
+        } catch {
+            return "unknown-zone";
+        }
     }
 
     void Load() {
@@ -22,8 +25,8 @@ namespace Zones {
         try {
             zones = Json::FromFile(Files::zones);
         } catch {
-            trace("zones.json not found! ");
-            Log::TimerEnd(timerId, false);
+            Log::Write(Log::Level::Warnings, "zones.json not found!");
+            Log::TimerDelete(timerId);
             return;
         }
 

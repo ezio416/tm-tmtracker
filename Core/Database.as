@@ -1,11 +1,11 @@
 /*
 c 2023-07-14
-m 2023-09-20
+m 2023-10-09
 */
 
 namespace Database {
-    uint maxSqlValues = 1000;
     uint sqlLoadBatch = 100;
+    uint sqlMaxValues = 1000;
 
     string accountColumns = """ (
         accountId   CHAR(36) PRIMARY KEY,
@@ -41,48 +41,83 @@ namespace Database {
         timestampUnix INT
     ); """;
 
-    void Clear() {
+    void ClearCoro() {
+        while (Locks::db)
+            yield();
+        Locks::db = true;
         string timerId = Log::TimerBegin("clearing database");
 
         SQLite::Database@ db = SQLite::Database(Files::db);
-        try { db.Execute("DELETE FROM Accounts"); } catch { }
-        try { db.Execute("DELETE FROM Maps");     } catch { }
-        try { db.Execute("DELETE FROM Records");  } catch { }
+        try {
+            db.Execute("DELETE FROM Accounts");
+        } catch {
+            Log::Write(Log::Level::Debug, "no Accounts table in database");
+        }
+
+        try {
+            db.Execute("DELETE FROM Maps");
+        } catch {
+            Log::Write(Log::Level::Debug, "no Maps table in database");
+        }
+
+        try {
+            db.Execute("DELETE FROM Records");
+        } catch {
+            Log::Write(Log::Level::Debug, "no Records table in database");
+        }
 
         Log::TimerEnd(timerId);
+        Locks::db = false;
     }
 
     void ClearMapRecords(Models::Map@ map) {
+        while (Locks::db)
+            yield();
+        Locks::db = true;
         string timerId = Log::TimerBegin("clearing database records for " + map.mapNameText);
 
         SQLite::Database@ db = SQLite::Database(Files::db);
-        try { db.Execute("DELETE FROM Records WHERE mapId = " + Util::StrWrap(map.mapId)); } catch { warn("couldn't clear records " + getExceptionInfo()); }
+        try {
+            db.Execute("DELETE FROM Records WHERE mapId = " + Util::StrWrap(map.mapId));
+        } catch {
+            Log::Write(Log::Level::Warnings, map.logName + "couldn't clear records: " + getExceptionInfo());
+        }
 
         Log::TimerEnd(timerId);
+        Locks::db = false;
     }
 
     void LoadCoro() {
-        while (Locks::myMaps) yield();
+        while (Locks::myMaps)
+            yield();
         Locks::myMaps = true;
-
         string timerId = Log::TimerBegin("loading database");
-        Globals::status.Set("db-load", "loading database...");
+        string statusId = "db-load";
+        Globals::status.Set(statusId, "loading database...");
 
-        auto mapsCoro = startnew(CoroutineFunc(LoadMapsCoro));
-        while (mapsCoro.IsRunning()) yield();
+        Meta::PluginCoroutine@ mapsCoro = startnew(CoroutineFunc(LoadMapsCoro));
+        while (mapsCoro.IsRunning())
+            yield();
 
-        auto accountsCoro = startnew(CoroutineFunc(LoadAccountsCoro));
-        while (accountsCoro.IsRunning()) yield();
+        Meta::PluginCoroutine@ accountsCoro = startnew(CoroutineFunc(LoadAccountsCoro));
+        while (accountsCoro.IsRunning())
+            yield();
 
-        auto recordsCoro = startnew(CoroutineFunc(LoadRecordsCoro));
-        while (recordsCoro.IsRunning()) yield();
+        Meta::PluginCoroutine@ recordsCoro = startnew(CoroutineFunc(LoadRecordsCoro));
+        while (recordsCoro.IsRunning())
+            yield();
 
-        Globals::status.Delete("db-load");
+        Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
         Locks::myMaps = false;
     }
 
     void LoadMapsCoro() {
+        while (Locks::db)
+            yield();
+        Locks::db = true;
+        string timerId = Log::TimerBegin("loading maps from database");
+
         SQLite::Database@ db = SQLite::Database(Files::db);
         SQLite::Statement@ s;
 
@@ -90,20 +125,30 @@ namespace Database {
         try {
             @s = db.Prepare("SELECT * FROM Maps");
         } catch {
-            warn("no Maps table in database");
+            Log::Write(Log::Level::Warnings, "no Maps table in database");
+            Log::TimerDelete(timerId);
+            Locks::db = false;
             return;
         }
         uint i = 0;
         while (s.NextRow()) {
             i++;
             Globals::AddMap(Models::Map(s));
-            if (i % sqlLoadBatch == 0) yield();
+            if (i % sqlLoadBatch == 0)
+                yield();
         }
         Globals::maps.Reverse();
-        startnew(CoroutineFunc(Bulk::LoadMyMapsThumbnailsCoro));
+
+        Log::TimerEnd(timerId);
+        Locks::db = false;
     }
 
     void LoadAccountsCoro() {
+        while (Locks::db)
+            yield();
+        Locks::db = true;
+        string timerId = Log::TimerBegin("loading accounts from database");
+
         SQLite::Database@ db = SQLite::Database(Files::db);
         SQLite::Statement@ s;
 
@@ -111,18 +156,29 @@ namespace Database {
         try {
             @s = db.Prepare("SELECT * FROM Accounts");
         } catch {
-            warn("no Accounts table in database");
+            Log::Write(Log::Level::Warnings, "no Accounts table in database");
+            Log::TimerDelete(timerId);
+            Locks::db = false;
             return;
         }
         uint i = 0;
         while (s.NextRow()) {
             i++;
             Globals::AddAccount(Models::Account(s));
-            if (i % sqlLoadBatch == 0) yield();
+            if (i % sqlLoadBatch == 0)
+                yield();
         }
+
+        Log::TimerEnd(timerId);
+        Locks::db = false;
     }
 
     void LoadRecordsCoro() {
+        while (Locks::db)
+            yield();
+        Locks::db = true;
+        string timerId = Log::TimerBegin("loading records from database");
+
         SQLite::Database@ db = SQLite::Database(Files::db);
         SQLite::Statement@ s;
 
@@ -130,29 +186,42 @@ namespace Database {
         try {
             @s = db.Prepare("SELECT * FROM Records");
         } catch {
-            warn("no Records table in database");
+            Log::Write(Log::Level::Warnings, "no Records table in database");
+            Log::TimerDelete(timerId);
+            Locks::db = false;
             return;
         }
         uint i = 0;
         while (s.NextRow()) {
             i++;
-            Globals::AddRecord(Models::Record(s));
-            if (i % sqlLoadBatch == 0) yield();
+            try {
+                Globals::AddRecord(Models::Record(s));
+            } catch {
+                Log::Write(Log::Level::Errors, "couldn't add record: " + getExceptionInfo());
+                Locks::db = false;
+            }
+            if (i % sqlLoadBatch == 0)
+                yield();
         }
+
+        Log::TimerEnd(timerId);
+        Locks::db = false;
 
         startnew(CoroutineFunc(Globals::SortRecordsCoro));
     }
 
     void SaveCoro() {
-        while (Locks::dbSave) yield();
-        Locks::dbSave = true;
-
+        while (Locks::db)
+            yield();
+        Locks::db = true;
         string timerId = Log::TimerBegin("saving database");
-        Globals::status.Set("db-save", "saving database...");
+        string statusId = "db-save";
+        Globals::status.Set(statusId, "saving database...");
 
         SQLite::Database@ db = SQLite::Database(Files::db);
         SQLite::Statement@ s;
 
+        Log::Write(Log::Level::Debug, "saving accounts to database...");
         db.Execute("CREATE TABLE IF NOT EXISTS Accounts" + accountColumns);
         string[] accountGroups = AccountGroups(Globals::accounts);
         for (uint i = 0; i < accountGroups.Length; i++) {
@@ -167,6 +236,7 @@ namespace Database {
             yield();
         }
 
+        Log::Write(Log::Level::Debug, "saving maps to database...");
         db.Execute("CREATE TABLE IF NOT EXISTS Maps" + mapColumns);
         string[] mapGroups = MapGroups(Globals::maps);
         for (uint i = 0; i < mapGroups.Length; i++) {
@@ -191,6 +261,7 @@ namespace Database {
             yield();
         }
 
+        Log::Write(Log::Level::Debug, "saving records to database...");
         db.Execute("CREATE TABLE IF NOT EXISTS Records" + recordColumns);
         string[] recordGroups = RecordGroups(Globals::records);
         for (uint i = 0; i < recordGroups.Length; i++) {
@@ -208,20 +279,20 @@ namespace Database {
             yield();
         }
 
-        Globals::status.Delete("db-save");
+        Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
-        Locks::dbSave = false;
+        Locks::db = false;
     }
 
     string[] AccountGroups(Models::Account[] accounts) {
         string[] ret;
 
         while (accounts.Length > 0) {
-            uint accountsToAdd = Math::Min(accounts.Length, maxSqlValues);
+            uint accountsToAdd = Math::Min(accounts.Length, sqlMaxValues);
             string accountValue = "";
 
             for (uint i = 0; i < accountsToAdd; i++) {
-                auto account = @accounts[i];
+                Models::Account@ account = @accounts[i];
                 accountValue += "(" +
                     Util::StrWrap(account.accountId) + "," +
                     Util::StrWrap(account.accountName) + "," +
@@ -245,11 +316,11 @@ namespace Database {
         maps.Reverse();
 
         while (maps.Length > 0) {
-            uint mapsToAdd = Math::Min(maps.Length, maxSqlValues);
+            uint mapsToAdd = Math::Min(maps.Length, sqlMaxValues);
             string mapValue = "";
 
             for (uint i = 0; i < mapsToAdd; i++) {
-                auto map = @maps[i];
+                Models::Map@ map = @maps[i];
                 mapValue += "(" +
                     Util::StrWrap(map.authorId) + "," +
                     map.authorTime + "," +
@@ -282,11 +353,11 @@ namespace Database {
         string[] ret;
 
         while (records.Length > 0) {
-            uint recordsToAdd = Math::Min(records.Length, maxSqlValues);
+            uint recordsToAdd = Math::Min(records.Length, sqlMaxValues);
             string recordValue = "";
 
             for (uint i = 0; i < recordsToAdd; i++) {
-                auto record = @records[i];
+                Models::Record@ record = @records[i];
                 recordValue += "(" +
                     Util::StrWrap(record.accountId) + "," +
                     Util::StrWrap(record.mapId) + "," +
