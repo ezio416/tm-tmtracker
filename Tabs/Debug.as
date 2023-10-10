@@ -1,17 +1,16 @@
 /*
 c 2023-05-26
-m 2023-08-07
+m 2023-10-09
 */
 
 namespace Tabs {
     void Tab_Debug() {
-        if (!UI::BeginTabItem(Icons::CodeFork + " Debug")) return;
-
-        Button_LockDebug();
+        if (!UI::BeginTabItem(Icons::CodeFork + " Debug"))
+            return;
 
         UI::TextWrapped(
-            "I take no responsibility if you break the plugin, your game, or get yourself" +
-            " banned in here. Turn back with the lock above. \\$DA2You've been warned."
+            "I take no responsibility if you break the plugin, your game, " +
+            "or get yourself banned in here. \\$DA2You've been warned."
         );
 
         UI::Separator();
@@ -42,7 +41,7 @@ namespace Tabs {
                     UI::ListClipper clipper(Globals::accounts.Length);
                     while (clipper.Step()) {
                         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                            auto account = @Globals::accounts[i];
+                            Models::Account@ account = @Globals::accounts[i];
                             UI::TableNextRow();
                             UI::TableNextColumn();
                             UI::Text(account.accountId);
@@ -80,7 +79,7 @@ namespace Tabs {
                     UI::ListClipper clipper(Globals::maps.Length);
                     while (clipper.Step()) {
                         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                            auto map = @Globals::maps[i];
+                            Models::Map@ map = @Globals::maps[i];
 
                             UI::TableNextRow();
                             UI::TableNextColumn();
@@ -95,6 +94,7 @@ namespace Tabs {
                     }
                     UI::EndTable();
                 }
+
                 UI::EndTabItem();
             }
 
@@ -125,8 +125,8 @@ namespace Tabs {
                     UI::ListClipper clipper(Globals::records.Length);
                     while (clipper.Step()) {
                         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                            auto record = @Globals::records[i];
-                            auto account = cast<Models::Account@>(Globals::accountsIndex[record.accountId]);
+                            Models::Record@ record = @Globals::records[i];
+                            Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.accountId]);
 
                             UI::TableNextRow();
                             UI::TableNextColumn();
@@ -153,16 +153,30 @@ namespace Tabs {
 
                 UI::EndTabItem();
             }
+
+            if (UI::BeginTabItem("database")) {
+                if (UI::Button("clear"))
+                    startnew(CoroutineFunc(Database::ClearCoro));
+
+                UI::EndTabItem();
+            }
+
+            if (UI::BeginTabItem("locks")) {
+                UI::Text((Locks::allRecords    ? "\\$0F0" : "\\$F00") + "allRecords");
+                UI::Text((Locks::db            ? "\\$0F0" : "\\$F00") + "db");
+                UI::Text((Locks::editMap       ? "\\$0F0" : "\\$F00") + "editMap");
+                UI::Text((Locks::myMaps        ? "\\$0F0" : "\\$F00") + "myMaps");
+                UI::Text((Locks::playMap       ? "\\$0F0" : "\\$F00") + "playMap");
+                UI::Text((Locks::requesting    ? "\\$0F0" : "\\$F00") + "requesting");
+                UI::Text((Locks::singleRecords ? "\\$0F0" : "\\$F00") + "singleRecords");
+                UI::Text((Locks::sortRecords   ? "\\$0F0" : "\\$F00") + "sortRecords");
+                UI::Text((Locks::tmx           ? "\\$0F0" : "\\$F00") + "tmx");
+
+                UI::EndTabItem();
+            }
+
         UI::EndTabBar();
 
         UI::EndTabItem();
-    }
-
-    void Button_LockDebug() {
-        if (UI::Button(Icons::Lock + " Lock Debug Tab")) {
-            trace("debug tab locked");
-            Settings::debugHidden = true;
-            Globals::debug = false;
-        }
     }
 }

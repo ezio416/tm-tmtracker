@@ -1,58 +1,63 @@
 /*
 c 2023-05-14
-m 2023-09-20
+m 2023-10-09
 */
+
+void RenderMenu() {
+    if (UI::MenuItem(Globals::title, "", Settings::windowOpen))
+        Settings::windowOpen = !Settings::windowOpen;
+}
 
 void Main() {
     if (!Settings::rememberOpen)
         Settings::windowOpen = false;
 
-    NadeoServices::AddAudience("NadeoServices");
-    NadeoServices::AddAudience("NadeoLiveServices");
-
-#if SIG_DEVELOPER
-    Globals::debug = !Settings::debugHidden;
-#endif
+    NadeoServices::AddAudience(Globals::apiCore);
+    NadeoServices::AddAudience(Globals::apiLive);
 
     Zones::Load();
 
     IO::CreateFolder(Files::thumbnailFolder);
 
     if (Version::CheckFile()) {
+        startnew(CoroutineFunc(Database::LoadAccountsCoro));
+
         string timerId = Log::TimerBegin("loading hiddenMaps.json");
         if (IO::FileExists(Files::hiddenMaps)) {
-            try   { Globals::hiddenMapsIndex = Json::FromFile(Files::hiddenMaps); }
-            catch { warn("error loading hiddenMaps.json!"); }
+            try {
+                Globals::hiddenMapsDict = Json::FromFile(Files::hiddenMaps);
+            } catch {
+                Log::Write(Log::Level::Errors, "error loading hiddenMaps.json! " + getExceptionInfo());
+            }
         } else {
-            warn("hiddenMaps.json not found!");
+            Log::Write(Log::Level::Warnings, "file not found: hiddenMaps.json");
         }
         Log::TimerEnd(timerId);
 
         timerId = Log::TimerBegin("loading mapRecordsTimestamps.json");
         if (IO::FileExists(Files::mapRecordsTimestamps)) {
-            try   { Globals::recordsTimestampsIndex = Json::FromFile(Files::mapRecordsTimestamps); }
-            catch { warn("error loading mapRecordsTimestamps.json!"); }
+            try {
+                Globals::recordsTimestampsDict = Json::FromFile(Files::mapRecordsTimestamps);
+            } catch {
+                Log::Write(Log::Level::Errors, "error loading mapRecordsTimestamps.json! " + getExceptionInfo());
+            }
         } else {
-            warn("mapRecordsTimestamps.json not found!");
+            Log::Write(Log::Level::Warnings, "file not found: mapRecordsTimestamps.json");
         }
         Log::TimerEnd(timerId);
-
-        startnew(CoroutineFunc(Database::LoadAccountsCoro));
     }
 
     if (Settings::refreshMaps)
         startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
-}
 
-void RenderMenu() {
-	if (UI::MenuItem(Globals::title, "", Settings::windowOpen))
-		Settings::windowOpen = !Settings::windowOpen;
+#if SIG_DEVELOPER
+    Globals::debugTab = true;
+#endif
 }
 
 void RenderInterface() {
-    if (!Settings::windowOpen) return;
-
-    Settings::Window_Settings();
+    if (!Settings::windowOpen)
+        return;
 
     UI::SetNextWindowSize(600, 540, UI::Cond::FirstUseEver);
     UI::SetNextWindowPos(300, 300, UI::Cond::FirstUseEver);
@@ -64,7 +69,8 @@ void RenderInterface() {
     UI::Begin(Globals::title, Settings::windowOpen, flags);
         if (Settings::statusBar && UI::BeginMenuBar()) {
             UI::Text("v" + Version::version.x + "." + Version::version.y + "." + Version::version.z + "   |");
-            string[] keys = Globals::status.GetKeys();
+
+            string[]@ keys = Globals::status.GetKeys();
             if (keys.Length > 0) {
                 for (uint i = 0; i < keys.Length; i++) {
                     string statusText;
@@ -74,6 +80,7 @@ void RenderInterface() {
             } else {
                 UI::Text("idle");
             }
+
             UI::EndMenuBar();
         }
 
@@ -83,9 +90,15 @@ void RenderInterface() {
         UI::BeginTabBar("tabs");
             Tabs::Tab_Maps();
             Tabs::Tab_Records();
-            Tabs::Tab_Settings();
-            if (Settings::infoTab) Tabs::Tab_Info();
-            if (Globals::debug)    Tabs::Tab_Debug();
+            if (Settings::infoTab)
+                Tabs::Tab_Info();
+            if (Globals::debugTab)
+                Tabs::Tab_Debug();
+            Tabs::Tab_Test();
         UI::EndTabBar();
     UI::End();
 }
+
+// void OnSettingsChanged() {
+//     // highlight color vec4 to string
+// }

@@ -1,282 +1,365 @@
 /*
 c 2023-05-16
-m 2023-09-20
+m 2023-10-09
 */
 
-namespace Models {
-    class Map {
-        string            authorId;
-        uint              authorTime;
-        uint              bronzeTime;
-        string            downloadUrl;
-        uint              goldTime;
-        bool              hidden;
-        string            logName;
-        string            mapId;
-        string            mapNameColor;
-        string            mapNameRaw;
-        string            mapNameText;
-        string            mapUid;
-        Models::Record@[] records;
-        dictionary        recordsIndex;
-        uint              recordsTimestamp;
-        uint              silverTime;
-        string            thumbnailFile;
-        bool              thumbnailLoaded;
-        bool              thumbnailLoading;
-        UI::Texture@      thumbnailTexture;
-        string            thumbnailUrl;
-        uint              updateTimestamp;
-        uint              uploadTimestamp;
-        bool              viewing;
+namespace Models { class Map {
+    string       authorId;
+    uint         authorTime;
+    uint         bronzeTime;
+    string       downloadUrl;
+    uint         goldTime;
+    bool         hidden;
+    string       logName;
+    string       mapId;
+    string       mapNameColor;
+    string       mapNameRaw;
+    string       mapNameText;
+    string       mapUid;
+    Record@[]    records;
+    dictionary   recordsDict;
+    uint         recordsTimestamp;
+    uint         silverTime;
+    string       thumbnailFile;
+    bool         thumbnailLoading;
+    UI::Texture@ thumbnailTexture;
+    string       thumbnailUrl;
+    uint         updateTimestamp;
+    uint         uploadTimestamp;
+    bool         viewing;
 
-        Map() { }
-        Map(Json::Value map) {
-            mapUid          = map["uid"];
-            thumbnailFile   = Files::thumbnailFolder + "/" + mapUid + ".jpg";  // needs to be Uid
-            mapId           = map["mapId"];
-            mapNameRaw      = map["name"];
-            mapNameColor    = ColoredString(mapNameRaw);
-            mapNameText     = StripFormatCodes(mapNameRaw);
-            logName         = "MAP[" + mapNameText + "] - ";
-            authorId        = map["author"];
-            authorTime      = map["authorTime"];
-            goldTime        = map["goldTime"];
-            silverTime      = map["silverTime"];
-            bronzeTime      = map["bronzeTime"];
-            downloadUrl     = string(map["downloadUrl"]).Replace("\\", "");
-            thumbnailUrl    = string(map["thumbnailUrl"]).Replace("\\", "");
-            uploadTimestamp = map["uploadTimestamp"];
-            updateTimestamp = map["updateTimestamp"];
-        }
-        Map(SQLite::Statement@ s) {
-            authorId         = s.GetColumnString("authorId");
-            authorTime       = s.GetColumnInt("authorTime");
-            bronzeTime       = s.GetColumnInt("bronzeTime");
-            downloadUrl      = s.GetColumnString("downloadUrl");
-            goldTime         = s.GetColumnInt("goldTime");
-            mapId            = s.GetColumnString("mapId");
-            mapNameRaw       = s.GetColumnString("mapNameRaw");
-            mapNameColor     = ColoredString(mapNameRaw);
-            mapNameText      = StripFormatCodes(mapNameRaw);
-            logName          = "MAP[ " + mapNameText + " ] - ";
-            mapUid           = s.GetColumnString("mapUid");
-            recordsTimestamp = s.GetColumnInt("recordsTimestamp");
-            silverTime       = s.GetColumnInt("silverTime");
-            thumbnailFile    = Files::thumbnailFolder + "/" + mapUid + ".jpg";
-            thumbnailUrl     = s.GetColumnString("thumbnailUrl");
-            updateTimestamp  = s.GetColumnInt("updateTimestamp");
-            uploadTimestamp  = s.GetColumnInt("uploadTimestamp");
-        }
+    Map() { }
+    Map(Json::Value@ map) {
+        mapUid          = map["uid"];
+        thumbnailFile   = Files::thumbnailFolder + "/" + mapUid + ".jpg";  // needs to be Uid
+        mapId           = map["mapId"];
+        mapNameRaw      = map["name"];
+        mapNameColor    = ColoredString(mapNameRaw);
+        mapNameText     = StripFormatCodes(mapNameRaw);
+        logName         = "MAP[ " + mapNameText + " ] - ";
+        authorId        = map["author"];
+        authorTime      = map["authorTime"];
+        goldTime        = map["goldTime"];
+        silverTime      = map["silverTime"];
+        bronzeTime      = map["bronzeTime"];
+        downloadUrl     = string(map["downloadUrl"]).Replace("\\", "");
+        thumbnailUrl    = string(map["thumbnailUrl"]).Replace("\\", "");
+        uploadTimestamp = map["uploadTimestamp"];
+        updateTimestamp = map["updateTimestamp"];
+    }
+    Map(Json::Value@ map, bool fromMapInfo) {
+        authorId        = map["author"];
+        authorTime      = map["authorScore"];
+        bronzeTime      = map["bronzeScore"];
+        downloadUrl     = map["fileUrl"];
+        goldTime        = map["goldScore"];
+        mapId           = map["mapId"];
+        mapNameRaw      = map["name"];
+        mapNameColor    = ColoredString(mapNameRaw);
+        mapNameText     = StripFormatCodes(mapNameRaw);
+        logName         = "MAP[ " + mapNameText + " ] - ";
+        mapUid          = map["mapUid"];
+        silverTime      = map["silverScore"];
+        thumbnailFile    = Files::thumbnailFolder + "/" + mapUid + ".jpg";
+        thumbnailUrl    = map["thumbnailUrl"];
+        updateTimestamp = Util::IsoToUnix(map["timestamp"]);
+        uploadTimestamp = updateTimestamp;
+    }
+    Map(SQLite::Statement@ s) {
+        authorId         = s.GetColumnString("authorId");
+        authorTime       = s.GetColumnInt   ("authorTime");
+        bronzeTime       = s.GetColumnInt   ("bronzeTime");
+        downloadUrl      = s.GetColumnString("downloadUrl");
+        goldTime         = s.GetColumnInt   ("goldTime");
+        mapId            = s.GetColumnString("mapId");
+        mapNameRaw       = s.GetColumnString("mapNameRaw");
+        mapNameColor     = ColoredString(mapNameRaw);
+        mapNameText      = StripFormatCodes(mapNameRaw);
+        logName          = "MAP[ " + mapNameText + " ] - ";
+        mapUid           = s.GetColumnString("mapUid");
+        recordsTimestamp = s.GetColumnInt   ("recordsTimestamp");
+        silverTime       = s.GetColumnInt   ("silverTime");
+        thumbnailFile    = Files::thumbnailFolder + "/" + mapUid + ".jpg";
+        thumbnailUrl     = s.GetColumnString("thumbnailUrl");
+        updateTimestamp  = s.GetColumnInt   ("updateTimestamp");
+        uploadTimestamp  = s.GetColumnInt   ("uploadTimestamp");
+    }
 
-        void GetRecordsCoro() {
-            if (hidden || Locks::singleRecords) return;
-            Locks::singleRecords = true;
+    // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
+    void EditCoro() {
+        if (Locks::editMap)
+            return;
 
-            string timerId = Log::TimerBegin(logName + "getting records");
+        Locks::editMap = true;
+        Log::Write(Log::Level::Normal, logName + "loading map for editing");
 
-            string statusId = "map-records-" + mapId;
-            if (Globals::singleMapRecordStatus)
-                Globals::status.Set(statusId, "getting records for " + mapNameText + " ...");
+        CTrackMania@ app = cast<CTrackMania@>(GetApp());
+        app.BackToMainMenu();
+        while (!app.ManiaTitleControlScriptAPI.IsReady)
+            yield();
+        while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null)
+            yield();
+        yield();
+        app.ManiaTitleControlScriptAPI.EditMap(downloadUrl, "", "");
 
-            string[] accountIds;
-            uint offset = 0;
-            Models::Record[] tmpRecords;
-            dictionary tmpRecordsIndex;
-            bool tooManyRecords;
+        uint64 waitToEditAgain = 5000;
+        uint64 now = Time::Now;
+        while (Time::Now - now < waitToEditAgain)
+            yield();
 
-            if (records.Length > Settings::maxRecordsPerMap)
-                Database::ClearMapRecords(this);
+        Locks::editMap = false;
+    }
 
-            Globals::ClearMapRecords(this);
+    void GetRecordsCoro() {
+        if (hidden || Locks::singleRecords)
+            return;
 
-            do {
-                auto waitCoro = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
-                while (waitCoro.IsRunning()) yield();
+        Locks::singleRecords = true;
+        string timerId = Log::TimerBegin(logName + "getting records");
+        string statusId = "map-records-" + mapUid;
 
-                auto req = NadeoServices::Get(  // sorted by position asc
-                    "NadeoLiveServices",
-                    NadeoServices::BaseURLLive() +
-                        "/api/token/leaderboard/group/Personal_Best/map/" + mapUid +
-                        "/top?onlyWorld=true&length=100&offset=" + offset
-                );
-                req.Start();
-                while (!req.Finished()) yield();
-                Locks::requesting = false;
-                offset += 100;
+        if (Globals::singleMapRecordStatus)
+            Globals::status.Set(statusId, "getting records for " + mapNameText + " ...");
 
-                auto top = Json::Parse(req.String())["tops"][0]["top"];
-                tooManyRecords = top.Length == 100;
-                for (uint i = 0; i < top.Length; i++) {
-                    auto record = Record(top[i]);
-                    record.mapId        = mapId;
-                    record.mapName      = mapNameText;
-                    record.mapUid       = mapUid;
-                    record.recordFakeId = mapId + "-" + record.accountId;
+        string[] accountIds;
+        uint offset = 0;
+        Record[] tmpRecords;
+        dictionary tmpRecordsIndex;
+        bool tooManyRecords;
 
-                    Globals::AddAccount(Account(record));
-                    accountIds.InsertLast(record.accountId);
-                    tmpRecords.InsertLast(record);
-                    tmpRecordsIndex.Set(record.accountId, @tmpRecords[tmpRecords.Length - 1]);
-                }
+        if (records.Length > Settings::maxRecordsPerMap)
+            Database::ClearMapRecords(this);
 
-            } while (tooManyRecords && tmpRecords.Length < Settings::maxRecordsPerMap);
+        Globals::ClearMapRecords(this);
 
-            while (accountIds.Length > 0) {
-                string[] group;
-                int idsToAdd = Math::Min(accountIds.Length, 206);
-                for (int i = 0; i < idsToAdd; i++)
-                    group.InsertLast(accountIds[i]);
-                accountIds.RemoveRange(0, idsToAdd);
+        do {
+            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            while (waitCoro.IsRunning())
+                yield();
 
-                auto waitCoro = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
-                while (waitCoro.IsRunning()) yield();
+            Net::HttpRequest@ req = NadeoServices::Get(  // sorted by position asc
+                Globals::apiLive,
+                NadeoServices::BaseURLLive() +
+                    "/api/token/leaderboard/group/Personal_Best/map/" + mapUid +
+                    "/top?onlyWorld=true&length=100&offset=" + offset
+            );
+            req.Start();
+            while (!req.Finished())
+                yield();
+            Locks::requesting = false;
+            offset += 100;
 
-                auto req = NadeoServices::Get(  // sorted by timestamp asc
-                    "NadeoServices",
-                    NadeoServices::BaseURLCore() +
-                    "/mapRecords/?accountIdList=" + string::Join(group, "%2C") +
-                    "&mapIdList=" + mapId
-                );
-                req.Start();
-                while (!req.Finished()) yield();
-                Locks::requesting = false;
-
-                auto coreRecords = Json::Parse(req.String());
-                for (uint i = 0; i < coreRecords.Length; i++) {
-                    auto coreRecord = @coreRecords[i];
-                    auto tmpRecord = cast<Models::Record@>(tmpRecordsIndex[coreRecord["accountId"]]);
-                    tmpRecord.recordId = coreRecord["mapRecordId"];
-                    tmpRecord.timestampIso = coreRecord["timestamp"];
-                    tmpRecord.timestampUnix = Util::IsoToUnix(tmpRecord.timestampIso);
-                }
-
-                for (uint i = 0; i < tmpRecords.Length; i++)
-                    Globals::AddRecord(tmpRecords[i]);
-            }
-
-            recordsTimestamp = Time::Stamp;
-            Globals::recordsTimestampsIndex[mapId] = recordsTimestamp;
-            Json::ToFile(Files::mapRecordsTimestamps, Globals::recordsTimestampsIndex);
-
-            auto namesCoro = startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
-            while (namesCoro.IsRunning()) yield();
-
-            if (Globals::singleMapRecordStatus)
-                Globals::status.Delete(statusId);
-
-            Log::TimerEnd(timerId);
-            Locks::singleRecords = false;
-        }
-
-        void GetThumbnailCoro() {
-            if (IO::FileExists(thumbnailFile)) return;
-
-            string timerId = Log::TimerBegin(logName + "downloading thumbnail");
-
-            uint max_timeout = 3000;
-            uint max_wait = 2000;
-            while (true) {
-                uint64 nowTimeout = Time::Now;
-                bool timedOut = false;
-
-                auto req = Net::HttpGet(thumbnailUrl);
-                while (!req.Finished()) {
-                    if (Time::Now - nowTimeout > max_timeout) {
-                        timedOut = true;
-                        break;
-                    }
-                    yield();
-                }
-                if (timedOut) {
-                    trace(logName + "timed out, waiting " + max_wait + " ms");
-                    uint64 nowWait = Time::Now;
-                    while (Time::Now - nowWait < max_wait) yield();
-                    continue;
-                }
-                req.SaveToFile(thumbnailFile);
+            Json::Value@ top;
+            try {
+                @top = Json::Parse(req.String())["tops"][0]["top"];
+            } catch {
+                Log::Write(Log::Level::Errors, logName + "couldn't parse records: " + getExceptionInfo());
                 break;
             }
 
-            Log::TimerEnd(timerId);
-        }
+            tooManyRecords = top.Length == 100;
 
-        void LoadThumbnailCoro() {
-            string timerId = Log::TimerBegin(logName + "loading thumbnail", false);
-            thumbnailLoading = true;
+            for (uint i = 0; i < top.Length; i++) {
+                Record record = Record(top[i]);
+                record.mapId        = mapId;
+                record.mapName      = mapNameText;
+                record.mapUid       = mapUid;
+                record.recordFakeId = mapId + "-" + record.accountId;
 
-            if (Globals::thumbnailTextures.Exists(mapId)) {
-                UI::Texture@ tex;
-                @tex = cast<UI::Texture@>(Globals::thumbnailTextures[mapId]);
-                if (@thumbnailTexture == null)
-                    @thumbnailTexture = tex;
-                Log::TimerEnd(timerId, false);
-                return;
+                Globals::AddAccount(Account(record));
+                accountIds.InsertLast(record.accountId);
+                tmpRecords.InsertLast(record);
+                tmpRecordsIndex.Set(record.accountId, @tmpRecords[tmpRecords.Length - 1]);
             }
 
-            if (!IO::FileExists(thumbnailFile)) {
-                auto coro = startnew(CoroutineFunc(GetThumbnailCoro));
-                while (coro.IsRunning()) yield();
-            }
+        } while (
+            tooManyRecords &&
+            tmpRecords.Length < Settings::maxRecordsPerMap
+        );
 
-            IO::File file(thumbnailFile, IO::FileMode::Read);
-            @thumbnailTexture = UI::LoadTexture(file.Read(file.Size()));
-            file.Close();
+        while (accountIds.Length > 0) {
+            string[] group;
+            int idsToAdd = Math::Min(accountIds.Length, 206);
+            for (int i = 0; i < idsToAdd; i++)
+                group.InsertLast(accountIds[i]);
+            accountIds.RemoveRange(0, idsToAdd);
 
-            Globals::thumbnailTextures.Set(mapId, @thumbnailTexture);
-
-            thumbnailLoading = false;
-            thumbnailLoaded = true;
-            Log::TimerEnd(timerId, false);
-        }
-
-        // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
-        void PlayCoro() {
-            if (Locks::playMap) return;
-            Locks::playMap = true;
-
-            if (!Permissions::PlayLocalMap()) {
-                Util::NotifyWarn("Refusing to load map because you lack the necessary permissions. Standard or Club access required.");
-                return;
-            }
-            // change the menu page to avoid main menu bug where 3d scene not redrawn correctly (which can lead to a script error and `recovery restart...`)
-            auto app = cast<CGameManiaPlanet>(GetApp());
-            app.BackToMainMenu();
-            while (!app.ManiaTitleControlScriptAPI.IsReady) yield();
-            while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null)
+            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            while (waitCoro.IsRunning())
                 yield();
-            yield();
-            app.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
 
-            uint64 waitToPlayAgain = 5000;
-            uint64 now = Time::Now;
-            while (Time::Now - now < waitToPlayAgain) yield();
-
-            Locks::playMap = false;
-        }
-
-        // courtesy of "Map Info" plugin - https://github.com/MisfitMaid/tm-map-info
-        void TmxCoro() {
-            if (Locks::tmx) return;
-            Locks::tmx = true;
-
-            Net::HttpRequest@ req = Net::HttpRequest();
-            req.Url = "https://trackmania.exchange/api/maps/get_map_info/uid/" + mapUid;
-            req.Headers['User-Agent'] = "TMTracker v3 Plugin / contact=Ezio416";
-            req.Method = Net::HttpMethod::Get;
+            Net::HttpRequest@ req = NadeoServices::Get(  // sorted by timestamp asc
+                Globals::apiCore,
+                NadeoServices::BaseURLCore() +
+                "/mapRecords/?accountIdList=" + string::Join(group, "%2C") +
+                "&mapIdList=" + mapId
+            );
             req.Start();
-            while (!req.Finished()) yield();
-            if (req.ResponseCode() >= 400 || req.ResponseCode() < 200 || req.Error().Length > 0) {
-                warn("[status:" + req.ResponseCode() + "] Error getting map by UID from TMX: " + req.Error());
-                return;
-            }
-            try {
-                OpenBrowserURL("https://trackmania.exchange/tracks/view/" + int(Json::Parse(req.String()).Get("TrackID")));
-            } catch {
-                Util::NotifyWarn("Error opening TMX for map " + mapNameText);
+            while (!req.Finished())
+                yield();
+            Locks::requesting = false;
+
+            Json::Value@ coreRecords = Json::Parse(req.String());
+            for (uint i = 0; i < coreRecords.Length; i++) {
+                Json::Value@ coreRecord = @coreRecords[i];
+                Record@ tmpRecord = cast<Record@>(tmpRecordsIndex[coreRecord["accountId"]]);
+
+                tmpRecord.recordId = coreRecord["mapRecordId"];
+                tmpRecord.timestampIso = coreRecord["timestamp"];
+                tmpRecord.timestampUnix = Util::IsoToUnix(tmpRecord.timestampIso);
             }
 
-            Locks::tmx = false;
+            for (uint i = 0; i < tmpRecords.Length; i++)
+                Globals::AddRecord(tmpRecords[i]);
         }
+
+        recordsTimestamp = Time::Stamp;
+        Globals::recordsTimestampsDict[mapId] = recordsTimestamp;
+        Json::ToFile(Files::mapRecordsTimestamps, Globals::recordsTimestampsDict);
+
+        Meta::PluginCoroutine@ namesCoro = startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
+        while (namesCoro.IsRunning())
+            yield();
+
+        if (Globals::singleMapRecordStatus)
+            Globals::status.Delete(statusId);
+
+        Log::TimerEnd(timerId);
+        Locks::singleRecords = false;
     }
-}
+
+    void GetThumbnailCoro() {
+        if (IO::FileExists(thumbnailFile))
+            return;
+
+        string timerId = Log::TimerBegin(logName + "downloading thumbnail");
+        string statusId = "get-thumb" + mapUid;
+        Globals::status.Set(statusId, "Getting thumbnail for " + mapNameText);
+
+        uint maxTimeout = 3000;
+        uint maxWait = 2000;
+
+        while (true) {
+            uint64 nowTimeout = Time::Now;
+            bool timedOut = false;
+
+            Net::HttpRequest@ req = Net::HttpGet(thumbnailUrl);
+            while (!req.Finished()) {
+                if (Time::Now - nowTimeout > maxTimeout) {
+                    timedOut = true;
+                    break;
+                }
+                yield();
+            }
+
+            if (timedOut) {
+                Log::Write(Log::Level::Normal, logName + "timed out, waiting " + maxWait + " ms");
+                uint64 nowWait = Time::Now;
+                while (Time::Now - nowWait < maxWait)
+                    yield();
+                continue;
+            }
+
+            req.SaveToFile(thumbnailFile);
+            break;
+        }
+
+        Globals::status.Delete(statusId);
+        Log::TimerEnd(timerId);
+    }
+
+    void LoadThumbnailCoro() {
+        if (thumbnailTexture !is null || thumbnailLoading)
+            return;
+
+        string timerId = Log::TimerBegin(logName + "loading thumbnail");
+        thumbnailLoading = true;
+
+        Meta::PluginCoroutine@ thumbCoro = startnew(CoroutineFunc(GetThumbnailCoro));
+        while (thumbCoro.IsRunning()) yield();
+
+        IO::File file(thumbnailFile, IO::FileMode::Read);
+        @thumbnailTexture = UI::LoadTexture(file.Read(file.Size()));
+        file.Close();
+
+        thumbnailLoading = false;
+        Log::TimerEnd(timerId);
+    }
+
+    // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
+    void PlayCoro() {
+        if (Locks::playMap)
+            return;
+
+        Locks::playMap = true;
+        Log::Write(Log::Level::Normal, logName + "loading map for playing");
+
+        if (!Permissions::PlayLocalMap()) {
+            Util::NotifyError("Standard or Club access required - can't load map " + mapNameText);
+            Locks::playMap = false;
+            return;
+        }
+
+        CTrackMania@ app = cast<CTrackMania@>(GetApp());
+        app.BackToMainMenu();
+        while (!app.ManiaTitleControlScriptAPI.IsReady)
+            yield();
+        while (app.Switcher.ModuleStack.Length < 1 || cast<CTrackManiaMenus>(app.Switcher.ModuleStack[0]) is null)
+            yield();
+        yield();
+        app.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
+
+        uint64 waitToPlayAgain = 5000;
+        uint64 now = Time::Now;
+        while (Time::Now - now < waitToPlayAgain)
+            yield();
+
+        Locks::playMap = false;
+    }
+
+    // courtesy of "Map Info" plugin - https://github.com/MisfitMaid/tm-map-info
+    void TmxCoro() {
+        if (Locks::tmx)
+            return;
+
+        Locks::tmx = true;
+        string timerId = Log::TimerBegin(logName + "loading TMX");
+
+        Net::HttpRequest@ req = Net::HttpRequest();
+        req.Url = "https://trackmania.exchange/api/maps/get_map_info/uid/" + mapUid;
+        req.Headers['User-Agent'] = "TMTracker v3 Plugin / contact=Ezio416";
+        req.Method = Net::HttpMethod::Get;
+        req.Start();
+
+        uint maxTimeout = 5000;
+        uint64 nowTimeout = Time::Now;
+        bool timedOut = false;
+
+        while (!req.Finished()) {
+            if (Time::Now - nowTimeout > maxTimeout && !timedOut) {
+                timedOut = true;
+                Util::NotifyError("TMX took longer than " + maxTimeout + "ms to respond, site is likely down");
+            }
+            yield();
+        }
+
+        if (req.ResponseCode() >= 400 || req.ResponseCode() < 200 || req.Error().Length > 0) {
+            Log::Write(
+                Log::Level::Errors,
+                logName + "[status:" + req.ResponseCode() + "] error getting map by UID from TMX: " + req.Error()
+            );
+            Log::TimerDelete(timerId);
+            Locks::tmx = false;
+            return;
+        }
+
+        try {
+            OpenBrowserURL("https://trackmania.exchange/tracks/view/" + int(Json::Parse(req.String()).Get("TrackID")));
+        } catch {
+            Util::NotifyError(logName + "error opening TMX: " + getExceptionInfo());
+        }
+
+        Log::TimerEnd(timerId);
+        Locks::tmx = false;
+    }
+}}

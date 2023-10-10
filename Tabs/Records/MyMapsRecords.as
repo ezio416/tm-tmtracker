@@ -1,11 +1,12 @@
 /*
 c 2023-07-12
-m 2023-09-20
+m 2023-10-09
 */
 
 namespace Tabs { namespace Records {
     void Tab_MyMapsRecords() {
-        if (!UI::BeginTabItem(Icons::MapO + " My Maps")) return;
+        if (!UI::BeginTabItem(Icons::MapO + " My Maps"))
+            return;
 
         int64 now = Time::Stamp;
 
@@ -31,12 +32,16 @@ namespace Tabs { namespace Records {
 
         if (!Locks::allRecords) {
             uint timestamp;
-            try { timestamp = uint(Globals::recordsTimestampsIndex.Get("all")); } catch { timestamp = 0; }
+            try {
+                timestamp = uint(Globals::recordsTimestampsDict.Get("all"));
+            } catch {
+                timestamp = 0;
+            }
 
             UI::SameLine();
             UI::Text("Last Updated: " + (
                 timestamp > 0 ?
-                    Time::FormatString(Settings::dateFormat + "Local\\$G", timestamp) +
+                    Time::FormatString(Globals::dateFormat + "Local\\$G", timestamp) +
                         " (" + Util::FormatSeconds(now - timestamp) + " ago)" :
                     "never"
             ));
@@ -57,13 +62,13 @@ namespace Tabs { namespace Records {
             UI::ListClipper clipper(Globals::recordsSorted.Length);
             while (clipper.Step()) {
                 for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                    auto record = Globals::recordsSorted[i];
-                    auto account = Globals::accounts.Length > 0 ? cast<Models::Account@>(Globals::accountsIndex[record.accountId]) : Models::Account();
+                    Models::Record@ record = Globals::recordsSorted[i];
+                    Models::Account@ account = Globals::accounts.Length > 0 ? cast<Models::Account@>(Globals::accountsDict[record.accountId]) : Models::Account();
 
                     UI::TableNextRow();
                     UI::TableNextColumn();
                     if (UI::Selectable(record.mapName + "##" + i, false))
-                        Globals::AddCurrentMap(cast<Models::Map@>(Globals::mapsIndex[record.mapId]));
+                        Globals::AddCurrentMap(cast<Models::Map@>(Globals::mapsDict[record.mapId]));
                     Util::HoverTooltip("view map (switch to Maps tab above to view)");
 
                     UI::TableNextColumn();
@@ -73,16 +78,16 @@ namespace Tabs { namespace Records {
                     string timeColor = "";
                     if (Settings::recordsMedalColors)
                         switch (record.medals) {
-                            case 1: timeColor = "\\$C80"; break;
-                            case 2: timeColor = "\\$AAA"; break;
-                            case 3: timeColor = "\\$DD1"; break;
-                            case 4: timeColor = "\\$4B0"; break;
+                            case 1: timeColor = Globals::colorBronze; break;
+                            case 2: timeColor = Globals::colorSilver; break;
+                            case 3: timeColor = Globals::colorGold;   break;
+                            case 4: timeColor = Globals::colorAuthor; break;
                         }
                     UI::Text(timeColor + Time::Format(record.time));
 
                     UI::TableNextColumn();
                     if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : account.accountId) + "##" + i, false))
-                        Util::Tmio(account.accountId);
+                        Util::TmioPlayer(account.accountId);
                     Util::HoverTooltip("Trackmania.io profile");
 
                     UI::TableNextColumn();
