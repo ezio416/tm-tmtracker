@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Globals {
@@ -24,7 +24,7 @@ namespace Globals {
     Models::Map[]     maps;
     dictionary        mapsDict;
     string            mapSearch;
-    string            myAccountId            = GetApp().LocalPlayerInfo.WebServicesUserId;
+    string            myAccountId;
     Models::Record[]  myRecords;
     Models::Map[]     myRecordsMaps;
     dictionary        myRecordsMapsDict;

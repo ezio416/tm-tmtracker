@@ -1,6 +1,6 @@
 /*
 c 2023-05-14
-m 2023-10-09
+m 2023-10-11
 */
 
 void RenderMenu() {
@@ -9,6 +9,8 @@ void RenderMenu() {
 }
 
 void Main() {
+    Globals::myAccountId = GetApp().LocalPlayerInfo.WebServicesUserId;
+
     if (!Settings::rememberOpen)
         Settings::windowOpen = false;
 
