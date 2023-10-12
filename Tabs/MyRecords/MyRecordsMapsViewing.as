@@ -16,6 +16,12 @@ namespace Tabs { namespace MyRecords {
 
         int64 now = Time::Stamp;
 
+        for (uint i = 0; i < Globals::myRecordsMapsViewing.Length; i++) {
+            Models::Map@ map = @Globals::myRecordsMapsViewing[i];
+
+            ;
+        }
+
 
         UI::EndTabBar();
 
