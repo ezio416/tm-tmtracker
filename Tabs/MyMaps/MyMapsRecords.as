@@ -1,6 +1,6 @@
 /*
 c 2023-07-12
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Tabs { namespace MyMaps {
@@ -17,7 +17,8 @@ namespace Tabs { namespace MyMaps {
                 "\\$G.\nIt could be shorter, but we don't want to spam Nadeo with API requests. This action does 2+ per map." +
                 "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate." +
                 "\nMaps with no records are faster and hidden maps are skipped." +
-                "\nClick on a map name to add it to the \"Viewing Maps\" tab above."
+                "\nClick on a map name to add it to the \"Viewing Maps\" tab above." +
+                "\nClick on an account name to open their Trackmania.io page."
             );
 
         UI::BeginDisabled(Locks::allRecords);
@@ -88,7 +89,6 @@ namespace Tabs { namespace MyMaps {
                     UI::TableNextColumn();
                     if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : account.accountId) + "##" + i, false))
                         Util::TmioPlayer(account.accountId);
-                    Util::HoverTooltip("Trackmania.io profile");
 
                     UI::TableNextColumn();
                     UI::Text(Util::UnixToIso(record.timestampUnix));
