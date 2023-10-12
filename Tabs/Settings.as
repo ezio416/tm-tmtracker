@@ -1,6 +1,6 @@
 /*
 c 2023-07-16
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Settings {
@@ -78,4 +78,7 @@ namespace Settings {
 
     [Setting category="My Map Records" name="Top 5 highlight color"]
     string recordsHighlightColor = "F71";
+
+    [Setting category="My Records" name="Show help text"]
+    bool myRecordsText = true;
 }
