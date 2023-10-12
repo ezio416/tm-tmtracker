@@ -42,12 +42,33 @@ namespace Tabs { namespace MyRecords {
             ));
         }
 
+        Globals::myRecordsMapsSearch = UI::InputText("search maps", Globals::myRecordsMapsSearch, false);
+
+        if (Globals::myRecordsMapsSearch != "") {
+            UI::SameLine();
+            if (UI::Button(Icons::Times + " Clear Search"))
+                Globals::myRecordsMapsSearch = "";
+        }
+
         Table_MyRecordsList(now);
 
         UI::EndTabItem();
     }
 
     void Table_MyRecordsList(int64 now) {
+        Models::Record@[] records;
+
+        for (uint i = 0; i < Globals::myRecordsSorted.Length; i++) {
+            Models::Record@ record = Globals::myRecordsSorted[i];
+            Models::Map@ map;
+
+            if (Globals::myRecordsMapsDict.Exists(record.mapId))
+                @map = cast<Models::Map@>(Globals::myRecordsMapsDict[record.mapId]);
+
+            if (map is null || map.mapNameText.ToLower().Contains(Globals::myRecordsMapsSearch.ToLower()))
+                records.InsertLast(record);
+        }
+
         int flags = UI::TableFlags::RowBg |
                     UI::TableFlags::ScrollY;
 
@@ -63,10 +84,10 @@ namespace Tabs { namespace MyRecords {
             UI::TableSetupColumn("Recency "   + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
             UI::TableHeadersRow();
 
-            UI::ListClipper clipper(Globals::myRecordsSorted.Length);
+            UI::ListClipper clipper(records.Length);
             while (clipper.Step()) {
                 for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                    Models::Record@ record = Globals::myRecordsSorted[i];
+                    Models::Record@ record = records[i];
                     Models::Map@ map;
 
                     UI::TableNextRow();
