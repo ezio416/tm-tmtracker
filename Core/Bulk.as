@@ -188,12 +188,12 @@ namespace Bulk {
             return;
 
         Locks::mapInfo = true;
-        string timerId = Log::TimerBegin("getting my records map info");
+        string timerId = Log::TimerBegin("getting map info for my records");
         string statusId = "my-record-map-info";
         uint count = myRecordsMapIds.Length;
 
         while (myRecordsMapIds.Length > 0) {
-            Globals::status.Set(statusId, "getting my records map info... (" + (count - myRecordsMapIds.Length) + "/" + count + ")");
+            Globals::status.Set(statusId, "getting map info for my records... (" + (count - myRecordsMapIds.Length) + "/" + count + ")");
             string[] group;
             int idsToAdd = Math::Min(myRecordsMapIds.Length, 206);
             for (int i = 0; i < idsToAdd; i++)
