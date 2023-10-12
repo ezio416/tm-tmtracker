@@ -46,7 +46,7 @@ namespace Bulk {
         string statusId = "get-my-maps";
         Globals::status.Set(statusId, "getting maps...");
 
-        Globals::ClearMaps();
+        Globals::ClearMyMaps();
 
         while (!NadeoServices::IsAuthenticated(Globals::apiLive))
             yield();
@@ -77,14 +77,14 @@ namespace Bulk {
                 try {
                     map.recordsTimestamp = uint(Globals::recordsTimestampsJson.Get(map.mapId));
                 } catch { }  // error should mean no records gotten yet
-                Globals::AddMap(map);
+                Globals::AddMyMap(map);
             }
 
             if (tooManyMaps)
                 Log::Write(Log::Level::Debug, "tooManyMaps, getting more...");
         } while (tooManyMaps);
 
-        Log::Write(Log::Level::Debug, "number of maps gotten: " + Globals::maps.Length);
+        Log::Write(Log::Level::Debug, "number of maps gotten: " + Globals::myMaps.Length);
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
@@ -104,10 +104,10 @@ namespace Bulk {
         Globals::getAccountNames = false;
         Globals::singleMapRecordStatus = false;
 
-        for (uint i = 0; i < Globals::maps.Length; i++) {
-            Globals::status.Set(statusId, "getting records... (" + (i + 1) + "/" + Globals::maps.Length + ")");
+        for (uint i = 0; i < Globals::myMaps.Length; i++) {
+            Globals::status.Set(statusId, "getting records... (" + (i + 1) + "/" + Globals::myMaps.Length + ")");
 
-            Models::Map@ map = @Globals::maps[i];
+            Models::Map@ map = @Globals::myMaps[i];
             Meta::PluginCoroutine@ recordsCoro = startnew(CoroutineFunc(map.GetRecordsCoro));
             while (recordsCoro.IsRunning())
                 yield();

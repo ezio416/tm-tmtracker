@@ -1,6 +1,6 @@
 /*
 c 2023-10-09
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Tabs {
@@ -69,9 +69,9 @@ namespace Test {
 
             for (uint i = 0; i < theseMaps.Length; i++) {
                 Models::Map map = Models::Map(theseMaps[i], true);
-                if (Globals::mapsDict.Exists(map.mapId))
+                if (Globals::myMapsDict.Exists(map.mapId))
                     continue;
-                Globals::AddMap(map);
+                Globals::AddMyMap(map);
             }
         }
     }
