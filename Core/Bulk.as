@@ -1,6 +1,6 @@
 /*
 c 2023-07-06
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Bulk {
@@ -168,7 +168,7 @@ namespace Bulk {
         for (uint i = 0; i < records.Length; i++) {
             Models::Record record = Models::Record(records[i], true);
             Globals::myRecords.InsertLast(record);
-            Globals::myRecordsDict.Set(record.mapId, record);
+            Globals::myRecordsDict.Set(record.mapId, @Globals::myRecords[Globals::myRecords.Length - 1]);
             myRecordsMapIds.InsertLast(record.mapId);
         }
 
@@ -219,6 +219,10 @@ namespace Bulk {
                 Models::Map map = Models::Map(maps[i], true);
                 Globals::myRecordsMaps.InsertLast(map);
                 Globals::myRecordsMapsDict.Set(map.mapId, @Globals::myRecordsMaps[Globals::myRecordsMaps.Length - 1]);
+
+                Models::Record@ record = cast<Models::Record@>(Globals::myRecordsDict[map.mapId]);
+                record.mapNameColor = map.mapNameColor;
+                record.mapNameText = map.mapNameText;
             }
         }
 
