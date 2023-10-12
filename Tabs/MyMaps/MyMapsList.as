@@ -5,22 +5,20 @@ m 2023-10-11
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsList() {
-        if (!UI::BeginTabItem(Icons::ListUl + " Map List (" + Globals::maps.Length + ")"))
+        if (!UI::BeginTabItem(Icons::ListUl + " Map List (" + Globals::shownMaps + ")###my-maps-list"))
             return;
-
-        Globals::clickedMapId = "";
 
         if (Settings::myMapsListHint) {
             UI::TextWrapped(
                 "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
                 "\nIf you upload a map again or add it to a club campaign, it's moved to the top of the list." +
-                "\nClick on a map name to open a tab for that map." +
+                "\nClick on a map name to add it to the \"Viewing\" tab above." +
                 "\nYou cannot get records for hidden maps."
             );
         }
 
         UI::BeginDisabled(Locks::myMaps);
-        if (UI::Button(Icons::Refresh + " Refresh Maps (" + Globals::shownMaps + ")"))
+        if (UI::Button(Icons::Refresh + " Refresh Maps"))
             startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
         UI::EndDisabled();
 

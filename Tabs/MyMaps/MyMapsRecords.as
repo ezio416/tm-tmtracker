@@ -5,7 +5,7 @@ m 2023-10-11
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsRecords() {
-        if (!UI::BeginTabItem(Icons::Trophy + " Records (" + Globals::records.Length + ")"))
+        if (!UI::BeginTabItem(Icons::Trophy + " Records (" + Globals::records.Length + ")###my-maps-records"))
             return;
 
         int64 now = Time::Stamp;
@@ -17,11 +17,11 @@ namespace Tabs { namespace MyMaps {
                 "\\$G.\nIt could be shorter, but we don't want to spam Nadeo with API requests. This action does 2+ per map." +
                 "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate." +
                 "\nMaps with no records are faster and hidden maps are skipped." +
-                "\nClick on a map name to open a tab for that map."
+                "\nClick on a map name to add it to the \"Viewing\" tab above."
             );
 
         UI::BeginDisabled(Locks::allRecords);
-        if (UI::Button(Icons::Download + " Get Records (" + Globals::records.Length + ")"))
+        if (UI::Button(Icons::Download + " Get All Records"))
             startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
         UI::EndDisabled();
 
