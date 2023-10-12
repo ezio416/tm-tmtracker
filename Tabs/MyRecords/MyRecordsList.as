@@ -58,15 +58,15 @@ namespace Tabs { namespace MyRecords {
     void Table_MyRecordsList(int64 now) {
         Models::Record@[] records;
 
-        for (uint i = 0; i < Globals::myRecordsSorted.Length; i++) {
-            Models::Record@ record = Globals::myRecordsSorted[i];
-            Models::Map@ map;
+        if (Globals::myRecordsMapsSearch == "")
+            records = Globals::myRecordsSorted;
+        else {
+            for (uint i = 0; i < Globals::myRecordsSorted.Length; i++) {
+                Models::Record@ record = Globals::myRecordsSorted[i];
 
-            if (Globals::myRecordsMapsDict.Exists(record.mapId))
-                @map = cast<Models::Map@>(Globals::myRecordsMapsDict[record.mapId]);
-
-            if (map is null || map.mapNameText.ToLower().Contains(Globals::myRecordsMapsSearch.ToLower()))
-                records.InsertLast(record);
+                if (record.mapNameText.ToLower().Contains(Globals::myRecordsMapsSearch.ToLower()))
+                    records.InsertLast(record);
+            }
         }
 
         int flags = UI::TableFlags::RowBg |
