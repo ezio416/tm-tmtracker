@@ -46,7 +46,7 @@ namespace Settings {
 
 
     [Setting category="Map List" name="Show help text"]
-    bool myMapsListHint = true;
+    bool myMapsListText = true;
 
     [Setting category="Map List" name="Show number of records"]
     bool myMapsListColRecords = true;
@@ -66,13 +66,13 @@ namespace Settings {
 
 
     [Setting category="Viewing Maps" name="Show help text"]
-    bool myMapsViewingText = true;
-
-    [Setting category="Viewing Maps" name="Thumbnail width" min=100 max=1000]
-    uint myMapsViewingThumbWidth = uint(Globals::scale * 150);
+    bool viewingText = true;
 
     [Setting category="Viewing Maps" name="Automatically load thumbnails"]
-    bool myMapsViewingLoadThumbs = false;
+    bool viewingLoadThumbs = false;
+
+    [Setting category="Viewing Maps" name="Thumbnail width" min=100 max=1000]
+    uint viewingThumbWidth = uint(Globals::scale * 150);
 
 
     [Setting category="My Records" name="Show help text"]

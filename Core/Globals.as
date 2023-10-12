@@ -28,6 +28,7 @@ namespace Globals {
     Models::Map@[]    myMapsViewing;
     dictionary        myMapsViewingDict;
     Models::Record[]  myRecords;
+    dictionary        myRecordsDict;
     Models::Map[]     myRecordsMaps;
     dictionary        myRecordsMapsDict;
     Models::Map@[]    myRecordsMapsViewing;
@@ -50,13 +51,6 @@ namespace Globals {
         accountsDict.Set(account.accountId, @accounts[accounts.Length - 1]);
     }
 
-    void ClearAccounts() {
-        Log::Write(Log::Level::Debug, "clearing accounts...");
-
-        accounts.RemoveRange(0, accounts.Length);
-        accountsDict.DeleteAll();
-    }
-
     void AddMyMap(Models::Map map) {
         if (myMapsDict.Exists(map.mapId))
             return;
@@ -70,21 +64,88 @@ namespace Globals {
         myMapsDict.Set(map.mapId, @myMaps[myMaps.Length - 1]);
     }
 
+    void AddMyMapsRecord(Models::Record record) {
+        if (record.timestampIso == "")
+            record.timestampIso = Time::FormatString("%Y-%m-%dT%H:%M:%S+00:00", record.timestampUnix);
+        myMapsRecords.InsertLast(record);
+        Models::Record@ storedRecord = @myMapsRecords[myMapsRecords.Length - 1];
+        myMapsRecordsDict.Set(record.recordFakeId, storedRecord);
+
+        Models::Map@ map = cast<Models::Map@>(myMapsDict[record.mapId]);
+        storedRecord.SetMedals(map);
+        storedRecord.mapNameColor = map.mapNameColor;
+        storedRecord.mapNameText = map.mapNameText;
+        map.records.InsertLast(storedRecord);
+        map.recordsDict.Set(record.accountId, storedRecord);
+    }
+
     void AddMyMapViewing(Models::Map@ map) {
         if (myMapsViewingDict.Exists(map.mapId))
             return;
 
-        Log::Write(Log::Level::Debug, map.logName + "adding to viewing...");
+        Log::Write(Log::Level::Debug, map.logName + "adding to my maps viewing...");
 
         myMapsViewing.InsertLast(map);
         myMapsViewingDict.Set(map.mapId, map);
     }
 
+    void AddMyRecordsMapViewing(Models::Map@ map) {
+        if (myRecordsMapsViewingDict.Exists(map.mapId))
+            return;
+
+        Log::Write(Log::Level::Debug, map.logName + "adding to my records maps viewing...");
+
+        myRecordsMapsViewing.InsertLast(map);
+        myRecordsMapsViewingDict.Set(map.mapId, map);
+    }
+
+    void ClearAccounts() {
+        Log::Write(Log::Level::Debug, "clearing accounts...");
+
+        accounts.RemoveRange(0, accounts.Length);
+        accountsDict.DeleteAll();
+    }
+
+    void ClearMyMaps() {
+        Log::Write(Log::Level::Debug, "clearing my maps...");
+
+        myMaps.RemoveRange(0, myMaps.Length);
+        myMapsDict.DeleteAll();
+        ClearMyMapsViewing();
+        shownMaps = 0;
+    }
+
+    void ClearMyMapRecords(Models::Map@ map) {
+        Log::Write(Log::Level::Debug, map.logName + "clearing my maps records...");
+
+        map.records.RemoveRange(0, map.records.Length);
+        map.recordsDict.DeleteAll();
+
+        if (myMapsRecords.Length == 0) return;
+        for (int i = myMapsRecords.Length - 1; i >= 0; i--)
+            if (myMapsRecords[i].mapId == map.mapId)
+                myMapsRecords.RemoveAt(i);
+    }
+
+    void ClearMyMapsRecords() {
+        Log::Write(Log::Level::Debug, "clearing my maps records...");
+
+        myMapsRecords.RemoveRange(0, myMapsRecords.Length);
+        myMapsRecordsDict.DeleteAll();
+    }
+
     void ClearMyMapsViewing() {
-        Log::Write(Log::Level::Debug, "clearing viewing maps...");
+        Log::Write(Log::Level::Debug, "clearing my maps viewing...");
 
         myMapsViewing.RemoveRange(0, myMapsViewing.Length);
         myMapsViewingDict.DeleteAll();
+    }
+
+    void ClearMyRecordsMapsViewing() {
+        Log::Write(Log::Level::Debug, "clearing my records maps viewing...");
+
+        myRecordsMapsViewing.RemoveRange(0, myRecordsMapsViewing.Length);
+        myRecordsMapsViewingDict.DeleteAll();
     }
 
     void HideMyMap(Models::Map@ map) {
@@ -109,30 +170,6 @@ namespace Globals {
         map.hidden = false;
         Globals::shownMaps++;
         Files::SaveHiddenMaps();
-    }
-
-    void ClearMyMaps() {
-        Log::Write(Log::Level::Debug, "clearing maps...");
-
-        myMaps.RemoveRange(0, myMaps.Length);
-        myMapsDict.DeleteAll();
-        ClearMyMapsViewing();
-        shownMaps = 0;
-    }
-
-    void AddMyMapsRecord(Models::Record record) {
-        if (record.timestampIso == "")
-            record.timestampIso = Time::FormatString("%Y-%m-%dT%H:%M:%S+00:00", record.timestampUnix);
-        myMapsRecords.InsertLast(record);
-        Models::Record@ storedRecord = @myMapsRecords[myMapsRecords.Length - 1];
-        myMapsRecordsDict.Set(record.recordFakeId, storedRecord);
-
-        Models::Map@ map = cast<Models::Map@>(myMapsDict[record.mapId]);
-        storedRecord.SetMedals(map);
-        storedRecord.mapNameColor = map.mapNameColor;
-        storedRecord.mapNameText = map.mapNameText;
-        map.records.InsertLast(storedRecord);
-        map.recordsDict.Set(record.accountId, storedRecord);
     }
 
     void SortMyMapsRecordsCoro() {
@@ -172,25 +209,6 @@ namespace Globals {
         Locks::sortMyMapsRecords = false;
 
         startnew(CoroutineFunc(Database::SaveCoro));
-    }
-
-    void ClearMyMapRecords(Models::Map@ map) {
-        Log::Write(Log::Level::Debug, map.logName + "clearing records...");
-
-        map.records.RemoveRange(0, map.records.Length);
-        map.recordsDict.DeleteAll();
-
-        if (myMapsRecords.Length == 0) return;
-        for (int i = myMapsRecords.Length - 1; i >= 0; i--)
-            if (myMapsRecords[i].mapId == map.mapId)
-                myMapsRecords.RemoveAt(i);
-    }
-
-    void ClearMyMapsRecords() {
-        Log::Write(Log::Level::Debug, "clearing records...");
-
-        myMapsRecords.RemoveRange(0, myMapsRecords.Length);
-        myMapsRecordsDict.DeleteAll();
     }
 
     void SortMyRecordsCoro() {

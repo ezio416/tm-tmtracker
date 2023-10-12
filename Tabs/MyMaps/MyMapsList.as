@@ -8,14 +8,13 @@ namespace Tabs { namespace MyMaps {
         if (!UI::BeginTabItem(Icons::ListUl + " Map List (" + Globals::shownMaps + ")###my-maps-list"))
             return;
 
-        if (Settings::myMapsListHint) {
+        if (Settings::myMapsListText)
             UI::TextWrapped(
                 "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
                 "\nIf you upload a map again or add it to a club campaign, it's moved to the top of the list." +
                 "\nClick on a map name to add it to the \"Viewing Maps\" tab above." +
                 "\nYou cannot get records for hidden maps."
             );
-        }
 
         UI::BeginDisabled(Locks::myMaps);
         if (UI::Button(Icons::Refresh + " Refresh Maps"))
@@ -34,7 +33,7 @@ namespace Tabs { namespace MyMaps {
             UI::EndDisabled();
         }
 
-        Globals::myMapsSearch = UI::InputText("search", Globals::myMapsSearch, false);
+        Globals::myMapsSearch = UI::InputText("search maps", Globals::myMapsSearch, false);
 
         if (Globals::myMapsSearch != "") {
             UI::SameLine();
@@ -53,9 +52,13 @@ namespace Tabs { namespace MyMaps {
 
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
             Models::Map@ map = @Globals::myMaps[i];
-            if (map is null) continue;
 
-            if (map.hidden && !Globals::showHidden) continue;
+            if (map is null)
+                continue;
+
+            if (map.hidden && !Globals::showHidden)
+                continue;
+
             if (map.mapNameText.ToLower().Contains(Globals::myMapsSearch.ToLower()))
                 maps.InsertLast(map);
         }
