@@ -8,7 +8,7 @@ namespace Tabs { namespace MyMaps {
         if (!UI::BeginTabItem(Icons::Eye + " Viewing Maps (" + Globals::myMapsViewing.Length + ")###my-maps-viewing"))
             return;
 
-        if (Settings::myMapsViewingText)
+        if (Settings::viewingText)
             UI::TextWrapped(
                 "Close map tabs with a middle click or the " + Icons::Kenney::ButtonTimes +
                 ".\nIf there are lots of maps here, use the dropdown arrow on the left or the left/right arrows on the right."
@@ -32,14 +32,14 @@ namespace Tabs { namespace MyMaps {
 
             if (UI::BeginTabItem((Settings::mapNameColors ? map.mapNameColor : map.mapNameText) + "###" + map.mapUid, map.viewing, UI::TabItemFlags::Trailing)) {
                 UI::BeginGroup();
-                    vec2 thumbSize = vec2(Settings::myMapsViewingThumbWidth, Settings::myMapsViewingThumbWidth);
+                    vec2 thumbSize = vec2(Settings::viewingThumbWidth, Settings::viewingThumbWidth);
                     try {
                         UI::Image(map.thumbnailTexture, thumbSize);
                     } catch {
                         UI::Dummy(thumbSize);
                     }
 
-                    if (Settings::myMapsViewingLoadThumbs) {
+                    if (Settings::viewingLoadThumbs) {
                         startnew(CoroutineFunc(map.LoadThumbnailCoro));
                     } else if (!Locks::thumbs && map.thumbnailTexture is null && !map.thumbnailLoading) {
                         if (UI::Button(Icons::PictureO + " Load Thumbnail"))
@@ -102,11 +102,11 @@ namespace Tabs { namespace MyMaps {
                         UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
 
                         UI::TableSetupScrollFreeze(0, 1);
-                        UI::TableSetupColumn("Pos",       UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
-                        UI::TableSetupColumn("Time",      UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                        UI::TableSetupColumn("Name",      UI::TableColumnFlags::WidthFixed, Globals::scale * 150);
-                        UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
-                        UI::TableSetupColumn("Recency",   UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
+                        UI::TableSetupColumn("Pos",               UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
+                        UI::TableSetupColumn("Time",              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+                        UI::TableSetupColumn("Name",              UI::TableColumnFlags::WidthFixed, Globals::scale * 150);
+                        UI::TableSetupColumn("Timestamp (Local)", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
+                        UI::TableSetupColumn("Recency",           UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
                         UI::TableHeadersRow();
 
                         UI::ListClipper clipper(map.records.Length);

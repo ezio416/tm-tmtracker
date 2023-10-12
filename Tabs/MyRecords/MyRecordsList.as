@@ -8,18 +8,18 @@ namespace Tabs { namespace MyRecords {
         if (!UI::BeginTabItem(Icons::ListUl + " Record List (" + Globals::myRecords.Length + ")###my-records-list"))
             return;
 
-        int64 now = Time::Stamp;
-
         if (Settings::myRecordsText)
             UI::TextWrapped(
-                "This tab shows records you've driven on any map." //+
-                // "\nClick on a map name to add it to the \"Viewing Maps\" tab above."
+                "This tab shows records you've driven on any map." +
+                "\nClick on a map name to add it to the \"Viewing Maps\" tab above."
             );
 
         UI::BeginDisabled(Locks::myRecords || Locks::mapInfo);
         if (UI::Button(Icons::Download + " Get My Records"))
             startnew(CoroutineFunc(Bulk::GetMyRecordsCoro));
         UI::EndDisabled();
+
+        int64 now = Time::Stamp;
 
         if (!Locks::myRecords) {
             uint timestamp;
@@ -42,6 +42,12 @@ namespace Tabs { namespace MyRecords {
             ));
         }
 
+        Table_MyRecordsMapsList(now);
+
+        UI::EndTabItem();
+    }
+
+    void Table_MyRecordsMapsList(int64 now) {
         int flags = UI::TableFlags::RowBg |
                     UI::TableFlags::ScrollY;
 
@@ -50,9 +56,9 @@ namespace Tabs { namespace MyRecords {
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("PB Time",                         UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+            UI::TableSetupColumn("PB",                              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
             UI::TableSetupColumn("AT",                              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-            UI::TableSetupColumn("Delta to AT",                     UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+            UI::TableSetupColumn("\u0394 to AT",                    UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
             UI::TableSetupColumn("Timestamp " + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
             UI::TableSetupColumn("Recency "   + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
             UI::TableHeadersRow();
@@ -67,7 +73,8 @@ namespace Tabs { namespace MyRecords {
                     UI::TableNextColumn();
                     if (Globals::myRecordsMapsDict.Exists(record.mapId)) {
                         @map = cast<Models::Map@>(Globals::myRecordsMapsDict[record.mapId]);
-                        UI::Text(Settings::medalColors ? map.mapNameColor : map.mapNameText);
+                        if (UI::Selectable((Settings::mapNameColors ? map.mapNameColor : map.mapNameText), false, UI::SelectableFlags::SpanAllColumns))
+                            Globals::AddMyRecordsMapViewing(map);
                     } else
                         UI::Text(record.mapId);
 
@@ -92,11 +99,9 @@ namespace Tabs { namespace MyRecords {
                         UI::Text("unknown");
 
                     UI::TableNextColumn();
-                    if (Globals::myRecordsMapsDict.Exists(record.mapId)) {
-                        int delta = int(map.authorTime) - int(record.time);
-                        string deltaStr = (delta > 0) ? "\\$0F0-" : "\\$F00+";
-                        UI::Text(deltaStr + Time::Format(Math::Abs(delta)));
-                    } else
+                    if (Globals::myRecordsMapsDict.Exists(record.mapId))
+                        UI::Text(Util::TimeFormatColored(int(record.time) - int(map.authorTime)));
+                    else
                         UI::Text("unknown");
 
                     UI::TableNextColumn();
@@ -110,7 +115,5 @@ namespace Tabs { namespace MyRecords {
             UI::PopStyleColor();
             UI::EndTable();
         }
-
-        UI::EndTabItem();
     }
 }}

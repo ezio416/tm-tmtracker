@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Util {
@@ -65,6 +65,10 @@ namespace Util {
 
     string StrWrap(const string &in input, const string &in wrapper = "'") {
         return wrapper + input + wrapper;
+    }
+
+    string TimeFormatColored(int time) {
+        return (time > 0 ? "\\$F00+" : "\\$0F0-") + Time::Format(Math::Abs(time));
     }
 
     void TmioMap(const string &in mapUid) {

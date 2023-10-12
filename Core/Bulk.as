@@ -44,7 +44,7 @@ namespace Bulk {
         Locks::myMaps = true;
         string timerId = Log::TimerBegin("getting my maps");
         string statusId = "get-my-maps";
-        Globals::status.Set(statusId, "getting maps...");
+        Globals::status.Set(statusId, "getting my maps...");
 
         Globals::ClearMyMaps();
 
@@ -98,14 +98,14 @@ namespace Bulk {
             return;
 
         Locks::allRecords = true;
-        string timerId = Log::TimerBegin("getting records");
+        string timerId = Log::TimerBegin("getting my maps records");
         string statusId = "get-all-records";
 
         Globals::getAccountNames = false;
         Globals::singleMapRecordStatus = false;
 
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
-            Globals::status.Set(statusId, "getting records... (" + (i + 1) + "/" + Globals::myMaps.Length + ")");
+            Globals::status.Set(statusId, "getting my maps records... (" + (i + 1) + "/" + Globals::myMaps.Length + ")");
 
             Models::Map@ map = @Globals::myMaps[i];
             Meta::PluginCoroutine@ recordsCoro = startnew(CoroutineFunc(map.GetRecordsCoro));
@@ -168,6 +168,7 @@ namespace Bulk {
         for (uint i = 0; i < records.Length; i++) {
             Models::Record record = Models::Record(records[i], true);
             Globals::myRecords.InsertLast(record);
+            Globals::myRecordsDict.Set(record.mapId, record);
             myRecordsMapIds.InsertLast(record.mapId);
         }
 
