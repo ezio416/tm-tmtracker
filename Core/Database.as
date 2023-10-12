@@ -1,6 +1,6 @@
 /*
 c 2023-07-14
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Database {
@@ -186,7 +186,7 @@ namespace Database {
         SQLite::Database@ db = SQLite::Database(Files::db);
         SQLite::Statement@ s;
 
-        Globals::ClearRecords();
+        Globals::ClearMyMapsRecords();
 
         try {
             @s = db.Prepare("SELECT * FROM Records");
@@ -213,7 +213,7 @@ namespace Database {
         Log::TimerEnd(timerId);
         Locks::db = false;
 
-        startnew(CoroutineFunc(Globals::SortRecordsCoro));
+        startnew(CoroutineFunc(Globals::SortMyMapsRecordsCoro));
     }
 
     void SaveCoro() {

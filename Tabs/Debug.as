@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Tabs {
@@ -100,7 +100,7 @@ namespace Tabs {
 
             if (UI::BeginTabItem("records (" + Globals::records.Length + ")")) {
                 if (UI::Button(Icons::Times + " Clear"))
-                    Globals::ClearRecords();
+                    Globals::ClearMyMapsRecords();
 
                 UI::SameLine();
                 if (UI::Button(Icons::Download + " Get All"))
@@ -162,15 +162,19 @@ namespace Tabs {
             }
 
             if (UI::BeginTabItem("locks")) {
-                UI::Text((Locks::allRecords    ? "\\$0F0" : "\\$F00") + "allRecords");
-                UI::Text((Locks::db            ? "\\$0F0" : "\\$F00") + "db");
-                UI::Text((Locks::editMap       ? "\\$0F0" : "\\$F00") + "editMap");
-                UI::Text((Locks::myMaps        ? "\\$0F0" : "\\$F00") + "myMaps");
-                UI::Text((Locks::playMap       ? "\\$0F0" : "\\$F00") + "playMap");
-                UI::Text((Locks::requesting    ? "\\$0F0" : "\\$F00") + "requesting");
-                UI::Text((Locks::singleRecords ? "\\$0F0" : "\\$F00") + "singleRecords");
-                UI::Text((Locks::sortRecords   ? "\\$0F0" : "\\$F00") + "sortRecords");
-                UI::Text((Locks::tmx           ? "\\$0F0" : "\\$F00") + "tmx");
+                UI::Text((Locks::allRecords        ? "\\$0F0" : "\\$F00") + "allRecords");
+                UI::Text((Locks::db                ? "\\$0F0" : "\\$F00") + "db");
+                UI::Text((Locks::editMap           ? "\\$0F0" : "\\$F00") + "editMap");
+                UI::Text((Locks::mapInfo           ? "\\$0F0" : "\\$F00") + "mapInfo");
+                UI::Text((Locks::myMaps            ? "\\$0F0" : "\\$F00") + "myMaps");
+                UI::Text((Locks::myRecords         ? "\\$0F0" : "\\$F00") + "myRecords");
+                UI::Text((Locks::playMap           ? "\\$0F0" : "\\$F00") + "playMap");
+                UI::Text((Locks::requesting        ? "\\$0F0" : "\\$F00") + "requesting");
+                UI::Text((Locks::singleRecords     ? "\\$0F0" : "\\$F00") + "singleRecords");
+                UI::Text((Locks::sortMyMapsRecords ? "\\$0F0" : "\\$F00") + "sortMyMapsRecords");
+                UI::Text((Locks::sortMyRecords     ? "\\$0F0" : "\\$F00") + "sortRecords");
+                UI::Text((Locks::thumbs            ? "\\$0F0" : "\\$F00") + "thumbs");
+                UI::Text((Locks::tmx               ? "\\$0F0" : "\\$F00") + "tmx");
 
                 UI::EndTabItem();
             }

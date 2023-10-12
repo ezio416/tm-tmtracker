@@ -25,6 +25,7 @@ namespace Globals {
     Models::Record[]  myRecords;
     Models::Map[]     myRecordsMaps;
     dictionary        myRecordsMapsDict;
+    Models::Record@[] myRecordsSorted;
     Models::Record[]  records;
     dictionary        recordsDict;
     Models::Record@[] recordsSorted;
@@ -131,17 +132,17 @@ namespace Globals {
         map.recordsDict.Set(record.accountId, storedRecord);
     }
 
-    void SortRecordsCoro() {
-        while (Locks::sortRecords)
+    void SortMyMapsRecordsCoro() {
+        while (Locks::sortMyMapsRecords)
             yield();
-        Locks::sortRecords = true;
-        string timerId = Log::TimerBegin("sorting records");
+        Locks::sortMyMapsRecords = true;
+        string timerId = Log::TimerBegin("sorting my maps records");
         string statusId = "sort-records";
 
         recordsSorted.RemoveRange(0, recordsSorted.Length);
 
         for (uint i = 0; i < records.Length; i++) {
-            Globals::status.Set(statusId, "sorting records... (" + i + "/" + records.Length + ")");
+            Globals::status.Set(statusId, "sorting my maps records... (" + i + "/" + records.Length + ")");
             Models::Record@ record = @records[i];
 
             for (uint j = 0; j < recordsSorted.Length; j++) {
@@ -165,7 +166,7 @@ namespace Globals {
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
-        Locks::sortRecords = false;
+        Locks::sortMyMapsRecords = false;
 
         startnew(CoroutineFunc(Database::SaveCoro));
     }
@@ -182,10 +183,47 @@ namespace Globals {
                 records.RemoveAt(i);
     }
 
-    void ClearRecords() {
+    void ClearMyMapsRecords() {
         Log::Write(Log::Level::Debug, "clearing records...");
 
         records.RemoveRange(0, records.Length);
         recordsDict.DeleteAll();
+    }
+
+    void SortMyRecordsCoro() {
+        while (Locks::sortMyRecords)
+            yield();
+        Locks::sortMyRecords = true;
+        string timerId = Log::TimerBegin("sorting my records");
+        string statusId = "sort-my-records";
+
+        myRecordsSorted.RemoveRange(0, myRecordsSorted.Length);
+
+        for (uint i = 0; i < myRecords.Length; i++) {
+            Globals::status.Set(statusId, "sorting my records... (" + i + "/" + myRecords.Length + ")");
+            Models::Record@ record = @myRecords[i];
+
+            for (uint j = 0; j < myRecordsSorted.Length; j++) {
+                if (record.timestampUnix > myRecordsSorted[j].timestampUnix) {
+                    myRecordsSorted.InsertAt(j, record);
+                    break;
+                }
+
+                if (j == myRecordsSorted.Length - 1) {
+                    myRecordsSorted.InsertLast(record);
+                    break;
+                }
+            }
+
+            if (myRecordsSorted.Length == 0)
+                myRecordsSorted.InsertLast(record);
+
+            if (i % 5 == 0)
+                yield();
+        }
+
+        Globals::status.Delete(statusId);
+        Log::TimerEnd(timerId);
+        Locks::sortMyRecords = false;
     }
 }

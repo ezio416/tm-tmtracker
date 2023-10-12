@@ -32,7 +32,7 @@ namespace Bulk {
             account.SetNameExpire();
         }
 
-        startnew(CoroutineFunc(Globals::SortRecordsCoro));
+        startnew(CoroutineFunc(Globals::SortMyMapsRecordsCoro));
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
@@ -175,6 +175,7 @@ namespace Bulk {
         Log::TimerEnd(timerId);
         Locks::myRecords = false;
 
+        startnew(CoroutineFunc(Globals::SortMyRecordsCoro));
         startnew(CoroutineFunc(GetMyRecordsMapInfoCoro));
     }
 

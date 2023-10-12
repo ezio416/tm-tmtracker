@@ -55,7 +55,7 @@ namespace Settings {
     bool recordsEstimate = true;
 
     [Setting category="My Map Records" name="Show record times with medal colors"]
-    bool recordsMedalColors = true;
+    bool recordsMedalColor = true;
 
     [Setting category="My Map Records" name="Highlight top 5 world"]
     bool recordsHighlight5 = true;
@@ -85,4 +85,10 @@ namespace Settings {
 
     [Setting category="My Records" name="Show help text"]
     bool myRecordsText = true;
+
+    [Setting category="My Records" name="Show map names with color"]
+    bool myRecordsMapColor = true;
+
+    [Setting category="My Records" name="Show record times with medal colors"]
+    bool myRecordsMedalColor = true;
 }
