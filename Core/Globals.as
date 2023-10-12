@@ -33,6 +33,7 @@ namespace Globals {
     dictionary        myRecordsDict;
     Models::Map[]     myRecordsMaps;
     dictionary        myRecordsMapsDict;
+    string            myRecordsMapsSearch;
     Models::Map@[]    myRecordsMapsViewing;
     dictionary        myRecordsMapsViewingDict;
     string            myRecordsMapsViewingMapId;
