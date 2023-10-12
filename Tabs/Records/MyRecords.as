@@ -1,12 +1,17 @@
 /*
 c 2023-10-09
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Tabs { namespace Records {
     void Tab_MyRecords() {
         if (!UI::BeginTabItem(Icons::Trophy + " My Records"))
             return;
+
+        if (Settings::myRecordsText)
+            UI::TextWrapped(
+                "This page shows records you've driven on any map."
+            );
 
         UI::BeginDisabled(Locks::myRecords || Locks::mapInfo);
         if (UI::Button(Icons::Download + " Get Records (" + Globals::myRecords.Length +")"))
