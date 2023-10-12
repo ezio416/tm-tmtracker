@@ -1,6 +1,6 @@
 /*
 c 2023-07-06
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Bulk {
@@ -42,7 +42,7 @@ namespace Bulk {
         while (Locks::myMaps)
             yield();
         Locks::myMaps = true;
-        string timerId = Log::TimerBegin("updating my maps");
+        string timerId = Log::TimerBegin("getting my maps");
         string statusId = "get-my-maps";
         Globals::status.Set(statusId, "getting maps...");
 
@@ -81,7 +81,7 @@ namespace Bulk {
             }
 
             if (tooManyMaps)
-                Log::Write(Log::Level::Debug, "tooManyMaps, getting more");
+                Log::Write(Log::Level::Debug, "tooManyMaps, getting more...");
         } while (tooManyMaps);
 
         Log::Write(Log::Level::Debug, "number of maps gotten: " + Globals::maps.Length);
