@@ -51,7 +51,7 @@ namespace Settings {
     bool myMapsListColUpload = true;
 
 
-    [Setting category="My Map Records" name="Show time estimate"]
+    [Setting category="My Map Records" name="Show time estimate + help text"]
     bool recordsEstimate = true;
 
     [Setting category="My Map Records" name="Show record times with medal colors"]
@@ -64,7 +64,7 @@ namespace Settings {
     string recordsHighlightColor = "F71";
 
 
-    [Setting category="Viewing Maps" name="Show map names with color"]
+    [Setting category="Viewing Maps" name="Show help text"]
     bool myMapsViewingText = true;
 
     [Setting category="Viewing Maps" name="Show map names with color"]

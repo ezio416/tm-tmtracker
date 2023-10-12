@@ -18,11 +18,13 @@ namespace Tabs {
             startnew(CoroutineFunc(Bulk::GetMyRecordsCoro));
         UI::EndDisabled();
 
-        int flags =
-            UI::TableFlags::Resizable |
-            UI::TableFlags::ScrollY;
+        int flags = UI::TableFlags::Resizable |
+                    UI::TableFlags::RowBg |
+                    UI::TableFlags::ScrollY;
 
         if (UI::BeginTable("my-records", 5, flags)) {
+            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
+
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("map");
             UI::TableSetupColumn("time");
@@ -75,6 +77,7 @@ namespace Tabs {
                 }
             }
 
+            UI::PopStyleColor();
             UI::EndTable();
         }
 

@@ -9,7 +9,6 @@ namespace Globals {
     string            apiCore                = "NadeoServices";
     string            apiLive                = "NadeoLiveServices";
     bool              cancelAllRecords       = false;
-    string            clickedMapId;
     string            colorAuthor            = "\\$4B0";
     string            colorBronze            = "\\$C80";
     string            colorGold              = "\\$DD1";
@@ -76,7 +75,6 @@ namespace Globals {
 
         viewingMaps.InsertLast(map);
         viewingMapsDict.Set(map.mapId, map);
-        clickedMapId = map.mapId;
     }
 
     void ClearViewingMaps() {

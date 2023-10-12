@@ -5,35 +5,32 @@ m 2023-10-11
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsViewing() {
-        if (!UI::BeginTabItem(Icons::Eye + " Viewing (" + Globals::viewingMaps.Length + ")"))
+        if (!UI::BeginTabItem(Icons::Eye + " Viewing (" + Globals::viewingMaps.Length + ")###my-maps-viewing"))
             return;
 
-        UI::TextWrapped(
-            "Close map tabs with a middle click or the " + Icons::Kenney::ButtonTimes
-        );
+        if (Settings::myMapsViewingText)
+            UI::TextWrapped(
+                "Close map tabs with a middle click or the " + Icons::Kenney::ButtonTimes +
+                ".\nIf there are lots of maps here, use the dropdown arrow on the left or the left/right arrows on the right."
+            );
 
         UI::BeginDisabled(Globals::viewingMaps.Length == 0);
-        if (UI::Button(Icons::Times + " Clear"))
+        if (UI::Button(Icons::Times + " Clear All"))
             Globals::ClearViewingMaps();
         UI::EndDisabled();
 
-        UI::BeginTabBar("viewing", UI::TabBarFlags::FittingPolicyScroll);
+        int flags = UI::TabBarFlags::FittingPolicyScroll;
+        if (Globals::viewingMaps.Length > 0)
+            flags |= UI::TabBarFlags::TabListPopupButton;
+
+        UI::BeginTabBar("viewing", flags);
 
         int64 now = Time::Stamp;
 
         for (uint i = 0; i < Globals::viewingMaps.Length; i++) {
             Models::Map@ map = @Globals::viewingMaps[i];
 
-            int flags = UI::TabItemFlags::Trailing;
-            if (
-                Globals::clickedMapId == map.mapId //&&
-                // Settings::myMapTabsSwitchOnClicked
-            ) {
-                flags |= UI::TabItemFlags::SetSelected;
-                Globals::clickedMapId = "";
-            }
-
-            if (UI::BeginTabItem((Settings::myMapsViewingTabColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, map.viewing, flags)) {
+            if (UI::BeginTabItem((Settings::myMapsViewingTabColor ? map.mapNameColor : map.mapNameText) + "###" + map.mapUid, map.viewing, UI::TabItemFlags::Trailing)) {
                 UI::BeginGroup();
                     vec2 thumbSize = vec2(Settings::myMapsViewingThumbWidth, Settings::myMapsViewingThumbWidth);
                     try {
