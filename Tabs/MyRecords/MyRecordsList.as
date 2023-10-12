@@ -11,7 +11,7 @@ namespace Tabs { namespace MyRecords {
         if (Settings::myRecordsText)
             UI::TextWrapped(
                 "This tab shows records you've driven on any map, sorted by when you drove them." +
-                "\nClick on a map name to add it to the \"Viewing Maps\" tab above."
+                "\nClick on a map to add it to the \"Viewing Maps\" tab above."
             );
 
         UI::BeginDisabled(Locks::myRecords || Locks::mapInfo);

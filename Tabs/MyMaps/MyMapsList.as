@@ -12,8 +12,7 @@ namespace Tabs { namespace MyMaps {
             UI::TextWrapped(
                 "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
                 "\nIf you upload a map again or add it to a club campaign, it's moved to the top of the list." +
-                "\nClick on a map name to add it to the \"Viewing Maps\" tab above." +
-                "\nYou cannot get records for hidden maps."
+                "\nClick on a map to add it to the \"Viewing Maps\" tab above."
             );
 
         UI::BeginDisabled(Locks::myMaps);

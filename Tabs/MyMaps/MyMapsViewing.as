@@ -17,7 +17,9 @@ namespace Tabs { namespace MyMaps {
         if (Settings::viewingText)
             UI::TextWrapped(
                 "Close map tabs with a middle click or the " + Icons::Kenney::ButtonTimes +
-                ".\nIf there are lots of maps here, use the dropdown arrow on the left or the left/right arrows on the right."
+                ".\nIf there are lots of maps here, use the dropdown arrow on the left or the left/right arrows on the right." +
+                "\nClick on an account name to open their Trackmania.io page." +
+                "\nIf a map is hidden, you cannot get records for it."
             );
 
         UI::BeginDisabled(Globals::myMapsViewing.Length == 0);
@@ -145,7 +147,6 @@ namespace Tabs { namespace MyMaps {
                                 UI::TableNextColumn();
                                 if (UI::Selectable((account.accountName != "") ? account.accountName : account.accountId, false))
                                     Util::TmioPlayer(account.accountId);
-                                Util::HoverTooltip("Trackmania.io profile");
 
                                 UI::TableNextColumn();
                                 UI::Text(Util::UnixToIso(record.timestampUnix));
