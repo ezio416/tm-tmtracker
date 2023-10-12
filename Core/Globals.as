@@ -14,8 +14,6 @@ namespace Globals {
     string            colorBronze            = "\\$C80";
     string            colorGold              = "\\$DD1";
     string            colorSilver            = "\\$AAA";
-    Models::Map@[]    currentMaps;
-    dictionary        currentMapsDict;
     string            dateFormat             = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
     bool              debugTab               = false;
     bool              getAccountNames        = true;
@@ -39,6 +37,8 @@ namespace Globals {
     dictionary        status;
     vec4              tableRowBgAltColor     = vec4(0, 0, 0, 0.5);
     string            title                  = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
+    Models::Map@[]    viewingMaps;
+    dictionary        viewingMapsDict;
 
     void AddAccount(Models::Account account) {
         if (accountsDict.Exists(account.accountId))
@@ -68,22 +68,22 @@ namespace Globals {
         mapsDict.Set(map.mapId, @maps[maps.Length - 1]);
     }
 
-    void AddCurrentMap(Models::Map@ map) {
-        if (currentMapsDict.Exists(map.mapId))
+    void AddViewingMap(Models::Map@ map) {
+        if (viewingMapsDict.Exists(map.mapId))
             return;
 
-        Log::Write(Log::Level::Debug, map.logName + "adding to current...");
+        Log::Write(Log::Level::Debug, map.logName + "adding to viewing...");
 
-        currentMaps.InsertLast(map);
-        currentMapsDict.Set(map.mapId, map);
+        viewingMaps.InsertLast(map);
+        viewingMapsDict.Set(map.mapId, map);
         clickedMapId = map.mapId;
     }
 
-    void ClearCurrentMaps() {
-        Log::Write(Log::Level::Debug, "clearing current maps...");
+    void ClearViewingMaps() {
+        Log::Write(Log::Level::Debug, "clearing viewing maps...");
 
-        currentMaps.RemoveRange(0, currentMaps.Length);
-        currentMapsDict.DeleteAll();
+        viewingMaps.RemoveRange(0, viewingMaps.Length);
+        viewingMapsDict.DeleteAll();
     }
 
     void HideMap(Models::Map@ map) {
@@ -115,7 +115,7 @@ namespace Globals {
 
         maps.RemoveRange(0, maps.Length);
         mapsDict.DeleteAll();
-        ClearCurrentMaps();
+        ClearViewingMaps();
         shownMaps = 0;
     }
 

@@ -1,11 +1,11 @@
 /*
 c 2023-05-26
-m 2023-10-09
+m 2023-10-11
 */
 
-namespace Tabs { namespace Maps {
+namespace Tabs { namespace MyMaps {
     void Tab_MyMapsList() {
-        if (!UI::BeginTabItem(Icons::MapO + " My Maps"))
+        if (!UI::BeginTabItem(Icons::ListUl + " Map List (" + Globals::maps.Length + ")"))
             return;
 
         Globals::clickedMapId = "";
@@ -13,8 +13,8 @@ namespace Tabs { namespace Maps {
         if (Settings::myMapsListHint) {
             UI::TextWrapped(
                 "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
+                "\nIf you upload a map again or add it to a club campaign, it's moved to the top of the list." +
                 "\nClick on a map name to open a tab for that map." +
-                "\nClose map tabs with a middle click or the " + Icons::Kenney::ButtonTimes +
                 "\nYou cannot get records for hidden maps."
             );
         }
@@ -35,12 +35,6 @@ namespace Tabs { namespace Maps {
                 Globals::showHidden = true;
             UI::EndDisabled();
         }
-
-        UI::BeginDisabled(Globals::currentMaps.Length == 0);
-        UI::SameLine();
-        if (UI::Button(Icons::Times + " Clear Current (" + Globals::currentMaps.Length + ")"))
-            Globals::ClearCurrentMaps();
-        UI::EndDisabled();
 
         Globals::mapSearch = UI::InputText("search", Globals::mapSearch, false);
 
@@ -99,7 +93,7 @@ namespace Tabs { namespace Maps {
                     UI::TableNextRow();
                     UI::TableNextColumn();
                     if (UI::Selectable((Settings::myMapsListColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false, UI::SelectableFlags::SpanAllColumns))
-                        Globals::AddCurrentMap(map);
+                        Globals::AddViewingMap(map);
 
                     if (Settings::myMapsListColRecords) {
                         UI::TableNextColumn();

@@ -20,6 +20,9 @@ namespace Settings {
     [Setting category="General" name="Days to keep account names" min=0 max=30]
     uint accountNameValidDays = 7;
 
+    [Setting category="General" name="Max records to get per map"]
+    uint maxRecordsPerMap = 100;
+
 
     [Setting category="Startup" name="Refresh my maps"]
     bool refreshMaps = false;
@@ -32,39 +35,20 @@ namespace Settings {
     Log::Level logLevel = Log::Level::Normal;
 
 
-    [Setting category="My Maps List" name="Show help text"]
+    [Setting category="Map List" name="Show help text"]
     bool myMapsListHint = true;
 
-    [Setting category="My Maps List" name="Show map names with color"]
+    [Setting category="Map List" name="Show map names with color"]
     bool myMapsListColor = true;
 
-    [Setting category="My Maps List" name="Show number of records"]
+    [Setting category="Map List" name="Show number of records"]
     bool myMapsListColRecords = true;
 
-    [Setting category="My Maps List" name="Show latest record update time"]
+    [Setting category="Map List" name="Show latest record update time"]
     bool myMapsListColRecordsTime = true;
 
-    [Setting category="My Maps List" name="Show latest map upload time"]
+    [Setting category="Map List" name="Show latest map upload time"]
     bool myMapsListColUpload = true;
-
-
-    [Setting category="My Map Tabs" name="Show map names with color"]
-    bool myMapTabsColor = true;
-
-    [Setting category="My Map Tabs" name="Switch to map when clicked"]
-    bool myMapTabsSwitchOnClicked = true;
-
-    [Setting category="My Map Tabs" name="Thumbnail width" min=100 max=1000]
-    uint myMapTabsThumbWidth = uint(Globals::scale * 150);
-
-    [Setting category="My Map Tabs" name="Automatically load thumbnails"]
-    bool myMapTabsLoadThumbs = false;
-
-    [Setting category="My Map Tabs" name="Max records to get per map"]
-    uint maxRecordsPerMap = 100;
-
-    [Setting category="My Map Tabs" name="Show map record times with medal colors"]
-    bool mapRecordsMedalColors = true;
 
 
     [Setting category="My Map Records" name="Show time estimate"]
@@ -78,6 +62,26 @@ namespace Settings {
 
     [Setting category="My Map Records" name="Top 5 highlight color"]
     string recordsHighlightColor = "F71";
+
+
+    [Setting category="Viewing Maps" name="Show map names with color"]
+    bool myMapsViewingText = true;
+
+    [Setting category="Viewing Maps" name="Show map names with color"]
+    bool myMapsViewingTabColor = true;
+
+    // [Setting category="Viewing Maps" name="Switch to map when clicked"]
+    // bool myMapTabsSwitchOnClicked = true;
+
+    [Setting category="Viewing Maps" name="Thumbnail width" min=100 max=1000]
+    uint myMapsViewingThumbWidth = uint(Globals::scale * 150);
+
+    [Setting category="Viewing Maps" name="Automatically load thumbnails"]
+    bool myMapsViewingLoadThumbs = false;
+
+    [Setting category="Viewing Maps" name="Show map record times with medal colors"]
+    bool myMapsViewingMedalColors = true;
+
 
     [Setting category="My Records" name="Show help text"]
     bool myRecordsText = true;

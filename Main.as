@@ -90,8 +90,8 @@ void RenderInterface() {
             UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
 
         UI::BeginTabBar("tabs");
-            Tabs::Tab_Maps();
-            Tabs::Tab_Records();
+            Tabs::Tab_MyMaps();
+            Tabs::Tab_MyRecords();
             if (Settings::infoTab)
                 Tabs::Tab_Info();
             if (Globals::debugTab)
