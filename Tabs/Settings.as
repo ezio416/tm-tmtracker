@@ -1,6 +1,6 @@
 /*
 c 2023-07-16
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Settings {
@@ -67,6 +67,9 @@ namespace Settings {
 
     [Setting category="Viewing Maps" name="Show help text"]
     bool viewingText = true;
+
+    [Setting category="Viewing Maps" name="Switch to map tab when clicked"]
+    bool viewingSwitchOnClicked = true;
 
     [Setting category="Viewing Maps" name="Automatically load thumbnails"]
     bool viewingLoadThumbs = false;

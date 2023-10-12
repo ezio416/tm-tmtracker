@@ -1,11 +1,17 @@
 /*
 c 2023-05-26
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsViewing() {
-        if (!UI::BeginTabItem(Icons::Eye + " Viewing Maps (" + Globals::myMapsViewing.Length + ")###my-maps-viewing"))
+        int tabFlags = 0;
+        if (Globals::myMapsViewingSet) {
+            Globals::myMapsViewingSet = false;
+            tabFlags |= UI::TabItemFlags::SetSelected;
+        }
+
+        if (!UI::BeginTabItem(Icons::Eye + " Viewing Maps (" + Globals::myMapsViewing.Length + ")###my-maps-viewing", tabFlags))
             return;
 
         if (Settings::viewingText)
@@ -19,18 +25,24 @@ namespace Tabs { namespace MyMaps {
             Globals::ClearMyMapsViewing();
         UI::EndDisabled();
 
-        int flags = UI::TabBarFlags::FittingPolicyScroll;
+        int barFlags = UI::TabBarFlags::FittingPolicyScroll;
         if (Globals::myMapsViewing.Length > 0)
-            flags |= UI::TabBarFlags::TabListPopupButton;
+            barFlags |= UI::TabBarFlags::TabListPopupButton;
 
-        UI::BeginTabBar("my-maps-viewing", flags);
+        UI::BeginTabBar("my-maps-viewing", barFlags);
 
         int64 now = Time::Stamp;
 
         for (uint i = 0; i < Globals::myMapsViewing.Length; i++) {
             Models::Map@ map = @Globals::myMapsViewing[i];
 
-            if (UI::BeginTabItem((Settings::mapNameColors ? map.mapNameColor : map.mapNameText) + "###" + map.mapUid, map.viewing, UI::TabItemFlags::Trailing)) {
+            int mapTabFlags = UI::TabItemFlags::Trailing;
+            if (Globals::myMapsViewingMapId == map.mapId) {
+                Globals::myMapsViewingMapId = "";
+                mapTabFlags |= UI::TabItemFlags::SetSelected;
+            }
+
+            if (UI::BeginTabItem((Settings::mapNameColors ? map.mapNameColor : map.mapNameText) + "###" + map.mapUid, map.viewing, mapTabFlags)) {
                 UI::BeginGroup();
                     vec2 thumbSize = vec2(Settings::viewingThumbWidth, Settings::viewingThumbWidth);
                     try {
