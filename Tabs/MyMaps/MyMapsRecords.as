@@ -76,7 +76,7 @@ namespace Tabs { namespace MyMaps {
 
                     UI::TableNextColumn();
                     string timeColor = "";
-                    if (Settings::recordsMedalColors)
+                    if (Settings::recordsMedalColor)
                         switch (record.medals) {
                             case 1: timeColor = Globals::colorBronze; break;
                             case 2: timeColor = Globals::colorSilver; break;
