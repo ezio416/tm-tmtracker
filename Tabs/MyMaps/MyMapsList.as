@@ -52,10 +52,7 @@ namespace Tabs { namespace MyMaps {
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
             Models::Map@ map = @Globals::myMaps[i];
 
-            if (map is null)
-                continue;
-
-            if (map.hidden && !Globals::showHidden)
+            if (map is null || (map.hidden && !Globals::showHidden))
                 continue;
 
             if (map.mapNameText.ToLower().Contains(Globals::myMapsSearch.ToLower()))
