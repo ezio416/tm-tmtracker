@@ -1,34 +1,48 @@
 /*
 c 2023-05-26
-m 2023-10-09
+m 2023-10-11
 */
 
-namespace Tabs { namespace Maps {
-    void Tabs_Current() {
+namespace Tabs { namespace MyMaps {
+    void Tab_MyMapsViewing() {
+        if (!UI::BeginTabItem(Icons::Eye + " Viewing (" + Globals::viewingMaps.Length + ")"))
+            return;
+
+        UI::TextWrapped(
+            "Close map tabs with a middle click or the " + Icons::Kenney::ButtonTimes
+        );
+
+        UI::BeginDisabled(Globals::viewingMaps.Length == 0);
+        if (UI::Button(Icons::Times + " Clear"))
+            Globals::ClearViewingMaps();
+        UI::EndDisabled();
+
+        UI::BeginTabBar("viewing", UI::TabBarFlags::FittingPolicyScroll);
+
         int64 now = Time::Stamp;
 
-        for (uint i = 0; i < Globals::currentMaps.Length; i++) {
-            Models::Map@ map = @Globals::currentMaps[i];
+        for (uint i = 0; i < Globals::viewingMaps.Length; i++) {
+            Models::Map@ map = @Globals::viewingMaps[i];
 
             int flags = UI::TabItemFlags::Trailing;
             if (
-                Globals::clickedMapId == map.mapId &&
-                Settings::myMapTabsSwitchOnClicked
+                Globals::clickedMapId == map.mapId //&&
+                // Settings::myMapTabsSwitchOnClicked
             ) {
                 flags |= UI::TabItemFlags::SetSelected;
                 Globals::clickedMapId = "";
             }
 
-            if (UI::BeginTabItem((Settings::myMapTabsColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, map.viewing, flags)) {
+            if (UI::BeginTabItem((Settings::myMapsViewingTabColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, map.viewing, flags)) {
                 UI::BeginGroup();
-                    vec2 thumbSize = vec2(Settings::myMapTabsThumbWidth, Settings::myMapTabsThumbWidth);
+                    vec2 thumbSize = vec2(Settings::myMapsViewingThumbWidth, Settings::myMapsViewingThumbWidth);
                     try {
                         UI::Image(map.thumbnailTexture, thumbSize);
                     } catch {
                         UI::Dummy(thumbSize);
                     }
 
-                    if (Settings::myMapTabsLoadThumbs) {
+                    if (Settings::myMapsViewingLoadThumbs) {
                         startnew(CoroutineFunc(map.LoadThumbnailCoro));
                     } else if (!Locks::thumbs && map.thumbnailTexture is null && !map.thumbnailLoading) {
                         if (UI::Button(Icons::PictureO + " Load Thumbnail"))
@@ -110,7 +124,7 @@ namespace Tabs { namespace Maps {
 
                                 UI::TableNextColumn();
                                 string timeColor = "";
-                                if (Settings::mapRecordsMedalColors)
+                                if (Settings::myMapsViewingMedalColors)
                                     switch (record.medals) {
                                         case 1: timeColor = Globals::colorBronze; break;
                                         case 2: timeColor = Globals::colorSilver; break;
@@ -142,9 +156,13 @@ namespace Tabs { namespace Maps {
             }
 
             if (!map.viewing) {
-                Globals::currentMaps.RemoveAt(i);
-                Globals::currentMapsDict.Delete(map.mapId);
+                Globals::viewingMaps.RemoveAt(i);
+                Globals::viewingMapsDict.Delete(map.mapId);
             }
         }
+
+        UI::EndTabBar();
+
+        UI::EndTabItem();
     }
 }}

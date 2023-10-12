@@ -1,11 +1,11 @@
 /*
 c 2023-07-12
-m 2023-10-09
+m 2023-10-11
 */
 
-namespace Tabs { namespace Records {
+namespace Tabs { namespace MyMaps {
     void Tab_MyMapsRecords() {
-        if (!UI::BeginTabItem(Icons::MapO + " My Maps"))
+        if (!UI::BeginTabItem(Icons::Trophy + " Records (" + Globals::records.Length + ")"))
             return;
 
         int64 now = Time::Stamp;
@@ -16,7 +16,8 @@ namespace Tabs { namespace Records {
                 Util::FormatSeconds(uint(1.2 * Globals::shownMaps)) + " - " + Util::FormatSeconds(uint(3.6 * Globals::shownMaps)) +
                 "\\$G.\nIt could be shorter, but we don't want to spam Nadeo with API requests. This action does 2+ per map." +
                 "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate." +
-                "\nMaps with no records are faster and hidden maps are skipped."
+                "\nMaps with no records are faster and hidden maps are skipped." +
+                "\nClick on a map name to open a tab for that map."
             );
 
         UI::BeginDisabled(Locks::allRecords);
@@ -68,8 +69,7 @@ namespace Tabs { namespace Records {
                     UI::TableNextRow();
                     UI::TableNextColumn();
                     if (UI::Selectable(record.mapName + "##" + i, false))
-                        Globals::AddCurrentMap(cast<Models::Map@>(Globals::mapsDict[record.mapId]));
-                    Util::HoverTooltip("view map (switch to Maps tab above to view)");
+                        Globals::AddViewingMap(cast<Models::Map@>(Globals::mapsDict[record.mapId]));
 
                     UI::TableNextColumn();
                     UI::Text(((Settings::recordsHighlight5 && record.position < 6) ? "\\$" + Settings::recordsHighlightColor : "") + record.position);

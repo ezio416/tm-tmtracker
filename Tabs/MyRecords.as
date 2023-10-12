@@ -3,14 +3,14 @@ c 2023-10-09
 m 2023-10-11
 */
 
-namespace Tabs { namespace Records {
+namespace Tabs {
     void Tab_MyRecords() {
         if (!UI::BeginTabItem(Icons::Trophy + " My Records"))
             return;
 
         if (Settings::myRecordsText)
             UI::TextWrapped(
-                "This page shows records you've driven on any map."
+                "This tab shows records you've driven on any map."
             );
 
         UI::BeginDisabled(Locks::myRecords || Locks::mapInfo);
@@ -80,4 +80,4 @@ namespace Tabs { namespace Records {
 
         UI::EndTabItem();
     }
-}}
+}
