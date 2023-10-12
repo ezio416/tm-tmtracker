@@ -5,14 +5,15 @@ m 2023-10-11
 
 namespace Tabs { namespace MyRecords {
     void Tab_MyRecordsList() {
-        if (!UI::BeginTabItem(Icons::ListUl + " Record List (" + Globals::myRecords.Length + ")"))
+        if (!UI::BeginTabItem(Icons::ListUl + " Record List (" + Globals::myRecords.Length + ")###my-records-list"))
             return;
 
         int64 now = Time::Stamp;
 
         if (Settings::myRecordsText)
             UI::TextWrapped(
-                "This tab shows records you've driven on any map."
+                "This tab shows records you've driven on any map." //+
+                // "\nClick on a map name to add it to the \"Viewing Maps\" tab above."
             );
 
         UI::BeginDisabled(Locks::myRecords || Locks::mapInfo);
@@ -22,11 +23,15 @@ namespace Tabs { namespace MyRecords {
 
         if (!Locks::myRecords) {
             uint timestamp;
-            try {
-                timestamp = uint(Globals::recordsTimestampsJson.Get("myRecords"));
-            } catch {
+
+            if (Globals::myRecordsMaps.Length == 0)
                 timestamp = 0;
-            }
+            else
+                try {
+                    timestamp = uint(Globals::recordsTimestampsJson.Get("myRecords"));
+                } catch {
+                    timestamp = 0;
+                }
 
             UI::SameLine();
             UI::Text("Last Updated: " + (

@@ -10,6 +10,7 @@ namespace Tabs {
 
         UI::BeginTabBar("MyRecordsTabs");
             MyRecords::Tab_MyRecordsList();
+            MyRecords::Tab_MyRecordsMapsViewing();
         UI::EndTabBar();
 
         UI::EndTabItem();

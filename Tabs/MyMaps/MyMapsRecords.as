@@ -5,7 +5,7 @@ m 2023-10-11
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsRecords() {
-        if (!UI::BeginTabItem(Icons::Trophy + " Records (" + Globals::records.Length + ")###my-maps-records"))
+        if (!UI::BeginTabItem(Icons::Trophy + " Records (" + Globals::myMapsRecords.Length + ")###my-maps-records"))
             return;
 
         int64 now = Time::Stamp;
@@ -17,7 +17,7 @@ namespace Tabs { namespace MyMaps {
                 "\\$G.\nIt could be shorter, but we don't want to spam Nadeo with API requests. This action does 2+ per map." +
                 "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate." +
                 "\nMaps with no records are faster and hidden maps are skipped." +
-                "\nClick on a map name to add it to the \"Viewing\" tab above."
+                "\nClick on a map name to add it to the \"Viewing Maps\" tab above."
             );
 
         UI::BeginDisabled(Locks::allRecords);
@@ -60,16 +60,16 @@ namespace Tabs { namespace MyMaps {
             UI::TableSetupColumn("Recency "   + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
             UI::TableHeadersRow();
 
-            UI::ListClipper clipper(Globals::recordsSorted.Length);
+            UI::ListClipper clipper(Globals::myMapsRecordsSorted.Length);
             while (clipper.Step()) {
                 for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                    Models::Record@ record = Globals::recordsSorted[i];
+                    Models::Record@ record = Globals::myMapsRecordsSorted[i];
                     Models::Account@ account = Globals::accounts.Length > 0 ? cast<Models::Account@>(Globals::accountsDict[record.accountId]) : Models::Account();
 
                     UI::TableNextRow();
                     UI::TableNextColumn();
                     if (UI::Selectable(record.mapName + "##" + i, false))
-                        Globals::AddViewingMap(cast<Models::Map@>(Globals::mapsDict[record.mapId]));
+                        Globals::AddMyMapViewing(cast<Models::Map@>(Globals::myMapsDict[record.mapId]));
 
                     UI::TableNextColumn();
                     UI::Text(((Settings::recordsHighlight5 && record.position < 6) ? "\\$" + Settings::recordsHighlightColor : "") + record.position);

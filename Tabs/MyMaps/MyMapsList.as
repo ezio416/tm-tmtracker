@@ -12,7 +12,7 @@ namespace Tabs { namespace MyMaps {
             UI::TextWrapped(
                 "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
                 "\nIf you upload a map again or add it to a club campaign, it's moved to the top of the list." +
-                "\nClick on a map name to add it to the \"Viewing\" tab above." +
+                "\nClick on a map name to add it to the \"Viewing Maps\" tab above." +
                 "\nYou cannot get records for hidden maps."
             );
         }
@@ -28,18 +28,18 @@ namespace Tabs { namespace MyMaps {
             if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + hiddenMapCount + ")"))
                 Globals::showHidden = false;
         } else {
-            UI::BeginDisabled(Globals::maps.Length == 0);
+            UI::BeginDisabled(Globals::myMaps.Length == 0);
             if (UI::Button(Icons::Eye + " Show Hidden (" + hiddenMapCount + ")"))
                 Globals::showHidden = true;
             UI::EndDisabled();
         }
 
-        Globals::mapSearch = UI::InputText("search", Globals::mapSearch, false);
+        Globals::myMapsSearch = UI::InputText("search", Globals::myMapsSearch, false);
 
-        if (Globals::mapSearch != "") {
+        if (Globals::myMapsSearch != "") {
             UI::SameLine();
             if (UI::Button(Icons::Times + " Clear Search"))
-                Globals::mapSearch = "";
+                Globals::myMapsSearch = "";
         }
 
         Table_MyMapsList();
@@ -51,12 +51,12 @@ namespace Tabs { namespace MyMaps {
         int64 now = Time::Stamp;
         Models::Map@[] maps;
 
-        for (uint i = 0; i < Globals::maps.Length; i++) {
-            Models::Map@ map = @Globals::maps[i];
+        for (uint i = 0; i < Globals::myMaps.Length; i++) {
+            Models::Map@ map = @Globals::myMaps[i];
             if (map is null) continue;
 
             if (map.hidden && !Globals::showHidden) continue;
-            if (map.mapNameText.ToLower().Contains(Globals::mapSearch.ToLower()))
+            if (map.mapNameText.ToLower().Contains(Globals::myMapsSearch.ToLower()))
                 maps.InsertLast(map);
         }
 
@@ -91,7 +91,7 @@ namespace Tabs { namespace MyMaps {
                     UI::TableNextRow();
                     UI::TableNextColumn();
                     if (UI::Selectable((Settings::myMapsListColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false, UI::SelectableFlags::SpanAllColumns))
-                        Globals::AddViewingMap(map);
+                        Globals::AddMyMapViewing(map);
 
                     if (Settings::myMapsListColRecords) {
                         UI::TableNextColumn();

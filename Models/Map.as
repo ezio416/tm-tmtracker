@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Models { class Map {
@@ -135,7 +135,7 @@ namespace Models { class Map {
         if (records.Length > Settings::maxRecordsPerMap)
             Database::ClearMapRecords(this);
 
-        Globals::ClearMapRecords(this);
+        Globals::ClearMyMapRecords(this);
 
         do {
             Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
@@ -216,7 +216,7 @@ namespace Models { class Map {
             }
 
             for (uint i = 0; i < tmpRecords.Length; i++)
-                Globals::AddRecord(tmpRecords[i]);
+                Globals::AddMyMapsRecord(tmpRecords[i]);
         }
 
         recordsTimestamp = Time::Stamp;

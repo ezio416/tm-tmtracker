@@ -121,7 +121,7 @@ namespace Database {
         SQLite::Database@ db = SQLite::Database(Files::db);
         SQLite::Statement@ s;
 
-        Globals::ClearMaps();
+        Globals::ClearMyMaps();
 
         try {
             @s = db.Prepare("SELECT * FROM Maps");
@@ -135,11 +135,11 @@ namespace Database {
         uint i = 0;
         while (s.NextRow()) {
             i++;
-            Globals::AddMap(Models::Map(s));
+            Globals::AddMyMap(Models::Map(s));
             if (i % sqlLoadBatch == 0)
                 yield();
         }
-        Globals::maps.Reverse();
+        Globals::myMaps.Reverse();
 
         Log::TimerEnd(timerId);
         Locks::db = false;
@@ -201,7 +201,7 @@ namespace Database {
         while (s.NextRow()) {
             i++;
             try {
-                Globals::AddRecord(Models::Record(s));
+                Globals::AddMyMapsRecord(Models::Record(s));
             } catch {
                 Log::Write(Log::Level::Errors, "couldn't add record: " + getExceptionInfo());
                 Locks::db = false;
@@ -244,7 +244,7 @@ namespace Database {
 
         Log::Write(Log::Level::Debug, "saving maps to database...");
         db.Execute("CREATE TABLE IF NOT EXISTS Maps" + mapColumns);
-        string[] mapGroups = MapGroups(Globals::maps);
+        string[] mapGroups = MapGroups(Globals::myMaps);
         for (uint i = 0; i < mapGroups.Length; i++) {
             @s = db.Prepare("""
                 REPLACE INTO Maps (
@@ -269,7 +269,7 @@ namespace Database {
 
         Log::Write(Log::Level::Debug, "saving records to database...");
         db.Execute("CREATE TABLE IF NOT EXISTS Records" + recordColumns);
-        string[] recordGroups = RecordGroups(Globals::records);
+        string[] recordGroups = RecordGroups(Globals::myMapsRecords);
         for (uint i = 0; i < recordGroups.Length; i++) {
             @s = db.Prepare("""
                 REPLACE INTO Records (

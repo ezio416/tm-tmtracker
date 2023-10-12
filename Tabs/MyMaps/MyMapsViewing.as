@@ -5,7 +5,7 @@ m 2023-10-11
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsViewing() {
-        if (!UI::BeginTabItem(Icons::Eye + " Viewing (" + Globals::viewingMaps.Length + ")###my-maps-viewing"))
+        if (!UI::BeginTabItem(Icons::Eye + " Viewing Maps (" + Globals::myMapsViewing.Length + ")###my-maps-viewing"))
             return;
 
         if (Settings::myMapsViewingText)
@@ -14,21 +14,21 @@ namespace Tabs { namespace MyMaps {
                 ".\nIf there are lots of maps here, use the dropdown arrow on the left or the left/right arrows on the right."
             );
 
-        UI::BeginDisabled(Globals::viewingMaps.Length == 0);
+        UI::BeginDisabled(Globals::myMapsViewing.Length == 0);
         if (UI::Button(Icons::Times + " Clear All"))
-            Globals::ClearViewingMaps();
+            Globals::ClearMyMapsViewing();
         UI::EndDisabled();
 
         int flags = UI::TabBarFlags::FittingPolicyScroll;
-        if (Globals::viewingMaps.Length > 0)
+        if (Globals::myMapsViewing.Length > 0)
             flags |= UI::TabBarFlags::TabListPopupButton;
 
-        UI::BeginTabBar("viewing", flags);
+        UI::BeginTabBar("my-maps-viewing", flags);
 
         int64 now = Time::Stamp;
 
-        for (uint i = 0; i < Globals::viewingMaps.Length; i++) {
-            Models::Map@ map = @Globals::viewingMaps[i];
+        for (uint i = 0; i < Globals::myMapsViewing.Length; i++) {
+            Models::Map@ map = @Globals::myMapsViewing[i];
 
             if (UI::BeginTabItem((Settings::myMapsViewingTabColor ? map.mapNameColor : map.mapNameText) + "###" + map.mapUid, map.viewing, UI::TabItemFlags::Trailing)) {
                 UI::BeginGroup();
@@ -69,10 +69,10 @@ namespace Tabs { namespace MyMaps {
                     UI::SameLine();
                     if (map.hidden) {
                         if (UI::Button(Icons::Eye + " Show"))
-                            Globals::ShowMap(map);
+                            Globals::ShowMyMap(map);
                     } else {
                         if (UI::Button(Icons::EyeSlash + " Hide"))
-                            Globals::HideMap(map);
+                            Globals::HideMyMap(map);
                     }
 
                     UI::SameLine();
@@ -153,8 +153,8 @@ namespace Tabs { namespace MyMaps {
             }
 
             if (!map.viewing) {
-                Globals::viewingMaps.RemoveAt(i);
-                Globals::viewingMapsDict.Delete(map.mapId);
+                Globals::myMapsViewing.RemoveAt(i);
+                Globals::myMapsViewingDict.Delete(map.mapId);
             }
         }
 

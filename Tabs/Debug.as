@@ -61,9 +61,9 @@ namespace Tabs {
                 UI::EndTabItem();
             }
 
-            if (UI::BeginTabItem("maps (" + Globals::maps.Length + ")")) {
+            if (UI::BeginTabItem("maps (" + Globals::myMaps.Length + ")")) {
                 if (UI::Button(Icons::Times + " Clear"))
-                    Globals::ClearMaps();
+                    Globals::ClearMyMaps();
 
                 int flags =
                     UI::TableFlags::Resizable |
@@ -76,10 +76,10 @@ namespace Tabs {
                     UI::TableSetupColumn("Hidden");
                     UI::TableHeadersRow();
 
-                    UI::ListClipper clipper(Globals::maps.Length);
+                    UI::ListClipper clipper(Globals::myMaps.Length);
                     while (clipper.Step()) {
                         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                            Models::Map@ map = @Globals::maps[i];
+                            Models::Map@ map = @Globals::myMaps[i];
 
                             UI::TableNextRow();
                             UI::TableNextColumn();
@@ -98,7 +98,7 @@ namespace Tabs {
                 UI::EndTabItem();
             }
 
-            if (UI::BeginTabItem("records (" + Globals::records.Length + ")")) {
+            if (UI::BeginTabItem("records (" + Globals::myMapsRecords.Length + ")")) {
                 if (UI::Button(Icons::Times + " Clear"))
                     Globals::ClearMyMapsRecords();
 
@@ -122,10 +122,10 @@ namespace Tabs {
                     UI::TableSetupColumn("TimestampUnix");
                     UI::TableHeadersRow();
 
-                    UI::ListClipper clipper(Globals::records.Length);
+                    UI::ListClipper clipper(Globals::myMapsRecords.Length);
                     while (clipper.Step()) {
                         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                            Models::Record@ record = @Globals::records[i];
+                            Models::Record@ record = @Globals::myMapsRecords[i];
                             Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.accountId]);
 
                             UI::TableNextRow();
