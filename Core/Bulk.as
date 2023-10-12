@@ -126,7 +126,7 @@ namespace Bulk {
         while (nameCoro.IsRunning())
             yield();
 
-        Globals::recordsTimestampsJson["all"] = Time::Stamp;
+        Globals::recordsTimestampsJson["myMaps"] = Time::Stamp;
         Files::SaveRecordsTimestamps();
 
         Globals::status.Delete(statusId);
@@ -170,6 +170,9 @@ namespace Bulk {
             Globals::myRecords.InsertLast(record);
             myRecordsMapIds.InsertLast(record.mapId);
         }
+
+        Globals::recordsTimestampsJson["myRecords"] = Time::Stamp;
+        Files::SaveRecordsTimestamps();
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);

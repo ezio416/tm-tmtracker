@@ -1,11 +1,11 @@
 /*
-c 2023-10-09
+c 2023-10-11
 m 2023-10-11
 */
 
-namespace Tabs {
-    void Tab_MyRecords() {
-        if (!UI::BeginTabItem(Icons::Trophy + " My Records"))
+namespace Tabs { namespace MyRecords {
+    void Tab_MyRecordsList() {
+        if (!UI::BeginTabItem(Icons::ListUl + " Record List (" + Globals::myRecords.Length + ")"))
             return;
 
         int64 now = Time::Stamp;
@@ -16,9 +16,26 @@ namespace Tabs {
             );
 
         UI::BeginDisabled(Locks::myRecords || Locks::mapInfo);
-        if (UI::Button(Icons::Download + " Get Records (" + Globals::myRecords.Length +")"))
+        if (UI::Button(Icons::Download + " Get My Records"))
             startnew(CoroutineFunc(Bulk::GetMyRecordsCoro));
         UI::EndDisabled();
+
+        if (!Locks::myRecords) {
+            uint timestamp;
+            try {
+                timestamp = uint(Globals::recordsTimestampsJson.Get("myRecords"));
+            } catch {
+                timestamp = 0;
+            }
+
+            UI::SameLine();
+            UI::Text("Last Updated: " + (
+                timestamp > 0 ?
+                    Time::FormatString(Globals::dateFormat + "Local\\$G", timestamp) +
+                        " (" + Util::FormatSeconds(now - timestamp) + " ago)" :
+                    "never"
+            ));
+        }
 
         int flags = UI::TableFlags::RowBg |
                     UI::TableFlags::ScrollY;
@@ -91,4 +108,4 @@ namespace Tabs {
 
         UI::EndTabItem();
     }
-}
+}}

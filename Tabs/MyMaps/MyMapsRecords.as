@@ -34,7 +34,7 @@ namespace Tabs { namespace MyMaps {
         if (!Locks::allRecords) {
             uint timestamp;
             try {
-                timestamp = uint(Globals::recordsTimestampsJson.Get("all"));
+                timestamp = uint(Globals::recordsTimestampsJson.Get("myMaps"));
             } catch {
                 timestamp = 0;
             }
@@ -97,9 +97,11 @@ namespace Tabs { namespace MyMaps {
                     UI::Text(Util::FormatSeconds(now - record.timestampUnix));
                 }
             }
+
             UI::PopStyleColor();
             UI::EndTable();
         }
+
         UI::EndTabItem();
     }
 }}

@@ -24,7 +24,7 @@ namespace Settings {
     uint maxRecordsPerMap = 100;
 
 
-    [Setting category="Startup" name="Refresh my maps"]
+    [Setting category="Startup" name="Refresh my map list"]
     bool refreshMaps = false;
 
     [Setting category="Startup" name="Remember if window was open"]
