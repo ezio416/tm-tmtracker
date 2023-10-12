@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Tabs {
@@ -162,6 +162,7 @@ namespace Tabs {
             }
 
             if (UI::BeginTabItem("locks")) {
+                UI::Text((Locks::accountNames      ? "\\$0F0" : "\\$F00") + "accountNames");
                 UI::Text((Locks::allRecords        ? "\\$0F0" : "\\$F00") + "allRecords");
                 UI::Text((Locks::db                ? "\\$0F0" : "\\$F00") + "db");
                 UI::Text((Locks::editMap           ? "\\$0F0" : "\\$F00") + "editMap");

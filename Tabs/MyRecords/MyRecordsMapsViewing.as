@@ -63,6 +63,10 @@ namespace Tabs { namespace MyRecords {
                     UI::Text(map.mapNameText);
                     UI::PopTextWrapPos();
 
+                    Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[map.authorId]);
+                    if (account !is null)
+                        UI::Text(account.accountName != "" ? account.accountName : "unknown");
+
                     UI::Text(Globals::colorAuthor + Icons::Circle + " " + Time::Format(map.authorTime));
                     UI::Text(Globals::colorGold   + Icons::Circle + " " + Time::Format(map.goldTime));
                     UI::Text(Globals::colorSilver + Icons::Circle + " " + Time::Format(map.silverTime));

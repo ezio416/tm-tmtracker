@@ -72,13 +72,14 @@ namespace Tabs { namespace MyRecords {
         int flags = UI::TableFlags::RowBg |
                     UI::TableFlags::ScrollY;
 
-        if (UI::BeginTable("my-records", 6, flags)) {
+        if (UI::BeginTable("my-records", 7, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("PB",                              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+            UI::TableSetupColumn("Author",                          UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
             UI::TableSetupColumn("AT",                              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+            UI::TableSetupColumn("PB",                              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
             UI::TableSetupColumn("\u0394 to AT",                    UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
             UI::TableSetupColumn("Timestamp " + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
             UI::TableSetupColumn("Recency "   + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
@@ -100,6 +101,16 @@ namespace Tabs { namespace MyRecords {
                         UI::Text(record.mapId);
 
                     UI::TableNextColumn();
+                    if (map !is null && Globals::accountsDict.Exists(map.authorId)) {
+                        Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[map.authorId]);
+                        UI::Text(account.accountName == "" ? account.accountId : account.accountName);
+                    } else
+                        UI::Text("unknown");
+
+                    UI::TableNextColumn();
+                    UI::Text(map is null ? "unknown" : Globals::colorAuthor + Time::Format(map.authorTime));
+
+                    UI::TableNextColumn();
                     string color = "\\$";
                     if (Settings::medalColors)
                         switch (record.medals) {
@@ -112,9 +123,6 @@ namespace Tabs { namespace MyRecords {
                     else
                         color += "G";
                     UI::Text(color + Time::Format(record.time));
-
-                    UI::TableNextColumn();
-                    UI::Text(map is null ? "unknown" : Globals::colorAuthor + Time::Format(map.authorTime));
 
                     UI::TableNextColumn();
                     UI::Text(map is null ? "unknown" : Util::TimeFormatColored(int(record.time) - int(map.authorTime)));
