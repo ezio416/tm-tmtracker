@@ -167,7 +167,7 @@ namespace Models { class Map {
             for (uint i = 0; i < top.Length; i++) {
                 Record record = Record(top[i]);
                 record.mapId        = mapId;
-                record.mapName      = mapNameText;
+                record.mapNameText  = mapNameText;
                 record.mapUid       = mapUid;
                 record.recordFakeId = mapId + "-" + record.accountId;
 

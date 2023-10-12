@@ -68,15 +68,15 @@ namespace Tabs { namespace MyMaps {
 
                     UI::TableNextRow();
                     UI::TableNextColumn();
-                    if (UI::Selectable(record.mapName + "##" + i, false))
+                    if (UI::Selectable((Settings::mapNameColors ? record.mapNameColor : record.mapNameText) + "##" + i, false))
                         Globals::AddMyMapViewing(cast<Models::Map@>(Globals::myMapsDict[record.mapId]));
 
                     UI::TableNextColumn();
-                    UI::Text(((Settings::recordsHighlight5 && record.position < 6) ? "\\$" + Settings::recordsHighlightColor : "") + record.position);
+                    UI::Text(((Settings::recordsHighlight5 && record.position < 6) ? "\\$" + Settings::top5HighlightColor : "") + record.position);
 
                     UI::TableNextColumn();
                     string timeColor = "";
-                    if (Settings::recordsMedalColor)
+                    if (Settings::medalColors)
                         switch (record.medals) {
                             case 1: timeColor = Globals::colorBronze; break;
                             case 2: timeColor = Globals::colorSilver; break;

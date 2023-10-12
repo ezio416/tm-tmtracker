@@ -130,7 +130,7 @@ namespace Tabs {
 
                             UI::TableNextRow();
                             UI::TableNextColumn();
-                            UI::Text(record.mapName);
+                            UI::Text(record.mapNameText);
                             UI::TableNextColumn();
                             UI::Text((account.accountName != "") ? account.accountName : account.accountId);
                             UI::TableNextColumn();

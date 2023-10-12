@@ -1,12 +1,13 @@
 /*
 c 2023-05-16
-m 2023-10-09
+m 2023-10-11
 */
 
 namespace Models { class Record {
     string accountId;
     string mapId;
-    string mapName;
+    string mapNameColor;
+    string mapNameText;
     string mapUid;
     uint   medals       = 0;
     uint   position;

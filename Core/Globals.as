@@ -129,7 +129,8 @@ namespace Globals {
 
         Models::Map@ map = cast<Models::Map@>(myMapsDict[record.mapId]);
         storedRecord.SetMedals(map);
-        storedRecord.mapName = map.mapNameText;
+        storedRecord.mapNameColor = map.mapNameColor;
+        storedRecord.mapNameText = map.mapNameText;
         map.records.InsertLast(storedRecord);
         map.recordsDict.Set(record.accountId, storedRecord);
     }
