@@ -10,6 +10,9 @@ namespace Bulk {
         if (!Globals::getAccountNames)
             return;
 
+        while (Locks::accountNames)
+            yield();
+        Locks::accountNames = true;
         string timerId = Log::TimerBegin("getting account names");
         string statusId = "account-names";
         Globals::status.Set(statusId, "getting account names...");
@@ -18,6 +21,12 @@ namespace Bulk {
 
         for (uint i = 0; i < Globals::accounts.Length; i++) {
             Models::Account@ account = @Globals::accounts[i];
+
+            if (account.accountId == "d2372a08-a8a1-46cb-97fb-23a161d85ad0") {
+                account.accountName = "Nadeo";
+                continue;
+            }
+
             if (account.IsNameExpired()) {
                 account.accountName = "";
                 missing.InsertLast(account.accountId);
@@ -32,10 +41,9 @@ namespace Bulk {
             account.SetNameExpire();
         }
 
-        startnew(CoroutineFunc(Globals::SortMyMapsRecordsCoro));
-
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
+        Locks::accountNames = false;
     }
 
     void GetMyMapsCoro() {
@@ -125,6 +133,8 @@ namespace Bulk {
         Meta::PluginCoroutine@ nameCoro = startnew(CoroutineFunc(GetAccountNamesCoro));
         while (nameCoro.IsRunning())
             yield();
+
+        startnew(CoroutineFunc(Globals::SortMyMapsRecordsCoro));
 
         Globals::recordsTimestampsJson["myMaps"] = Time::Stamp;
         Files::SaveRecordsTimestamps();
@@ -217,6 +227,9 @@ namespace Bulk {
 
             for (uint i = 0; i < maps.Length; i++) {
                 Models::Map map = Models::Map(maps[i], true);
+
+                Globals::AddAccount(Models::Account(map.authorId));
+
                 Globals::myRecordsMaps.InsertLast(map);
                 Globals::myRecordsMapsDict.Set(map.mapId, @Globals::myRecordsMaps[Globals::myRecordsMaps.Length - 1]);
 
@@ -224,7 +237,10 @@ namespace Bulk {
                 record.mapNameColor = map.mapNameColor;
                 record.mapNameText = map.mapNameText;
             }
+
         }
+
+        startnew(CoroutineFunc(GetAccountNamesCoro));
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
