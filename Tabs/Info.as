@@ -17,7 +17,7 @@ namespace Tabs {
         UI::Separator();
 
         UI::TextWrapped(
-            "If you have suggestions or problems, please submit an issue.\n" +
+            "If you have suggestions or problems, please submit an issue!\n" +
             "It's very easy to add a setting, and probably easy to add a small feature."
         );
         string linkGH = "https://github.com/ezio416/tm-tmtracker/issues";
@@ -33,7 +33,7 @@ namespace Tabs {
             IO::SetClipboard(Files::storageFolder);
         Util::HoverTooltip("copy to clipboard");
 
-        if (UI::Button(Icons::ExternalLink + " Open Folder in Explorer"))
+        if (UI::Button(Icons::FolderOpen + " Open Folder in Explorer"))
             OpenExplorerPath(Files::storageFolder);
 
         UI::TextWrapped("If you want to look in the database, I recommend DB Browser:");
