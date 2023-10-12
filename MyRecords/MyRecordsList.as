@@ -67,13 +67,13 @@ namespace Tabs { namespace MyRecords {
                     UI::TableNextColumn();
                     if (Globals::myRecordsMapsDict.Exists(record.mapId)) {
                         @map = cast<Models::Map@>(Globals::myRecordsMapsDict[record.mapId]);
-                        UI::Text(Settings::myRecordsMapColor ? map.mapNameColor : map.mapNameText);
+                        UI::Text(Settings::medalColors ? map.mapNameColor : map.mapNameText);
                     } else
                         UI::Text(record.mapId);
 
                     UI::TableNextColumn();
                     string color = "\\$";
-                    if (Settings::myRecordsMedalColor)
+                    if (Settings::medalColors)
                         switch (record.medals) {
                             case 1:  color += Globals::colorBronze; break;
                             case 2:  color += Globals::colorSilver; break;
@@ -87,7 +87,7 @@ namespace Tabs { namespace MyRecords {
 
                     UI::TableNextColumn();
                     if (Globals::myRecordsMapsDict.Exists(record.mapId)) {
-                        UI::Text(Globals::colorAuthor + Time::Format(map.authorTime));
+                        UI::Text((Settings::medalColors ? Globals::colorAuthor : "") + Time::Format(map.authorTime));
                     } else
                         UI::Text("unknown");
 

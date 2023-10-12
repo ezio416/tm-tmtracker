@@ -30,7 +30,7 @@ namespace Tabs { namespace MyMaps {
         for (uint i = 0; i < Globals::myMapsViewing.Length; i++) {
             Models::Map@ map = @Globals::myMapsViewing[i];
 
-            if (UI::BeginTabItem((Settings::myMapsViewingTabColor ? map.mapNameColor : map.mapNameText) + "###" + map.mapUid, map.viewing, UI::TabItemFlags::Trailing)) {
+            if (UI::BeginTabItem((Settings::mapNameColors ? map.mapNameColor : map.mapNameText) + "###" + map.mapUid, map.viewing, UI::TabItemFlags::Trailing)) {
                 UI::BeginGroup();
                     vec2 thumbSize = vec2(Settings::myMapsViewingThumbWidth, Settings::myMapsViewingThumbWidth);
                     try {
@@ -121,7 +121,7 @@ namespace Tabs { namespace MyMaps {
 
                                 UI::TableNextColumn();
                                 string timeColor = "";
-                                if (Settings::myMapsViewingMedalColors)
+                                if (Settings::medalColors)
                                     switch (record.medals) {
                                         case 1: timeColor = Globals::colorBronze; break;
                                         case 2: timeColor = Globals::colorSilver; break;

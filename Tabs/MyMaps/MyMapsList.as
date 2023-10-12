@@ -90,7 +90,7 @@ namespace Tabs { namespace MyMaps {
 
                     UI::TableNextRow();
                     UI::TableNextColumn();
-                    if (UI::Selectable((Settings::myMapsListColor ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false, UI::SelectableFlags::SpanAllColumns))
+                    if (UI::Selectable((Settings::mapNameColors ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false, UI::SelectableFlags::SpanAllColumns))
                         Globals::AddMyMapViewing(map);
 
                     if (Settings::myMapsListColRecords) {

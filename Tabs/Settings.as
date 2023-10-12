@@ -31,15 +31,22 @@ namespace Settings {
     bool rememberOpen = false;
 
 
+    [Setting category="Colors" name="Show map names with color"]
+    bool mapNameColors = true;
+
+    [Setting category="Colors" name="Show record times with medal colors"]
+    bool medalColors = true;
+
+    [Setting category="Colors" name="Top 5 highlight color"]
+    string top5HighlightColor = "F71";
+
+
     [Setting category="Logging" name="Log level" description="Debug clutters the log - only use if needed!"]
     Log::Level logLevel = Log::Level::Normal;
 
 
     [Setting category="Map List" name="Show help text"]
     bool myMapsListHint = true;
-
-    [Setting category="Map List" name="Show map names with color"]
-    bool myMapsListColor = true;
 
     [Setting category="Map List" name="Show number of records"]
     bool myMapsListColRecords = true;
@@ -54,24 +61,12 @@ namespace Settings {
     [Setting category="My Map Records" name="Show time estimate + help text"]
     bool recordsEstimate = true;
 
-    [Setting category="My Map Records" name="Show record times with medal colors"]
-    bool recordsMedalColor = true;
-
     [Setting category="My Map Records" name="Highlight top 5 world"]
     bool recordsHighlight5 = true;
-
-    [Setting category="My Map Records" name="Top 5 highlight color"]
-    string recordsHighlightColor = "F71";
 
 
     [Setting category="Viewing Maps" name="Show help text"]
     bool myMapsViewingText = true;
-
-    [Setting category="Viewing Maps" name="Show map names with color"]
-    bool myMapsViewingTabColor = true;
-
-    // [Setting category="Viewing Maps" name="Switch to map when clicked"]
-    // bool myMapTabsSwitchOnClicked = true;
 
     [Setting category="Viewing Maps" name="Thumbnail width" min=100 max=1000]
     uint myMapsViewingThumbWidth = uint(Globals::scale * 150);
@@ -79,16 +74,7 @@ namespace Settings {
     [Setting category="Viewing Maps" name="Automatically load thumbnails"]
     bool myMapsViewingLoadThumbs = false;
 
-    [Setting category="Viewing Maps" name="Show map record times with medal colors"]
-    bool myMapsViewingMedalColors = true;
-
 
     [Setting category="My Records" name="Show help text"]
     bool myRecordsText = true;
-
-    [Setting category="My Records" name="Show map names with color"]
-    bool myRecordsMapColor = true;
-
-    [Setting category="My Records" name="Show record times with medal colors"]
-    bool myRecordsMedalColor = true;
 }
