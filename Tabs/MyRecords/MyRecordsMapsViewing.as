@@ -1,11 +1,17 @@
 /*
 c 2023-10-11
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Tabs { namespace MyRecords {
     void Tab_MyRecordsMapsViewing() {
-        if (!UI::BeginTabItem(Icons::Eye + " Viewing Maps (" + Globals::myRecordsMapsViewing.Length + ")###my-records-maps-viewing"))
+        int tabFlags = 0;
+        if (Globals::myRecordsMapsViewingSet) {
+            Globals::myRecordsMapsViewingSet = false;
+            tabFlags |= UI::TabItemFlags::SetSelected;
+        }
+
+        if (!UI::BeginTabItem(Icons::Eye + " Viewing Maps (" + Globals::myRecordsMapsViewing.Length + ")###my-records-maps-viewing", tabFlags))
             return;
 
         if (Settings::viewingText)
@@ -30,7 +36,13 @@ namespace Tabs { namespace MyRecords {
         for (uint i = 0; i < Globals::myRecordsMapsViewing.Length; i++) {
             Models::Map@ map = @Globals::myRecordsMapsViewing[i];
 
-            if (UI::BeginTabItem((Settings::mapNameColors ? map.mapNameColor : map.mapNameText) + "###" + map.mapUid, map.viewing, UI::TabItemFlags::Trailing)) {
+            int mapTabFlags = UI::TabItemFlags::Trailing;
+            if (Globals::myRecordsMapsViewingMapId == map.mapId) {
+                Globals::myRecordsMapsViewingMapId = "";
+                mapTabFlags |= UI::TabItemFlags::SetSelected;
+            }
+
+            if (UI::BeginTabItem((Settings::mapNameColors ? map.mapNameColor : map.mapNameText) + "###" + map.mapUid, map.viewing, mapTabFlags)) {
                 UI::BeginGroup();
                     vec2 thumbSize = vec2(Settings::viewingThumbWidth, Settings::viewingThumbWidth);
                     try {

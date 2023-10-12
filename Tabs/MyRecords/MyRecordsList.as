@@ -1,6 +1,6 @@
 /*
 c 2023-10-11
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Tabs { namespace MyRecords {
@@ -10,7 +10,7 @@ namespace Tabs { namespace MyRecords {
 
         if (Settings::myRecordsText)
             UI::TextWrapped(
-                "This tab shows records you've driven on any map." +
+                "This tab shows records you've driven on any map, sorted by when you drove them." +
                 "\nClick on a map name to add it to the \"Viewing Maps\" tab above."
             );
 
@@ -42,12 +42,12 @@ namespace Tabs { namespace MyRecords {
             ));
         }
 
-        Table_MyRecordsMapsList(now);
+        Table_MyRecordsList(now);
 
         UI::EndTabItem();
     }
 
-    void Table_MyRecordsMapsList(int64 now) {
+    void Table_MyRecordsList(int64 now) {
         int flags = UI::TableFlags::RowBg |
                     UI::TableFlags::ScrollY;
 
@@ -66,7 +66,7 @@ namespace Tabs { namespace MyRecords {
             UI::ListClipper clipper(Globals::myRecordsSorted.Length);
             while (clipper.Step()) {
                 for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                    Models::Record@ record = @Globals::myRecordsSorted[i];
+                    Models::Record@ record = Globals::myRecordsSorted[i];
                     Models::Map@ map;
 
                     UI::TableNextRow();
@@ -93,16 +93,10 @@ namespace Tabs { namespace MyRecords {
                     UI::Text(color + Time::Format(record.time));
 
                     UI::TableNextColumn();
-                    if (Globals::myRecordsMapsDict.Exists(record.mapId)) {
-                        UI::Text(Globals::colorAuthor + Time::Format(map.authorTime));
-                    } else
-                        UI::Text("unknown");
+                    UI::Text(map is null ? "unknown" : Globals::colorAuthor + Time::Format(map.authorTime));
 
                     UI::TableNextColumn();
-                    if (Globals::myRecordsMapsDict.Exists(record.mapId))
-                        UI::Text(Util::TimeFormatColored(int(record.time) - int(map.authorTime)));
-                    else
-                        UI::Text("unknown");
+                    UI::Text(map is null ? "unknown" : Util::TimeFormatColored(int(record.time) - int(map.authorTime)));
 
                     UI::TableNextColumn();
                     UI::Text(Util::UnixToIso(record.timestampUnix));

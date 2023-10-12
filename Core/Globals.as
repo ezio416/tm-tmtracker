@@ -1,23 +1,23 @@
 /*
 c 2023-05-16
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Globals {
     Models::Account[] accounts;
     dictionary        accountsDict;
-    string            apiCore                = "NadeoServices";
-    string            apiLive                = "NadeoLiveServices";
-    bool              cancelAllRecords       = false;
-    string            colorAuthor            = "\\$4B0";
-    string            colorBronze            = "\\$C80";
-    string            colorGold              = "\\$DD1";
-    string            colorSilver            = "\\$AAA";
-    string            dateFormat             = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
-    bool              debugTab               = false;
-    bool              getAccountNames        = true;
-    Json::Value@      hiddenMapsJson         = Json::Object();
-    uint64            latestNandoRequest     = 0;
+    string            apiCore                 = "NadeoServices";
+    string            apiLive                 = "NadeoLiveServices";
+    bool              cancelAllRecords        = false;
+    string            colorAuthor             = "\\$4B0";
+    string            colorBronze             = "\\$C80";
+    string            colorGold               = "\\$DD1";
+    string            colorSilver             = "\\$AAA";
+    string            dateFormat              = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
+    bool              debugTab                = false;
+    bool              getAccountNames         = true;
+    Json::Value@      hiddenMapsJson          = Json::Object();
+    uint64            latestNandoRequest      = 0;
     string            myAccountId;
     Models::Map[]     myMaps;
     dictionary        myMapsDict;
@@ -27,21 +27,25 @@ namespace Globals {
     string            myMapsSearch;
     Models::Map@[]    myMapsViewing;
     dictionary        myMapsViewingDict;
+    string            myMapsViewingMapId;
+    bool              myMapsViewingSet        = false;
     Models::Record[]  myRecords;
     dictionary        myRecordsDict;
     Models::Map[]     myRecordsMaps;
     dictionary        myRecordsMapsDict;
     Models::Map@[]    myRecordsMapsViewing;
     dictionary        myRecordsMapsViewingDict;
+    string            myRecordsMapsViewingMapId;
+    bool              myRecordsMapsViewingSet = false;
     Models::Record@[] myRecordsSorted;
-    Json::Value@      recordsTimestampsJson  = Json::Object();
-    float             scale                  = UI::GetScale();
-    bool              showHidden             = false;
-    uint              shownMaps              = 0;
-    bool              singleMapRecordStatus  = true;
+    Json::Value@      recordsTimestampsJson   = Json::Object();
+    float             scale                   = UI::GetScale();
+    bool              showHidden              = false;
+    uint              shownMaps               = 0;
+    bool              singleMapRecordStatus   = true;
     dictionary        status;
-    vec4              tableRowBgAltColor     = vec4(0, 0, 0, 0.5);
-    string            title                  = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
+    vec4              tableRowBgAltColor      = vec4(0, 0, 0, 0.5);
+    string            title                   = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
 
     void AddAccount(Models::Account account) {
         if (accountsDict.Exists(account.accountId))
@@ -80,23 +84,31 @@ namespace Globals {
     }
 
     void AddMyMapViewing(Models::Map@ map) {
-        if (myMapsViewingDict.Exists(map.mapId))
-            return;
+        if (!myMapsViewingDict.Exists(map.mapId)) {
+            Log::Write(Log::Level::Debug, map.logName + "adding to my maps viewing...");
 
-        Log::Write(Log::Level::Debug, map.logName + "adding to my maps viewing...");
+            myMapsViewing.InsertLast(map);
+            myMapsViewingDict.Set(map.mapId, map);
+        }
 
-        myMapsViewing.InsertLast(map);
-        myMapsViewingDict.Set(map.mapId, map);
+        if (Settings::viewingSwitchOnClicked) {
+            myMapsViewingMapId = map.mapId;
+            myMapsViewingSet = true;
+        }
     }
 
     void AddMyRecordsMapViewing(Models::Map@ map) {
-        if (myRecordsMapsViewingDict.Exists(map.mapId))
-            return;
+        if (!myRecordsMapsViewingDict.Exists(map.mapId)) {
+            Log::Write(Log::Level::Debug, map.logName + "adding to my records maps viewing...");
 
-        Log::Write(Log::Level::Debug, map.logName + "adding to my records maps viewing...");
+            myRecordsMapsViewing.InsertLast(map);
+            myRecordsMapsViewingDict.Set(map.mapId, map);
+        }
 
-        myRecordsMapsViewing.InsertLast(map);
-        myRecordsMapsViewingDict.Set(map.mapId, map);
+        if (Settings::viewingSwitchOnClicked) {
+            myRecordsMapsViewingMapId = map.mapId;
+            myRecordsMapsViewingSet = true;
+        }
     }
 
     void ClearAccounts() {
