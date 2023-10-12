@@ -87,7 +87,7 @@ namespace Tabs { namespace MyRecords {
 
                     UI::TableNextColumn();
                     if (Globals::myRecordsMapsDict.Exists(record.mapId)) {
-                        UI::Text((Settings::medalColors ? Globals::colorAuthor : "") + Time::Format(map.authorTime));
+                        UI::Text(Globals::colorAuthor + Time::Format(map.authorTime));
                     } else
                         UI::Text("unknown");
 

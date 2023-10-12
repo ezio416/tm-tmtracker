@@ -117,7 +117,7 @@ namespace Tabs { namespace MyMaps {
 
                                 UI::TableNextRow();
                                 UI::TableNextColumn();
-                                UI::Text("" + record.position);
+                                UI::Text(tostring(record.position));
 
                                 UI::TableNextColumn();
                                 string timeColor = "";
