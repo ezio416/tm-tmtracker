@@ -60,7 +60,11 @@ namespace Tabs { namespace MyMaps {
                             startnew(CoroutineFunc(map.LoadThumbnailCoro));
                     }
 
+                    vec2 pos = UI::GetCursorPos();
+                    UI::PushTextWrapPos(pos.x + Settings::viewingThumbWidth);
                     UI::Text(map.mapNameText);
+                    UI::PopTextWrapPos();
+
                     UI::Text(Globals::colorAuthor + Icons::Circle + " " + Time::Format(map.authorTime));
                     UI::Text(Globals::colorGold   + Icons::Circle + " " + Time::Format(map.goldTime));
                     UI::Text(Globals::colorSilver + Icons::Circle + " " + Time::Format(map.silverTime));
