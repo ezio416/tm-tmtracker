@@ -50,7 +50,7 @@ namespace Tabs { namespace MyMaps {
         }
 
         if (UI::BeginTable("records-table", 6, UI::TableFlags::ScrollY | UI::TableFlags::RowBg)) {
-            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
+            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
@@ -73,18 +73,19 @@ namespace Tabs { namespace MyMaps {
                         Globals::AddMyMapViewing(cast<Models::Map@>(Globals::myMapsDict[record.mapId]));
 
                     UI::TableNextColumn();
-                    UI::Text(((Settings::recordsHighlight5 && record.position < 6) ? "\\$" + Settings::top5HighlightColor : "") + record.position);
+                    UI::Text(((Settings::highlightTop5 && record.position < 6) ? Globals::colorTop5 : "") + record.position);
 
                     UI::TableNextColumn();
-                    string timeColor = "";
+                    string color;
                     if (Settings::medalColors)
                         switch (record.medals) {
-                            case 1: timeColor = Globals::colorBronze; break;
-                            case 2: timeColor = Globals::colorSilver; break;
-                            case 3: timeColor = Globals::colorGold;   break;
-                            case 4: timeColor = Globals::colorAuthor; break;
+                            case 1:  color = Globals::colorMedalBronze; break;
+                            case 2:  color = Globals::colorMedalSilver; break;
+                            case 3:  color = Globals::colorMedalGold;   break;
+                            case 4:  color = Globals::colorMedalAuthor; break;
+                            default: color = Globals::colorMedalNone;
                         }
-                    UI::Text(timeColor + Time::Format(record.time));
+                    UI::Text(color + Time::Format(record.time));
 
                     UI::TableNextColumn();
                     if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : account.accountId) + "##" + i, false))

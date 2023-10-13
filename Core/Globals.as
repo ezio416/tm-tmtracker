@@ -9,10 +9,13 @@ namespace Globals {
     string            apiCore                 = "NadeoServices";
     string            apiLive                 = "NadeoLiveServices";
     bool              cancelAllRecords        = false;
-    string            colorAuthor             = "\\$4B0";
-    string            colorBronze             = "\\$C80";
-    string            colorGold               = "\\$DD1";
-    string            colorSilver             = "\\$AAA";
+    string            colorMedalAuthor;
+    string            colorMedalBronze;
+    string            colorMedalGold;
+    string            colorMedalNone;
+    string            colorMedalSilver;
+    vec4              colorTableRowBgAlt      = vec4(0.0f, 0.0f, 0.0f, 0.5f);
+    string            colorTop5;
     string            dateFormat              = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
     bool              debugTab                = false;
     bool              getAccountNames         = true;
@@ -45,7 +48,6 @@ namespace Globals {
     uint              shownMaps               = 0;
     bool              singleMapRecordStatus   = true;
     dictionary        status;
-    vec4              tableRowBgAltColor      = vec4(0, 0, 0, 0.5);
     string            title                   = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
 
     void AddAccount(Models::Account account) {
@@ -171,6 +173,15 @@ namespace Globals {
         map.hidden = true;
         Globals::shownMaps--;
         Files::SaveHiddenMaps();
+    }
+
+    void SetColors() {
+        Globals::colorMedalAuthor = "\\" + Text::FormatGameColor(Settings::colorMedalAuthor);
+        Globals::colorMedalBronze = "\\" + Text::FormatGameColor(Settings::colorMedalBronze);
+        Globals::colorMedalGold   = "\\" + Text::FormatGameColor(Settings::colorMedalGold);
+        Globals::colorMedalNone   = "\\" + Text::FormatGameColor(Settings::colorMedalNone);
+        Globals::colorMedalSilver = "\\" + Text::FormatGameColor(Settings::colorMedalSilver);
+        Globals::colorTop5        = "\\" + Text::FormatGameColor(Settings::colorTop5);
     }
 
     void ShowMyMap(Models::Map@ map) {

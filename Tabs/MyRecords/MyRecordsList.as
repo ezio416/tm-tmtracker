@@ -73,7 +73,7 @@ namespace Tabs { namespace MyRecords {
                     UI::TableFlags::ScrollY;
 
         if (UI::BeginTable("my-records", 7, flags)) {
-            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
+            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
@@ -108,17 +108,17 @@ namespace Tabs { namespace MyRecords {
                         UI::Text("unknown");
 
                     UI::TableNextColumn();
-                    UI::Text(map is null ? "unknown" : Globals::colorAuthor + Time::Format(map.authorTime));
+                    UI::Text(map is null ? "unknown" : Globals::colorMedalAuthor + Time::Format(map.authorTime));
 
                     UI::TableNextColumn();
-                    string color = "\\$";
+                    string color;
                     if (Settings::medalColors)
                         switch (record.medals) {
-                            case 1:  color += Globals::colorBronze; break;
-                            case 2:  color += Globals::colorSilver; break;
-                            case 3:  color += Globals::colorGold;   break;
-                            case 4:  color += Globals::colorAuthor; break;
-                            default: color += "G";
+                            case 1:  color = Globals::colorMedalBronze; break;
+                            case 2:  color = Globals::colorMedalSilver; break;
+                            case 3:  color = Globals::colorMedalGold;   break;
+                            case 4:  color = Globals::colorMedalAuthor; break;
+                            default: color = Globals::colorMedalNone;
                         }
                     else
                         color += "G";

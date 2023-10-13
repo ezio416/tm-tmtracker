@@ -1,6 +1,6 @@
 /*
 c 2023-05-26
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Tabs { namespace MyMaps {
@@ -70,7 +70,7 @@ namespace Tabs { namespace MyMaps {
             UI::TableFlags::ScrollY;
 
         if (UI::BeginTable("my-maps-table", colCount, flags)) {
-            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
+            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Name");
