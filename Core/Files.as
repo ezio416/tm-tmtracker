@@ -48,6 +48,8 @@ namespace Files {
                 Globals::hiddenMapsJson = Json::FromFile(Files::hiddenMaps);
             } catch {
                 Log::Write(Log::Level::Errors, "error loading hiddenMaps.json! " + getExceptionInfo());
+                Log::TimerDelete(timerId);
+                return;
             }
         } else {
             Log::Write(Log::Level::Warnings, "file not found: hiddenMaps.json");
@@ -64,6 +66,8 @@ namespace Files {
                 Globals::recordsTimestampsJson = Json::FromFile(Files::mapRecordsTimestamps);
             } catch {
                 Log::Write(Log::Level::Errors, "error loading mapRecordsTimestamps.json! " + getExceptionInfo());
+                Log::TimerDelete(timerId);
+                return;
             }
         } else {
             Log::Write(Log::Level::Warnings, "file not found: mapRecordsTimestamps.json");

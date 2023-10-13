@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-10-09
+m 2023-10-12
 */
 
 namespace Models { class Account {
@@ -29,7 +29,7 @@ namespace Models { class Account {
     }
 
     bool IsNameExpired() {
-        return (nameExpire - Time::Stamp < 0);
+        return nameExpire - Time::Stamp < 0;
     }
 
     string NameExpireFormatted() {

@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Models { class Map {
@@ -166,6 +166,7 @@ namespace Models { class Map {
 
             for (uint i = 0; i < top.Length; i++) {
                 Record record = Record(top[i]);
+
                 record.mapId        = mapId;
                 record.mapNameText  = mapNameText;
                 record.mapUid       = mapUid;
@@ -173,6 +174,7 @@ namespace Models { class Map {
 
                 Globals::AddAccount(Account(record));
                 accountIds.InsertLast(record.accountId);
+
                 tmpRecords.InsertLast(record);
                 tmpRecordsDict.Set(record.accountId, @tmpRecords[tmpRecords.Length - 1]);
             }
@@ -260,9 +262,11 @@ namespace Models { class Map {
 
             if (timedOut) {
                 Log::Write(Log::Level::Normal, logName + "getting thumbnail timed out, waiting " + maxWait + " ms");
+
                 uint64 nowWait = Time::Now;
                 while (Time::Now - nowWait < maxWait)
                     yield();
+
                 continue;
             }
 
@@ -288,8 +292,8 @@ namespace Models { class Map {
         @thumbnailTexture = UI::LoadTexture(file.Read(file.Size()));
         file.Close();
 
-        thumbnailLoading = false;
         Log::TimerEnd(timerId);
+        thumbnailLoading = false;
     }
 
     // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
@@ -301,7 +305,7 @@ namespace Models { class Map {
         Log::Write(Log::Level::Normal, logName + "loading map for playing");
 
         if (!Permissions::PlayLocalMap()) {
-            Util::NotifyError("Standard or Club access required - can't load map " + mapNameText);
+            Util::NotifyError("Paid access required - can't load map " + mapNameText);
             Locks::playMap = false;
             return;
         }
@@ -349,10 +353,12 @@ namespace Models { class Map {
             yield();
         }
 
-        if (req.ResponseCode() >= 400 || req.ResponseCode() < 200 || req.Error().Length > 0) {
+        string reqError = req.Error();
+
+        if (req.ResponseCode() >= 400 || req.ResponseCode() < 200 || reqError.Length > 0) {
             Log::Write(
                 Log::Level::Errors,
-                logName + "[status:" + req.ResponseCode() + "] error getting map by UID from TMX: " + req.Error()
+                logName + "[status:" + req.ResponseCode() + "] error getting map by UID from TMX: " + reqError
             );
             Log::TimerDelete(timerId);
             Locks::tmx = false;
