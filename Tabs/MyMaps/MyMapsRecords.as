@@ -1,11 +1,12 @@
 /*
 c 2023-07-12
-m 2023-08-16
+m 2023-10-12
 */
 
-namespace Tabs { namespace Records {
+namespace Tabs { namespace MyMaps {
     void Tab_MyMapsRecords() {
-        if (!UI::BeginTabItem(Icons::MapO + " My Maps")) return;
+        if (!UI::BeginTabItem(Icons::Trophy + " Records (" + Globals::myMapsRecords.Length + ")###my-maps-records"))
+            return;
 
         int64 now = Time::Stamp;
 
@@ -15,35 +16,41 @@ namespace Tabs { namespace Records {
                 Util::FormatSeconds(uint(1.2 * Globals::shownMaps)) + " - " + Util::FormatSeconds(uint(3.6 * Globals::shownMaps)) +
                 "\\$G.\nIt could be shorter, but we don't want to spam Nadeo with API requests. This action does 2+ per map." +
                 "\nIt will take longer if there are lots of records, lots of unique accounts, or if you have low framerate." +
-                "\nMaps with no records are faster and hidden maps are skipped."
+                "\nMaps with no records are faster and hidden maps are skipped." +
+                "\nClick on a map name to add it to the \"Viewing Maps\" tab above." +
+                "\nClick on an account name to open their Trackmania.io page."
             );
 
         UI::BeginDisabled(Locks::allRecords);
-        if (UI::Button(Icons::Download + " Get Records (" + Globals::records.Length + ")"))
+        if (UI::Button(Icons::Download + " Get All Records"))
             startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
         UI::EndDisabled();
 
-        if (Locks::allRecords && !Globals::cancelAllRecords) {
-            UI::SameLine();
-            if (UI::Button(Icons::Times + " Cancel"))
-                Globals::cancelAllRecords = true;
-        }
+        UI::BeginDisabled(!Locks::allRecords || Globals::cancelAllRecords);
+        UI::SameLine();
+        if (UI::Button(Icons::Times + " Cancel"))
+            Globals::cancelAllRecords = true;
+        UI::EndDisabled();
 
         if (!Locks::allRecords) {
             uint timestamp;
-            try { timestamp = uint(Globals::recordsTimestampsIndex.Get("all")); } catch { timestamp = 0; }
+            try {
+                timestamp = uint(Globals::recordsTimestampsJson.Get("myMaps"));
+            } catch {
+                timestamp = 0;
+            }
 
             UI::SameLine();
             UI::Text("Last Updated: " + (
                 timestamp > 0 ?
-                    Time::FormatString(Settings::dateFormat + "Local\\$G", timestamp) +
+                    Time::FormatString(Globals::dateFormat + "Local\\$G", timestamp) +
                         " (" + Util::FormatSeconds(now - timestamp) + " ago)" :
                     "never"
             ));
         }
 
         if (UI::BeginTable("records-table", 6, UI::TableFlags::ScrollY | UI::TableFlags::RowBg)) {
-            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
+            UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
@@ -54,43 +61,48 @@ namespace Tabs { namespace Records {
             UI::TableSetupColumn("Recency "   + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
             UI::TableHeadersRow();
 
-            UI::ListClipper clipper(Globals::recordsSorted.Length);
+            UI::ListClipper clipper(Globals::myMapsRecordsSorted.Length);
             while (clipper.Step()) {
                 for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                    auto record = Globals::recordsSorted[i];
-                    auto account = Globals::accounts.Length > 0 ? cast<Models::Account@>(Globals::accountsIndex[record.accountId]) : Models::Account();
+                    Models::Record@ record = Globals::myMapsRecordsSorted[i];
+                    Models::Account@ account = Globals::accounts.Length > 0 ? cast<Models::Account@>(Globals::accountsDict[record.accountId]) : Models::Account();
 
                     UI::TableNextRow();
                     UI::TableNextColumn();
-                    UI::Text(record.mapName);
+                    if (UI::Selectable((Settings::mapNameColors ? record.mapNameColor : record.mapNameText) + "##" + i, false))
+                        Globals::AddMyMapViewing(cast<Models::Map@>(Globals::myMapsDict[record.mapId]));
 
                     UI::TableNextColumn();
-                    UI::Text(((Settings::recordsHighlight5 && record.position < 6) ? "\\$" + Settings::recordsHighlightColor : "") + record.position);
+                    UI::Text(((Settings::highlightTop5 && record.position < 6) ? Globals::colorTop5 : "") + record.position);
 
                     UI::TableNextColumn();
-                    string timeColor = "";
-                    if (Settings::recordsMedalColors)
+                    string color;
+                    if (Settings::medalColors)
                         switch (record.medals) {
-                            case 1: timeColor = "\\$C80"; break;
-                            case 2: timeColor = "\\$AAA"; break;
-                            case 3: timeColor = "\\$DD1"; break;
-                            case 4: timeColor = "\\$4B0"; break;
+                            case 1:  color = Globals::colorMedalBronze; break;
+                            case 2:  color = Globals::colorMedalSilver; break;
+                            case 3:  color = Globals::colorMedalGold;   break;
+                            case 4:  color = Globals::colorMedalAuthor; break;
+                            default: color = Globals::colorMedalNone;
                         }
-                    UI::Text(timeColor + Time::Format(record.time));
+                    UI::Text(color + Time::Format(record.time));
 
                     UI::TableNextColumn();
-                    UI::Text((account.accountName != "") ? account.accountName : account.accountId);
+                    if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : account.accountId) + "##" + i, false))
+                        Util::TmioPlayer(account.accountId);
 
                     UI::TableNextColumn();
-                    UI::Text(Time::FormatString("%Y-%m-%d %H:%M:%S \\$AAA(%a)", record.timestampUnix));
+                    UI::Text(Util::UnixToIso(record.timestampUnix));
 
                     UI::TableNextColumn();
                     UI::Text(Util::FormatSeconds(now - record.timestampUnix));
                 }
             }
+
             UI::PopStyleColor();
             UI::EndTable();
         }
+
         UI::EndTabItem();
     }
 }}

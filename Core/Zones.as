@@ -1,31 +1,35 @@
 /*
 c 2023-05-16
-m 2023-08-07
+m 2023-10-12
 */
 
 namespace Zones {
+    Json::Value@ zones;
+
     string Get(const string &in zoneId) {
-        try   { return string(Globals::zones.Get(zoneId)); }
-        catch { return "unknown-zone"; }
+        try {
+            return string(zones.Get(zoneId));
+        } catch {
+            return "unknown-zone";
+        }
     }
 
     void Load() {
         try {
-            Globals::zones.Length;
+            zones.Length;
             return;
         } catch { }
 
-        string timerId = Util::LogTimerBegin("loading zones.json");
+        string timerId = Log::TimerBegin("loading zones.json");
 
         try {
-            Globals::zones = Json::FromFile(Globals::zonesFile);
-            Globals::zonesFileMissing = false;
+            @zones = Json::FromFile(Files::zones);
         } catch {
-            trace("zones.json not found! ");
-            Util::LogTimerEnd(timerId, false);
+            Log::Write(Log::Level::Warnings, "zones.json not found!");
+            Log::TimerDelete(timerId);
             return;
         }
 
-        Util::LogTimerEnd(timerId);
+        Log::TimerEnd(timerId);
     }
 }

@@ -1,124 +1,274 @@
 /*
 c 2023-07-06
-m 2023-08-13
+m 2023-10-13
 */
 
 namespace Bulk {
-    void GetAccountNamesCoro() {
-        if (!Globals::getAccountNames) return;
+    string[] myRecordsMapIds;
 
-        string timerId = Util::LogTimerBegin("getting account names");
-        Globals::status.Set("account-names", "getting account names...");
+    void GetAccountNamesCoro() {
+        if (!Globals::getAccountNames)
+            return;
+
+        while (Locks::accountNames)
+            yield();
+        Locks::accountNames = true;
+        string timerId = Log::TimerBegin("getting account names");
+        string statusId = "account-names";
+        Globals::status.Set(statusId, "getting account names...");
 
         string[] missing;
 
         for (uint i = 0; i < Globals::accounts.Length; i++) {
-            auto account = @Globals::accounts[i];
+            Models::Account@ account = @Globals::accounts[i];
+
+            if (account.accountId == "d2372a08-a8a1-46cb-97fb-23a161d85ad0") {
+                account.accountName = "Nadeo";
+                continue;
+            }
+
             if (account.IsNameExpired()) {
                 account.accountName = "";
                 missing.InsertLast(account.accountId);
             }
         }
 
-        dictionary ret = NadeoServices::GetDisplayNamesAsync(missing);
+        Log::Write(Log::Level::Debug, "missing account names to get: " + missing.Length);
+
+        dictionary names = NadeoServices::GetDisplayNamesAsync(missing);
         for (uint i = 0; i < missing.Length; i++) {
-            string id = missing[i];
-            auto account = cast<Models::Account@>(Globals::accountsIndex[id]);
-            account.accountName = string(ret[id]);
+            string accountId = missing[i];
+            Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[accountId]);
+            account.accountName = string(names[accountId]);
             account.SetNameExpire();
         }
 
-        startnew(CoroutineFunc(Globals::SortRecordsCoro));
-
-        Globals::status.Delete("account-names");
-        Util::LogTimerEnd(timerId);
+        Globals::status.Delete(statusId);
+        Log::TimerEnd(timerId);
+        Locks::accountNames = false;
     }
 
     void GetMyMapsCoro() {
-        while (Locks::myMaps) yield();
+        while (Locks::myMaps)
+            yield();
         Locks::myMaps = true;
-        string timerId = Util::LogTimerBegin("updating my maps");
-        Globals::status.Set("get-my-maps", "getting maps...");
+        string timerId = Log::TimerBegin("getting my maps");
+        string statusId = "get-my-maps";
+        Globals::status.Set(statusId, "getting my maps...");
 
-        Globals::ClearMaps();
+        Globals::ClearMyMaps();
 
-        while (!NadeoServices::IsAuthenticated("NadeoLiveServices")) yield();
+        while (!NadeoServices::IsAuthenticated(Globals::apiLive))
+            yield();
 
         uint offset = 0;
         bool tooManyMaps;
 
         do {
-            auto waitCoro = startnew(CoroutineFunc(Util::WaitToDoNadeoRequestCoro));
-            while (waitCoro.IsRunning()) yield();
+            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            while (waitCoro.IsRunning())
+                yield();
 
-            auto req = NadeoServices::Get(
-                "NadeoLiveServices",
+            Net::HttpRequest@ req = NadeoServices::Get(
+                Globals::apiLive,
                 NadeoServices::BaseURLLive() + "/api/token/map?length=1000&offset=" + offset
             );
             req.Start();
-            while (!req.Finished()) yield();
+            while (!req.Finished())
+                yield();
             Locks::requesting = false;
             offset += 1000;
 
-            auto mapList = Json::Parse(req.String())["mapList"];
-            tooManyMaps = mapList.Length == 1000;
-            for (uint i = 0; i < mapList.Length; i++) {
-                auto map = Models::Map(mapList[i]);
-                try { map.recordsTimestamp = uint(Globals::recordsTimestampsIndex.Get(map.mapId)); } catch { }
-                Globals::AddMap(map);
+            Json::Value@ mapList;
+            try {
+                @mapList = Json::Parse(req.String())["mapList"];
+            } catch {
+                Log::Write(Log::Level::Errors, "error parsing mapList: " + getExceptionInfo());
+                break;
             }
+
+            tooManyMaps = mapList.Length == 1000;
+
+            for (uint i = 0; i < mapList.Length; i++) {
+                Models::Map map = Models::Map(mapList[i]);
+
+                try {
+                    map.recordsTimestamp = uint(Globals::recordsTimestampsJson.Get(map.mapId));
+                } catch { }  // error should mean no records have been gotten yet
+
+                Globals::AddMyMap(map);
+            }
+
+            if (tooManyMaps)
+                Log::Write(Log::Level::Debug, "tooManyMaps, getting more...");
         } while (tooManyMaps);
 
-        Globals::status.Delete("get-my-maps");
-        Util::LogTimerEnd(timerId);
+        Log::Write(Log::Level::Debug, "number of maps gotten: " + Globals::myMaps.Length);
+
+        Globals::status.Delete(statusId);
+        Log::TimerEnd(timerId);
         Locks::myMaps = false;
 
-        startnew(CoroutineFunc(LoadMyMapsThumbnailsCoro));
         startnew(CoroutineFunc(Database::LoadRecordsCoro));
     }
 
     void GetMyMapsRecordsCoro() {
-        if (Locks::allRecords) return;
+        if (Locks::allRecords)
+            return;
+
         Locks::allRecords = true;
-        string timerId = Util::LogTimerBegin("getting records");
+        string timerId = Log::TimerBegin("getting my maps records");
+        string statusId = "get-all-records";
 
         Globals::getAccountNames = false;
         Globals::singleMapRecordStatus = false;
-        for (uint i = 0; i < Globals::maps.Length; i++) {
-            Globals::status.Set("get-all-records", "getting records... (" + (i + 1) + "/" + Globals::maps.Length + ")");
-            auto recordsCoro = startnew(CoroutineFunc(@Globals::maps[i].GetRecordsCoro));
-            while (recordsCoro.IsRunning()) yield();
+
+        for (uint i = 0; i < Globals::myMaps.Length; i++) {
+            Globals::status.Set(statusId, "getting my maps records... (" + (i + 1) + "/" + Globals::myMaps.Length + ")");
+
+            Models::Map@ map = @Globals::myMaps[i];
+            Meta::PluginCoroutine@ recordsCoro = startnew(CoroutineFunc(map.GetRecordsCoro));
+            while (recordsCoro.IsRunning())
+                yield();
+
             if (Globals::cancelAllRecords) {
                 Globals::cancelAllRecords = false;
-                trace("getting records cancelled by user");
+                Log::Write(Log::Level::Normal, "getting my maps records cancelled by user");
                 break;
             }
         }
+
         Globals::getAccountNames = true;
         Globals::singleMapRecordStatus = true;
 
-        auto nameCoro = startnew(CoroutineFunc(GetAccountNamesCoro));
-        while (nameCoro.IsRunning()) yield();
+        Meta::PluginCoroutine@ nameCoro = startnew(CoroutineFunc(GetAccountNamesCoro));
+        while (nameCoro.IsRunning())
+            yield();
 
-        Globals::recordsTimestampsIndex["all"] = Time::Stamp;
-        Json::ToFile(Globals::mapRecordsTimestampsFile, Globals::recordsTimestampsIndex);
+        startnew(CoroutineFunc(Globals::SortMyMapsRecordsCoro));
 
-        Globals::status.Delete("get-all-records");
-        Util::LogTimerEnd(timerId);
+        Globals::recordsTimestampsJson["myMaps"] = Time::Stamp;
+        Files::SaveRecordsTimestamps();
+
+        Globals::status.Delete(statusId);
+        Log::TimerEnd(timerId);
         Locks::allRecords = false;
     }
 
-    void LoadMyMapsThumbnailsCoro() {
-        string timerId = Util::LogTimerBegin("loading my map thumbnails");
+    void GetMyRecordsCoro() {
+        if (Locks::myRecords)
+            return;
 
-        for (uint i = 0; i < Globals::maps.Length; i++) {
-            Globals::status.Set("load-thumbs", "loading thumbnails... (" + (i + 1) + "/" + Globals::maps.Length + ")");
-            auto map = @Globals::maps[i];
-            auto coro = startnew(CoroutineFunc(map.LoadThumbnailCoro));
-            while (coro.IsRunning()) yield();
+        Locks::myRecords = true;
+        string timerId = Log::TimerBegin("getting my records");
+        string statusId = "my-records";
+        Globals::status.Set(statusId, "getting my records...");
+
+        Globals::myRecords.RemoveRange(0, Globals::myRecords.Length);
+        Globals::myRecordsMapsDict.DeleteAll();
+        myRecordsMapIds.RemoveRange(0, myRecordsMapIds.Length);
+
+        while (!NadeoServices::IsAuthenticated(Globals::apiCore))
+            yield();
+
+        Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+        while (waitCoro.IsRunning())
+            yield();
+
+        Net::HttpRequest@ req = NadeoServices::Get(
+            Globals::apiCore,
+            NadeoServices::BaseURLCore() + "/accounts/" + Globals::myAccountId + "/mapRecords"
+        );
+        req.Start();
+        while (!req.Finished())
+            yield();
+        Locks::requesting = false;
+
+        Json::Value@ records;
+        try {
+            @records = Json::Parse(req.String());
+        } catch {
+            Log::Write(Log::Level::Errors, "error parsing my records: " + getExceptionInfo());
         }
 
-        Globals::status.Delete("load-thumbs");
-        Util::LogTimerEnd(timerId);
+        if (records !is null) {
+            for (uint i = 0; i < records.Length; i++) {
+                Models::Record record = Models::Record(records[i], true);
+                Globals::myRecords.InsertLast(record);
+                Globals::myRecordsDict.Set(record.mapId, @Globals::myRecords[Globals::myRecords.Length - 1]);
+                myRecordsMapIds.InsertLast(record.mapId);
+            }
+        }
+
+        Globals::recordsTimestampsJson["myRecords"] = Time::Stamp;
+        Files::SaveRecordsTimestamps();
+
+        Globals::status.Delete(statusId);
+        Log::TimerEnd(timerId);
+        Locks::myRecords = false;
+
+        startnew(CoroutineFunc(Globals::SortMyRecordsCoro));
+        startnew(CoroutineFunc(GetMyRecordsMapInfoCoro));
+    }
+
+    void GetMyRecordsMapInfoCoro() {
+        if (Locks::mapInfo)
+            return;
+
+        Locks::mapInfo = true;
+        string timerId = Log::TimerBegin("getting map info for my records");
+        string statusId = "my-record-map-info";
+        uint count = myRecordsMapIds.Length;
+
+        while (myRecordsMapIds.Length > 0) {
+            Globals::status.Set(statusId, "getting map info for my records... (" + (count - myRecordsMapIds.Length) + "/" + count + ")");
+
+            string[] group;
+            int idsToAdd = Math::Min(myRecordsMapIds.Length, 206);
+            for (int i = 0; i < idsToAdd; i++)
+                group.InsertLast(myRecordsMapIds[i]);
+            myRecordsMapIds.RemoveRange(0, idsToAdd);
+
+            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            while (waitCoro.IsRunning())
+                yield();
+
+            Net::HttpRequest@ req = NadeoServices::Get(
+                Globals::apiCore,
+                NadeoServices::BaseURLCore() + "/maps/?mapIdList=" + string::Join(group, "%2C")
+            );
+            req.Start();
+            while (!req.Finished())
+                yield();
+            Locks::requesting = false;
+
+            Json::Value@ maps;
+            try {
+                @maps = Json::Parse(req.String());
+            } catch {
+                Log::Write(Log::Level::Errors, "error parsing map info: " + getExceptionInfo());
+            }
+
+            if (maps !is null) {
+                for (uint i = 0; i < maps.Length; i++) {
+                    Models::Map map = Models::Map(maps[i], true);
+
+                    Globals::AddAccount(Models::Account(map.authorId));
+
+                    Globals::myRecordsMaps.InsertLast(map);
+                    Globals::myRecordsMapsDict.Set(map.mapId, @Globals::myRecordsMaps[Globals::myRecordsMaps.Length - 1]);
+
+                    Models::Record@ record = cast<Models::Record@>(Globals::myRecordsDict[map.mapId]);
+                    record.mapNameColor = map.mapNameColor;
+                    record.mapNameText = map.mapNameText;
+                }
+            }
+        }
+
+        Globals::status.Delete(statusId);
+        Log::TimerEnd(timerId);
+        Locks::mapInfo = false;
+
+        startnew(CoroutineFunc(GetAccountNamesCoro));
     }
 }
