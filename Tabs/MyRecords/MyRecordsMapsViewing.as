@@ -100,11 +100,23 @@ namespace Tabs { namespace MyRecords {
                         UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
                         UI::TableSetupScrollFreeze(0, 1);
-                        UI::TableSetupColumn("PB",                UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                        UI::TableSetupColumn("Bronze",            UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                        UI::TableSetupColumn("Silver",            UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                        UI::TableSetupColumn("Gold",              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                        UI::TableSetupColumn("Author",            UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+                        UI::TableSetupColumn("PB", UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+                        UI::TableSetupColumn(
+                            (Settings::medalColors ? Globals::colorMedalBronze : "") + "Bronze",
+                            UI::TableColumnFlags::WidthFixed, Globals::scale * 80
+                        );
+                        UI::TableSetupColumn(
+                            (Settings::medalColors ? Globals::colorMedalSilver : "") + "Silver",
+                            UI::TableColumnFlags::WidthFixed, Globals::scale * 80
+                        );
+                        UI::TableSetupColumn(
+                            (Settings::medalColors ? Globals::colorMedalGold : "") + "Gold",
+                            UI::TableColumnFlags::WidthFixed, Globals::scale * 80
+                        );
+                        UI::TableSetupColumn(
+                            (Settings::medalColors ? Globals::colorMedalAuthor : "") + "Author",
+                            UI::TableColumnFlags::WidthFixed, Globals::scale * 80
+                        );
                         UI::TableSetupColumn("Timestamp (Local)", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
                         UI::TableSetupColumn("Recency",           UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
                         UI::TableHeadersRow();
