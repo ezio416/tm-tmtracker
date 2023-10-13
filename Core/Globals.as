@@ -1,165 +1,278 @@
 /*
 c 2023-05-16
-m 2023-08-16
+m 2023-10-12
 */
 
 namespace Globals {
-    int3              version = int3(3, 0, 0);
-
     Models::Account[] accounts;
-    dictionary        accountsIndex;
-    bool              cancelAllRecords = false;
-    Models::Map@[]    currentMaps;
-    dictionary        currentMapsIndex;
-    bool              debug = false;
-    UI::Texture@      defaultTexture = UI::LoadTexture("Assets/1x1.png");
-    UI::Texture@      eyeTexture = UI::LoadTexture("Assets/eye.png");
-    bool              getAccountNames = true;
-    uint64            latestNadeoRequest = 0;
-    uint64            logTimerIndex = 0;
-    dictionary        logTimers;
-    string            clickedMapId;
-    string            hiddenMapsFile = storageFolder + "hiddenMaps.json";
-    Json::Value       hiddenMapsIndex = Json::Object();
-    Models::Map[]     maps;
-    string            mapRecordsTimestampsFile = storageFolder + "mapRecordsTimestamps.json";
-    string            mapSearch;
-    dictionary        mapsIndex;
-    Models::Record[]  records;
-    dictionary        recordsIndex;
-    Models::Record@[] recordsSorted;
-    Json::Value       recordsTimestampsIndex = Json::Object();
-    bool              saveSettings = false;
-    float             scale = UI::GetScale();
-    bool              showHidden = false;
-    uint              shownMaps = 0;
-    bool              singleMapRecordStatus = true;
+    dictionary        accountsDict;
+    string            apiCore                 = "NadeoServices";
+    string            apiLive                 = "NadeoLiveServices";
+    bool              cancelAllRecords        = false;
+    string            colorMedalAuthor;
+    string            colorMedalBronze;
+    string            colorMedalGold;
+    string            colorMedalNone;
+    string            colorMedalSilver;
+    vec4              colorTableRowBgAlt      = vec4(0.0f, 0.0f, 0.0f, 0.5f);
+    string            colorTop5;
+    string            dateFormat              = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
+    bool              debugTab                = false;
+    bool              getAccountNames         = true;
+    Json::Value@      hiddenMapsJson          = Json::Object();
+    uint64            latestNandoRequest      = 0;
+    string            myAccountId;
+    Models::Map[]     myMaps;
+    dictionary        myMapsDict;
+    Models::Record[]  myMapsRecords;
+    dictionary        myMapsRecordsDict;
+    Models::Record@[] myMapsRecordsSorted;
+    string            myMapsSearch;
+    Models::Map@[]    myMapsViewing;
+    dictionary        myMapsViewingDict;
+    string            myMapsViewingMapId;
+    bool              myMapsViewingSet        = false;
+    Models::Record[]  myRecords;
+    dictionary        myRecordsDict;
+    Models::Map[]     myRecordsMaps;
+    dictionary        myRecordsMapsDict;
+    string            myRecordsMapsSearch;
+    Models::Map@[]    myRecordsMapsViewing;
+    dictionary        myRecordsMapsViewingDict;
+    string            myRecordsMapsViewingMapId;
+    bool              myRecordsMapsViewingSet = false;
+    Models::Record@[] myRecordsSorted;
+    Json::Value@      recordsTimestampsJson   = Json::Object();
+    float             scale                   = UI::GetScale();
+    bool              showHidden              = false;
+    uint              shownMaps               = 0;
+    bool              singleMapRecordStatus   = true;
     dictionary        status;
-    string            storageFolder = IO::FromStorageFolder("").Replace("\\", "/");
-    vec4              tableRowBgAltColor = vec4(0, 0, 0, 0.5);
-    string            thumbnailFolder = storageFolder + "thumbnails";
-    dictionary        thumbnailTextures;
-    SQLite::Database@ timeDB = SQLite::Database(":memory:");
-    string            title = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
-    string            versionFile = storageFolder + "version.json";
-    Json::Value       zones;
-    string            zonesFile = "Assets/zones.json";
-    bool              zonesFileMissing = true;
+    string            title                   = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
 
     void AddAccount(Models::Account account) {
-        if (accountsIndex.Exists(account.accountId)) return;
+        if (accountsDict.Exists(account.accountId))
+            return;
+
         accounts.InsertLast(account);
-        accountsIndex.Set(account.accountId, @accounts[accounts.Length - 1]);
+        accountsDict.Set(account.accountId, @accounts[accounts.Length - 1]);
     }
 
-    void ClearAccounts() {
-        accounts.RemoveRange(0, accounts.Length);
-        accountsIndex.DeleteAll();
-    }
+    void AddMyMap(Models::Map map) {
+        if (myMapsDict.Exists(map.mapId))
+            return;
 
-    void AddMap(Models::Map map) {
-        if (mapsIndex.Exists(map.mapId)) return;
-        if (hiddenMapsIndex.HasKey(map.mapId))
+        if (hiddenMapsJson.HasKey(map.mapId))
             map.hidden = true;
         else
             shownMaps++;
-        maps.InsertLast(map);
-        mapsIndex.Set(map.mapId, @maps[maps.Length - 1]);
+
+        myMaps.InsertLast(map);
+        myMapsDict.Set(map.mapId, @myMaps[myMaps.Length - 1]);
     }
 
-    void AddCurrentMap(Models::Map@ map) {
-        if (currentMapsIndex.Exists(map.mapId)) return;
-        currentMaps.InsertLast(map);
-        currentMapsIndex.Set(map.mapId, map);
+    void AddMyMapsRecord(Models::Record record) {
+        if (record.timestampIso == "")
+            record.timestampIso = Time::FormatString("%Y-%m-%dT%H:%M:%S+00:00", record.timestampUnix);
+
+        myMapsRecords.InsertLast(record);
+        Models::Record@ storedRecord = @myMapsRecords[myMapsRecords.Length - 1];
+        myMapsRecordsDict.Set(record.recordFakeId, storedRecord);
+
+        Models::Map@ map = cast<Models::Map@>(myMapsDict[record.mapId]);
+        storedRecord.SetMedals(map);
+        storedRecord.mapNameColor = map.mapNameColor;
+        storedRecord.mapNameText = map.mapNameText;
+
+        map.records.InsertLast(storedRecord);
+        map.recordsDict.Set(record.accountId, storedRecord);
     }
 
-    void ClearCurrentMaps() {
-        currentMaps.RemoveRange(0, currentMaps.Length);
-        currentMapsIndex.DeleteAll();
+    void AddMyMapViewing(Models::Map@ map) {
+        if (!myMapsViewingDict.Exists(map.mapId)) {
+            Log::Write(Log::Level::Debug, map.logName + "adding to my maps viewing...");
+
+            myMapsViewing.InsertLast(map);
+            myMapsViewingDict.Set(map.mapId, map);
+        }
+
+        if (Settings::viewingSwitchOnClicked) {
+            myMapsViewingMapId = map.mapId;
+            myMapsViewingSet = true;
+        }
     }
 
-    void HideMap(Models::Map@ map) {
-        if (hiddenMapsIndex.HasKey(map.mapId)) return;
-        hiddenMapsIndex[map.mapId] = 0;
-        map.hidden = true;
-        Globals::shownMaps--;
-        Json::ToFile(Globals::hiddenMapsFile, Globals::hiddenMapsIndex);
+    void AddMyRecordsMapViewing(Models::Map@ map) {
+        if (!myRecordsMapsViewingDict.Exists(map.mapId)) {
+            Log::Write(Log::Level::Debug, map.logName + "adding to my records maps viewing...");
+
+            myRecordsMapsViewing.InsertLast(map);
+            myRecordsMapsViewingDict.Set(map.mapId, map);
+        }
+
+        if (Settings::viewingSwitchOnClicked) {
+            myRecordsMapsViewingMapId = map.mapId;
+            myRecordsMapsViewingSet = true;
+        }
     }
 
-    void ShowMap(Models::Map@ map) {
-        if (!hiddenMapsIndex.HasKey(map.mapId)) return;
-        hiddenMapsIndex.Remove(map.mapId);
-        map.hidden = false;
-        Globals::shownMaps++;
-        Json::ToFile(Globals::hiddenMapsFile, Globals::hiddenMapsIndex);
+    void ClearAccounts() {
+        Log::Write(Log::Level::Debug, "clearing accounts...");
+
+        accounts.RemoveRange(0, accounts.Length);
+        accountsDict.DeleteAll();
     }
 
-    void ClearMaps() {
-        maps.RemoveRange(0, maps.Length);
-        mapsIndex.DeleteAll();
-        ClearCurrentMaps();
+    void ClearMyMaps() {
+        Log::Write(Log::Level::Debug, "clearing my maps...");
+
+        myMaps.RemoveRange(0, myMaps.Length);
+        myMapsDict.DeleteAll();
+        ClearMyMapsViewing();
         shownMaps = 0;
     }
 
-    void AddRecord(Models::Record record) {
-        if (record.timestampIso == "")
-            record.timestampIso = Time::FormatString("%Y-%m-%dT%H:%M:%S+00:00", record.timestampUnix);
-        records.InsertLast(record);
-        auto storedRecord = @records[records.Length - 1];
-        recordsIndex.Set(record.recordFakeId, storedRecord);
+    void ClearMyMapRecords(Models::Map@ map) {
+        Log::Write(Log::Level::Debug, map.logName + "clearing my maps records...");
 
-        auto map = cast<Models::Map@>(mapsIndex[record.mapId]);
-        storedRecord.SetMedals(map);
-        storedRecord.mapName = map.mapNameText;
-        map.records.InsertLast(storedRecord);
-        map.recordsIndex.Set(record.accountId, storedRecord);
+        map.records.RemoveRange(0, map.records.Length);
+        map.recordsDict.DeleteAll();
+
+        if (myMapsRecords.Length == 0) return;
+        for (int i = myMapsRecords.Length - 1; i >= 0; i--)
+            if (myMapsRecords[i].mapId == map.mapId)
+                myMapsRecords.RemoveAt(i);
     }
 
-    void SortRecordsCoro() {
-        while (Locks::sortRecords) yield();
-        Locks::sortRecords = true;
+    void ClearMyMapsRecords() {
+        Log::Write(Log::Level::Debug, "clearing my maps records...");
 
-        string timerId = Util::LogTimerBegin("sorting records");
+        myMapsRecords.RemoveRange(0, myMapsRecords.Length);
+        myMapsRecordsDict.DeleteAll();
+    }
 
-        recordsSorted.RemoveRange(0, recordsSorted.Length);
+    void ClearMyMapsViewing() {
+        Log::Write(Log::Level::Debug, "clearing my maps viewing...");
 
-        for (uint i = 0; i < records.Length; i++) {
-            Globals::status.Set("sort-records", "sorting records... (" + i + "/" + records.Length + ")");
-            auto record = @records[i];
-            for (uint j = 0; j < recordsSorted.Length; j++) {
-                if (record.timestampUnix > recordsSorted[j].timestampUnix) {
-                    recordsSorted.InsertAt(j, record);
+        myMapsViewing.RemoveRange(0, myMapsViewing.Length);
+        myMapsViewingDict.DeleteAll();
+    }
+
+    void ClearMyRecordsMapsViewing() {
+        Log::Write(Log::Level::Debug, "clearing my records maps viewing...");
+
+        myRecordsMapsViewing.RemoveRange(0, myRecordsMapsViewing.Length);
+        myRecordsMapsViewingDict.DeleteAll();
+    }
+
+    void HideMyMap(Models::Map@ map) {
+        if (hiddenMapsJson.HasKey(map.mapId))
+            return;
+
+        Log::Write(Log::Level::Debug, map.logName + "hiding...");
+
+        map.hidden = true;
+        Globals::shownMaps--;
+
+        hiddenMapsJson[map.mapId] = 0;
+        Files::SaveHiddenMaps();
+    }
+
+    void SetColors() {
+        Globals::colorMedalAuthor = "\\" + Text::FormatGameColor(Settings::colorMedalAuthor);
+        Globals::colorMedalBronze = "\\" + Text::FormatGameColor(Settings::colorMedalBronze);
+        Globals::colorMedalGold   = "\\" + Text::FormatGameColor(Settings::colorMedalGold);
+        Globals::colorMedalNone   = "\\" + Text::FormatGameColor(Settings::colorMedalNone);
+        Globals::colorMedalSilver = "\\" + Text::FormatGameColor(Settings::colorMedalSilver);
+        Globals::colorTop5        = "\\" + Text::FormatGameColor(Settings::colorTop5);
+    }
+
+    void ShowMyMap(Models::Map@ map) {
+        if (!hiddenMapsJson.HasKey(map.mapId))
+            return;
+
+        Log::Write(Log::Level::Debug, map.logName + "showing...");
+
+        map.hidden = false;
+        Globals::shownMaps++;
+
+        hiddenMapsJson.Remove(map.mapId);
+        Files::SaveHiddenMaps();
+    }
+
+    void SortMyMapsRecordsCoro() {
+        while (Locks::sortMyMapsRecords)
+            yield();
+        Locks::sortMyMapsRecords = true;
+        string timerId = Log::TimerBegin("sorting my maps records");
+        string statusId = "sort-records";
+
+        myMapsRecordsSorted.RemoveRange(0, myMapsRecordsSorted.Length);
+
+        for (uint i = 0; i < myMapsRecords.Length; i++) {
+            Globals::status.Set(statusId, "sorting my maps records... (" + i + "/" + myMapsRecords.Length + ")");
+            Models::Record@ record = @myMapsRecords[i];
+
+            for (uint j = 0; j < myMapsRecordsSorted.Length; j++) {
+                if (record.timestampUnix > myMapsRecordsSorted[j].timestampUnix) {
+                    myMapsRecordsSorted.InsertAt(j, record);
                     break;
                 }
-                if (j == recordsSorted.Length - 1) {
-                    recordsSorted.InsertLast(record);
+
+                if (j == myMapsRecordsSorted.Length - 1) {
+                    myMapsRecordsSorted.InsertLast(record);
                     break;
                 }
             }
-            if (recordsSorted.Length == 0)
-                recordsSorted.InsertLast(record);
-            if (i % 5 == 0) yield();
+
+            if (myMapsRecordsSorted.Length == 0)
+                myMapsRecordsSorted.InsertLast(record);
+
+            if (i % 5 == 0)
+                yield();
         }
 
+        Globals::status.Delete(statusId);
+        Log::TimerEnd(timerId);
+        Locks::sortMyMapsRecords = false;
+
         startnew(CoroutineFunc(Database::SaveCoro));
-
-        Globals::status.Delete("sort-records");
-        Util::LogTimerEnd(timerId);
-        Locks::sortRecords = false;
     }
 
-    void ClearMapRecords(Models::Map@ map) {
-        map.records.RemoveRange(0, map.records.Length);
-        map.recordsIndex.DeleteAll();
+    void SortMyRecordsCoro() {
+        while (Locks::sortMyRecords)
+            yield();
+        Locks::sortMyRecords = true;
+        string timerId = Log::TimerBegin("sorting my records");
+        string statusId = "sort-my-records";
 
-        if (records.Length == 0) return;
-        for (int i = records.Length - 1; i >= 0; i--)
-            if (records[i].mapId == map.mapId)
-                records.RemoveAt(i);
-    }
+        myRecordsSorted.RemoveRange(0, myRecordsSorted.Length);
 
-    void ClearRecords() {
-        records.RemoveRange(0, records.Length);
-        recordsIndex.DeleteAll();
+        for (uint i = 0; i < myRecords.Length; i++) {
+            Globals::status.Set(statusId, "sorting my records... (" + i + "/" + myRecords.Length + ")");
+            Models::Record@ record = @myRecords[i];
+
+            for (uint j = 0; j < myRecordsSorted.Length; j++) {
+                if (record.timestampUnix > myRecordsSorted[j].timestampUnix) {
+                    myRecordsSorted.InsertAt(j, record);
+                    break;
+                }
+
+                if (j == myRecordsSorted.Length - 1) {
+                    myRecordsSorted.InsertLast(record);
+                    break;
+                }
+            }
+
+            if (myRecordsSorted.Length == 0)
+                myRecordsSorted.InsertLast(record);
+
+            if (i % 5 == 0)
+                yield();
+        }
+
+        Globals::status.Delete(statusId);
+        Log::TimerEnd(timerId);
+        Locks::sortMyRecords = false;
     }
 }
