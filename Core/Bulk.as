@@ -1,6 +1,6 @@
 /*
 c 2023-07-06
-m 2023-10-12
+m 2023-10-13
 */
 
 namespace Bulk {
@@ -79,7 +79,14 @@ namespace Bulk {
             Locks::requesting = false;
             offset += 1000;
 
-            Json::Value@ mapList = Json::Parse(req.String())["mapList"];
+            Json::Value@ mapList;
+            try {
+                @mapList = Json::Parse(req.String())["mapList"];
+            } catch {
+                Log::Write(Log::Level::Errors, "error parsing mapList: " + getExceptionInfo());
+                break;
+            }
+
             tooManyMaps = mapList.Length == 1000;
 
             for (uint i = 0; i < mapList.Length; i++) {
@@ -177,13 +184,20 @@ namespace Bulk {
             yield();
         Locks::requesting = false;
 
-        Json::Value@ records = Json::Parse(req.String());
+        Json::Value@ records;
+        try {
+            @records = Json::Parse(req.String());
+        } catch {
+            Log::Write(Log::Level::Errors, "error parsing my records: " + getExceptionInfo());
+        }
 
-        for (uint i = 0; i < records.Length; i++) {
-            Models::Record record = Models::Record(records[i], true);
-            Globals::myRecords.InsertLast(record);
-            Globals::myRecordsDict.Set(record.mapId, @Globals::myRecords[Globals::myRecords.Length - 1]);
-            myRecordsMapIds.InsertLast(record.mapId);
+        if (records !is null) {
+            for (uint i = 0; i < records.Length; i++) {
+                Models::Record record = Models::Record(records[i], true);
+                Globals::myRecords.InsertLast(record);
+                Globals::myRecordsDict.Set(record.mapId, @Globals::myRecords[Globals::myRecords.Length - 1]);
+                myRecordsMapIds.InsertLast(record.mapId);
+            }
         }
 
         Globals::recordsTimestampsJson["myRecords"] = Time::Stamp;
@@ -228,19 +242,26 @@ namespace Bulk {
                 yield();
             Locks::requesting = false;
 
-            Json::Value@ maps = Json::Parse(req.String());
+            Json::Value@ maps;
+            try {
+                @maps = Json::Parse(req.String());
+            } catch {
+                Log::Write(Log::Level::Errors, "error parsing map info: " + getExceptionInfo());
+            }
 
-            for (uint i = 0; i < maps.Length; i++) {
-                Models::Map map = Models::Map(maps[i], true);
+            if (maps !is null) {
+                for (uint i = 0; i < maps.Length; i++) {
+                    Models::Map map = Models::Map(maps[i], true);
 
-                Globals::AddAccount(Models::Account(map.authorId));
+                    Globals::AddAccount(Models::Account(map.authorId));
 
-                Globals::myRecordsMaps.InsertLast(map);
-                Globals::myRecordsMapsDict.Set(map.mapId, @Globals::myRecordsMaps[Globals::myRecordsMaps.Length - 1]);
+                    Globals::myRecordsMaps.InsertLast(map);
+                    Globals::myRecordsMapsDict.Set(map.mapId, @Globals::myRecordsMaps[Globals::myRecordsMaps.Length - 1]);
 
-                Models::Record@ record = cast<Models::Record@>(Globals::myRecordsDict[map.mapId]);
-                record.mapNameColor = map.mapNameColor;
-                record.mapNameText = map.mapNameText;
+                    Models::Record@ record = cast<Models::Record@>(Globals::myRecordsDict[map.mapId]);
+                    record.mapNameColor = map.mapNameColor;
+                    record.mapNameText = map.mapNameText;
+                }
             }
         }
 
