@@ -1,6 +1,6 @@
 /*
 c 2023-05-20
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Util {
@@ -68,7 +68,7 @@ namespace Util {
     }
 
     string TimeFormatColored(int time) {
-        return (time > 0 ? "\\$F00+" : "\\$0F0-") + Time::Format(Math::Abs(time));
+        return (time > 0 ? "\\$F00+" : "\\$0F0\u2212") + Time::Format(Math::Abs(time));
     }
 
     void TmioMap(const string &in mapUid) {
