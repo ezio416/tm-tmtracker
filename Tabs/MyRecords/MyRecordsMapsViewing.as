@@ -25,11 +25,11 @@ namespace Tabs { namespace MyRecords {
             Globals::ClearMyRecordsMapsViewing();
         UI::EndDisabled();
 
-        int flags = UI::TabBarFlags::FittingPolicyScroll;
+        int barFlags = UI::TabBarFlags::FittingPolicyScroll;
         if (Globals::myRecordsMapsViewing.Length > 0)
-            flags |= UI::TabBarFlags::TabListPopupButton;
+            barFlags |= UI::TabBarFlags::TabListPopupButton;
 
-        UI::BeginTabBar("my-records-viewing", flags);
+        UI::BeginTabBar("my-records-viewing", barFlags);
 
         int64 now = Time::Stamp;
 

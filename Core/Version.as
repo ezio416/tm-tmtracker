@@ -1,6 +1,6 @@
 /*
 c 2023-09-19
-m 2023-10-09
+m 2023-10-12
 */
 
 namespace Version {
@@ -26,36 +26,44 @@ namespace Version {
         return true;
     }
 
-    int3 FromToml() {
+    void FromToml() {
         if (version.x > 0)
-            return version;
+            return;
 
         string[]@ parts = Meta::ExecutingPlugin().Version.Split(".");
         version = int3(Text::ParseInt(parts[0]), Text::ParseInt(parts[1]), Text::ParseInt(parts[2]));
-        return version;
     }
 
     int3 GetFile() {
+        string timerId = Log::TimerBegin("loading version.json");
+
+        int3 readVersion;
+
         FromToml();
 
         if (IO::FileExists(Files::version)) {
             try {
                 Json::Value@ read = Json::FromFile(Files::version);
-                return int3(int(read["major"]), int(read["minor"]), int(read["patch"]));
+                readVersion = int3(int(read["major"]), int(read["minor"]), int(read["patch"]));
             } catch {
-                Log::Write(Log::Level::Errors, "error reading version.json! " + getExceptionInfo());
+                Log::Write(Log::Level::Errors, "error loading version.json! " + getExceptionInfo());
                 Files::Delete();
+                Log::TimerDelete(timerId);
                 return version;
             }
         } else {
             Log::Write(Log::Level::Warnings, "file not found: version.json");
             Files::Delete();
+            Log::TimerDelete(timerId);
             return version;
         }
+
+        Log::TimerEnd(timerId);
+        return readVersion;
     }
 
     void SetFile() {
-        string timerId = Log::TimerBegin("setting version.json");
+        string timerId = Log::TimerBegin("saving version.json");
 
         FromToml();
 
@@ -63,10 +71,11 @@ namespace Version {
         write["major"] = version.x;
         write["minor"] = version.y;
         write["patch"] = version.z;
+
         try {
             Json::ToFile(Files::version, write);
         } catch {
-            Log::Write(Log::Level::Errors, "error setting version.json! " + getExceptionInfo());
+            Log::Write(Log::Level::Errors, "error saving version.json! " + getExceptionInfo());
             Log::TimerDelete(timerId);
             return;
         }

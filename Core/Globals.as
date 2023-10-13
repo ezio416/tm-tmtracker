@@ -74,6 +74,7 @@ namespace Globals {
     void AddMyMapsRecord(Models::Record record) {
         if (record.timestampIso == "")
             record.timestampIso = Time::FormatString("%Y-%m-%dT%H:%M:%S+00:00", record.timestampUnix);
+
         myMapsRecords.InsertLast(record);
         Models::Record@ storedRecord = @myMapsRecords[myMapsRecords.Length - 1];
         myMapsRecordsDict.Set(record.recordFakeId, storedRecord);
@@ -82,6 +83,7 @@ namespace Globals {
         storedRecord.SetMedals(map);
         storedRecord.mapNameColor = map.mapNameColor;
         storedRecord.mapNameText = map.mapNameText;
+
         map.records.InsertLast(storedRecord);
         map.recordsDict.Set(record.accountId, storedRecord);
     }
@@ -169,9 +171,10 @@ namespace Globals {
 
         Log::Write(Log::Level::Debug, map.logName + "hiding...");
 
-        hiddenMapsJson[map.mapId] = 0;
         map.hidden = true;
         Globals::shownMaps--;
+
+        hiddenMapsJson[map.mapId] = 0;
         Files::SaveHiddenMaps();
     }
 
@@ -190,9 +193,10 @@ namespace Globals {
 
         Log::Write(Log::Level::Debug, map.logName + "showing...");
 
-        hiddenMapsJson.Remove(map.mapId);
         map.hidden = false;
         Globals::shownMaps++;
+
+        hiddenMapsJson.Remove(map.mapId);
         Files::SaveHiddenMaps();
     }
 

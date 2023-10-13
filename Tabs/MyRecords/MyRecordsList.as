@@ -120,8 +120,6 @@ namespace Tabs { namespace MyRecords {
                             case 4:  color = Globals::colorMedalAuthor; break;
                             default: color = Globals::colorMedalNone;
                         }
-                    else
-                        color += "G";
                     UI::Text(color + Time::Format(record.time));
 
                     UI::TableNextColumn();

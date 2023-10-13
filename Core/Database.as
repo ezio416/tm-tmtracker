@@ -134,11 +134,13 @@ namespace Database {
 
         uint i = 0;
         while (s.NextRow()) {
-            i++;
             Globals::AddMyMap(Models::Map(s));
+
+            i++;
             if (i % sqlLoadBatch == 0)
                 yield();
         }
+
         Globals::myMaps.Reverse();
 
         Log::TimerEnd(timerId);
@@ -167,8 +169,9 @@ namespace Database {
 
         uint i = 0;
         while (s.NextRow()) {
-            i++;
             Globals::AddAccount(Models::Account(s));
+
+            i++;
             if (i % sqlLoadBatch == 0)
                 yield();
         }
@@ -199,14 +202,13 @@ namespace Database {
 
         uint i = 0;
         while (s.NextRow()) {
-            i++;
-
             try {
                 Globals::AddMyMapsRecord(Models::Record(s));
             } catch {
                 Log::Write(Log::Level::Errors, "couldn't add record: " + getExceptionInfo());
             }
 
+            i++;
             if (i % sqlLoadBatch == 0)
                 yield();
         }
@@ -303,6 +305,7 @@ namespace Database {
 
             for (uint i = 0; i < accountsToAdd; i++) {
                 Models::Account@ account = @accounts[i];
+
                 accountValue += "(" +
                     Util::StrWrap(account.accountId) + "," +
                     Util::StrWrap(account.accountName) + "," +
@@ -331,6 +334,7 @@ namespace Database {
 
             for (uint i = 0; i < mapsToAdd; i++) {
                 Models::Map@ map = @maps[i];
+
                 mapValue += "(" +
                     Util::StrWrap(map.authorId) + "," +
                     map.authorTime + "," +
@@ -368,6 +372,7 @@ namespace Database {
 
             for (uint i = 0; i < recordsToAdd; i++) {
                 Models::Record@ record = @records[i];
+
                 recordValue += "(" +
                     Util::StrWrap(record.accountId) + "," +
                     Util::StrWrap(record.mapId) + "," +

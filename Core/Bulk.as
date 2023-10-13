@@ -126,7 +126,7 @@ namespace Bulk {
 
             if (Globals::cancelAllRecords) {
                 Globals::cancelAllRecords = false;
-                Log::Write(Log::Level::Normal, "getting my map records cancelled by user");
+                Log::Write(Log::Level::Normal, "getting my maps records cancelled by user");
                 break;
             }
         }
@@ -208,6 +208,7 @@ namespace Bulk {
 
         while (myRecordsMapIds.Length > 0) {
             Globals::status.Set(statusId, "getting map info for my records... (" + (count - myRecordsMapIds.Length) + "/" + count + ")");
+
             string[] group;
             int idsToAdd = Math::Min(myRecordsMapIds.Length, 206);
             for (int i = 0; i < idsToAdd; i++)
@@ -241,13 +242,12 @@ namespace Bulk {
                 record.mapNameColor = map.mapNameColor;
                 record.mapNameText = map.mapNameText;
             }
-
         }
-
-        startnew(CoroutineFunc(GetAccountNamesCoro));
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
         Locks::mapInfo = false;
+
+        startnew(CoroutineFunc(GetAccountNamesCoro));
     }
 }

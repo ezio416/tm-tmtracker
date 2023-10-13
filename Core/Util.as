@@ -34,7 +34,7 @@ namespace Util {
 
     // courtesy of MisfitMaid
     int64 IsoToUnix(const string &in inTime) {
-        auto s = timeDB.Prepare("SELECT unixepoch(?) as x");
+        SQLite::Statement@ s = timeDB.Prepare("SELECT unixepoch(?) as x");
         s.Bind(1, inTime);
         s.Execute();
         s.NextRow();
@@ -83,11 +83,5 @@ namespace Util {
 
     string UnixToIso(uint timestamp, const string &in format = "%Y-%m-%d %H:%M:%S \\$AAA(%a)") {
         return Time::FormatString(format, timestamp);
-    }
-
-    string Zpad2(int num) {
-        if (num > 9)
-            return "" + num;
-        return "0" + num;
     }
 }

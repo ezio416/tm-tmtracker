@@ -64,10 +64,9 @@ namespace Tabs { namespace MyMaps {
         if (Settings::myMapsListColRecordsTime) colCount++;
         if (Settings::myMapsListColUpload)      colCount++;
 
-        int flags =
-            UI::TableFlags::Resizable |
-            UI::TableFlags::RowBg |
-            UI::TableFlags::ScrollY;
+        int flags = UI::TableFlags::Resizable |
+                    UI::TableFlags::RowBg |
+                    UI::TableFlags::ScrollY;
 
         if (UI::BeginTable("my-maps-table", colCount, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
@@ -94,7 +93,7 @@ namespace Tabs { namespace MyMaps {
 
                     if (Settings::myMapsListColRecords) {
                         UI::TableNextColumn();
-                        UI::Text("" + map.records.Length);
+                        UI::Text(tostring(map.records.Length));
                     }
 
                     if (Settings::myMapsListColRecordsTime) {
