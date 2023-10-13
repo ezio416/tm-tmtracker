@@ -33,11 +33,13 @@ namespace Bulk {
             }
         }
 
-        dictionary ret = NadeoServices::GetDisplayNamesAsync(missing);
+        Log::Write(Log::Level::Debug, "missing account names to get: " + missing.Length);
+
+        dictionary names = NadeoServices::GetDisplayNamesAsync(missing);
         for (uint i = 0; i < missing.Length; i++) {
-            string id = missing[i];
-            Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[id]);
-            account.accountName = string(ret[id]);
+            string accountId = missing[i];
+            Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[accountId]);
+            account.accountName = string(names[accountId]);
             account.SetNameExpire();
         }
 
@@ -82,9 +84,11 @@ namespace Bulk {
 
             for (uint i = 0; i < mapList.Length; i++) {
                 Models::Map map = Models::Map(mapList[i]);
+
                 try {
                     map.recordsTimestamp = uint(Globals::recordsTimestampsJson.Get(map.mapId));
-                } catch { }  // error should mean no records gotten yet
+                } catch { }  // error should mean no records have been gotten yet
+
                 Globals::AddMyMap(map);
             }
 

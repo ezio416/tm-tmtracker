@@ -67,10 +67,10 @@ namespace Tabs { namespace MyRecords {
                     if (account !is null)
                         UI::Text(account.accountName != "" ? account.accountName : "unknown");
 
-                    UI::Text(Globals::colorAuthor + Icons::Circle + " " + Time::Format(map.authorTime));
-                    UI::Text(Globals::colorGold   + Icons::Circle + " " + Time::Format(map.goldTime));
-                    UI::Text(Globals::colorSilver + Icons::Circle + " " + Time::Format(map.silverTime));
-                    UI::Text(Globals::colorBronze + Icons::Circle + " " + Time::Format(map.bronzeTime));
+                    UI::Text(Globals::colorMedalAuthor + Icons::Circle + " " + Time::Format(map.authorTime));
+                    UI::Text(Globals::colorMedalGold   + Icons::Circle + " " + Time::Format(map.goldTime));
+                    UI::Text(Globals::colorMedalSilver + Icons::Circle + " " + Time::Format(map.silverTime));
+                    UI::Text(Globals::colorMedalBronze + Icons::Circle + " " + Time::Format(map.bronzeTime));
                 UI::EndGroup();
 
                 UI::SameLine();
@@ -97,7 +97,7 @@ namespace Tabs { namespace MyRecords {
                     UI::EndDisabled();
 
                     if (UI::BeginTable("table_records", 7, UI::TableFlags::ScrollY | UI::TableFlags::RowBg)) {
-                        UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
+                        UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
                         UI::TableSetupScrollFreeze(0, 1);
                         UI::TableSetupColumn("PB",                UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
@@ -113,15 +113,16 @@ namespace Tabs { namespace MyRecords {
 
                         UI::TableNextRow();
                         UI::TableNextColumn();
-                        string timeColor = "";
+                        string color;
                         if (Settings::medalColors)
                             switch (record.medals) {
-                                case 1: timeColor = Globals::colorBronze; break;
-                                case 2: timeColor = Globals::colorSilver; break;
-                                case 3: timeColor = Globals::colorGold;   break;
-                                case 4: timeColor = Globals::colorAuthor; break;
+                                case 1:  color = Globals::colorMedalBronze; break;
+                                case 2:  color = Globals::colorMedalSilver; break;
+                                case 3:  color = Globals::colorMedalGold;   break;
+                                case 4:  color = Globals::colorMedalAuthor; break;
+                                default: color = Globals::colorMedalNone;
                             }
-                        UI::Text(timeColor + Time::Format(record.time));
+                        UI::Text(color + Time::Format(record.time));
 
                         UI::TableNextColumn();
                         UI::Text(Util::TimeFormatColored(int(record.time) - int(map.bronzeTime)));

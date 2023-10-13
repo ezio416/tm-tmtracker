@@ -1,6 +1,6 @@
 /*
 c 2023-07-14
-m 2023-10-11
+m 2023-10-12
 */
 
 namespace Database {
@@ -200,12 +200,13 @@ namespace Database {
         uint i = 0;
         while (s.NextRow()) {
             i++;
+
             try {
                 Globals::AddMyMapsRecord(Models::Record(s));
             } catch {
                 Log::Write(Log::Level::Errors, "couldn't add record: " + getExceptionInfo());
-                Locks::db = false;
             }
+
             if (i % sqlLoadBatch == 0)
                 yield();
         }
@@ -241,6 +242,7 @@ namespace Database {
             s.Execute();
             yield();
         }
+        Log::Write(Log::Level::Debug, "saved accounts to database");
 
         Log::Write(Log::Level::Debug, "saving maps to database...");
         db.Execute("CREATE TABLE IF NOT EXISTS Maps" + mapColumns);
@@ -266,6 +268,7 @@ namespace Database {
             s.Execute();
             yield();
         }
+        Log::Write(Log::Level::Debug, "saved maps to database");
 
         Log::Write(Log::Level::Debug, "saving records to database...");
         db.Execute("CREATE TABLE IF NOT EXISTS Records" + recordColumns);
@@ -284,6 +287,7 @@ namespace Database {
             s.Execute();
             yield();
         }
+        Log::Write(Log::Level::Debug, "saved records to database");
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);

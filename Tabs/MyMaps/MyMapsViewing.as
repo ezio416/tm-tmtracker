@@ -65,10 +65,10 @@ namespace Tabs { namespace MyMaps {
                     UI::Text(map.mapNameText);
                     UI::PopTextWrapPos();
 
-                    UI::Text(Globals::colorAuthor + Icons::Circle + " " + Time::Format(map.authorTime));
-                    UI::Text(Globals::colorGold   + Icons::Circle + " " + Time::Format(map.goldTime));
-                    UI::Text(Globals::colorSilver + Icons::Circle + " " + Time::Format(map.silverTime));
-                    UI::Text(Globals::colorBronze + Icons::Circle + " " + Time::Format(map.bronzeTime));
+                    UI::Text(Globals::colorMedalAuthor + Icons::Circle + " " + Time::Format(map.authorTime));
+                    UI::Text(Globals::colorMedalGold   + Icons::Circle + " " + Time::Format(map.goldTime));
+                    UI::Text(Globals::colorMedalSilver + Icons::Circle + " " + Time::Format(map.silverTime));
+                    UI::Text(Globals::colorMedalBronze + Icons::Circle + " " + Time::Format(map.bronzeTime));
                 UI::EndGroup();
 
                 UI::SameLine();
@@ -117,7 +117,7 @@ namespace Tabs { namespace MyMaps {
                     ));
 
                     if (UI::BeginTable("table_records", 5, UI::TableFlags::ScrollY | UI::TableFlags::RowBg)) {
-                        UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::tableRowBgAltColor);
+                        UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
                         UI::TableSetupScrollFreeze(0, 1);
                         UI::TableSetupColumn("Pos",               UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
@@ -135,18 +135,19 @@ namespace Tabs { namespace MyMaps {
 
                                 UI::TableNextRow();
                                 UI::TableNextColumn();
-                                UI::Text(tostring(record.position));
+                                UI::Text((Settings::highlightTop5 && record.position < 6 ? Globals::colorTop5 : "") + record.position);
 
                                 UI::TableNextColumn();
-                                string timeColor = "";
+                                string color;
                                 if (Settings::medalColors)
                                     switch (record.medals) {
-                                        case 1: timeColor = Globals::colorBronze; break;
-                                        case 2: timeColor = Globals::colorSilver; break;
-                                        case 3: timeColor = Globals::colorGold;   break;
-                                        case 4: timeColor = Globals::colorAuthor; break;
+                                        case 1:  color = Globals::colorMedalBronze; break;
+                                        case 2:  color = Globals::colorMedalSilver; break;
+                                        case 3:  color = Globals::colorMedalGold;   break;
+                                        case 4:  color = Globals::colorMedalAuthor; break;
+                                        default: color = Globals::colorMedalNone;
                                     }
-                                UI::Text(timeColor + Time::Format(record.time));
+                                UI::Text(color + Time::Format(record.time));
 
                                 UI::TableNextColumn();
                                 if (UI::Selectable((account.accountName != "") ? account.accountName : account.accountId, false))
