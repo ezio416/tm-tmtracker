@@ -1,6 +1,6 @@
 /*
 c 2023-05-16
-m 2023-10-12
+m 2023-10-13
 */
 
 namespace Models { class Map {
@@ -158,7 +158,7 @@ namespace Models { class Map {
             try {
                 @top = Json::Parse(req.String())["tops"][0]["top"];
             } catch {
-                Log::Write(Log::Level::Errors, logName + "couldn't parse records: " + getExceptionInfo());
+                Log::Write(Log::Level::Errors, logName + "error parsing top: " + getExceptionInfo());
                 break;
             }
 
@@ -206,7 +206,13 @@ namespace Models { class Map {
                 yield();
             Locks::requesting = false;
 
-            Json::Value@ coreRecords = Json::Parse(req.String());
+            Json::Value@ coreRecords;
+            try {
+                @coreRecords = Json::Parse(req.String());
+            } catch {
+                Log::Write(Log::Level::Errors, logName + "error parsing coreRecords: " + getExceptionInfo());
+                continue;
+            }
 
             for (uint i = 0; i < coreRecords.Length; i++) {
                 Json::Value@ coreRecord = @coreRecords[i];
