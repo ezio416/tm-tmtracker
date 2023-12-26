@@ -60,7 +60,7 @@ namespace Tabs { namespace MyMaps {
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("Pos",       fixedNoSort, Globals::scale * 35);
+            UI::TableSetupColumn("Pos",       fixed,       Globals::scale * 35);
             UI::TableSetupColumn("Time",      fixed,       Globals::scale * 80);
             UI::TableSetupColumn("Name",      fixedNoSort, Globals::scale * 150);
             UI::TableSetupColumn("Timestamp", fixed,       Globals::scale * 180);
@@ -81,6 +81,11 @@ namespace Tabs { namespace MyMaps {
                                 default:;
                             }
                         case 1:  // pos
+                            switch (colSpecs[0].SortDirection) {
+                                case UI::SortDirection::Ascending:  Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsWorstPosFirst;  break;
+                                case UI::SortDirection::Descending: Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsBestPosFirst; break;
+                                default:;
+                            }
                             break;
                         case 2:  // time
                             switch (colSpecs[0].SortDirection) {
