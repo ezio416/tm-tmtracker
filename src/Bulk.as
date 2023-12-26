@@ -118,7 +118,7 @@ namespace Bulk {
             return;
 
         Locks::allRecords = true;
-        string timerId = Log::TimerBegin("getting my maps records");
+        string timerId = Log::TimerBegin("getting my maps' records");
         string statusId = "get-all-records";
 
         Globals::getAccountNames = false;
@@ -134,7 +134,7 @@ namespace Bulk {
 
             if (Globals::cancelAllRecords) {
                 Globals::cancelAllRecords = false;
-                Log::Write(Log::Level::Normal, "getting my maps records cancelled by user");
+                Log::Write(Log::Level::Normal, "getting my maps' records cancelled by user");
                 break;
             }
         }
@@ -222,12 +222,12 @@ namespace Bulk {
             return;
 
         Locks::mapInfo = true;
-        string timerId = Log::TimerBegin("getting map info for my records");
+        string timerId = Log::TimerBegin("getting my records' map info");
         string statusId = "my-record-map-info";
         uint count = myRecordsMapIds.Length;
 
         while (myRecordsMapIds.Length > 0) {
-            Globals::status.Set(statusId, "getting map info for my records... (" + (count - myRecordsMapIds.Length) + "/" + count + ")");
+            Globals::status.Set(statusId, "getting my records' map info... (" + (count - myRecordsMapIds.Length) + "/" + count + ")");
 
             string[] group;
             int idsToAdd = Math::Min(myRecordsMapIds.Length, 206);

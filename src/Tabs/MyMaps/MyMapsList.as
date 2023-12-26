@@ -5,7 +5,7 @@ namespace Tabs { namespace MyMaps {
     string mapSearch;
 
     void Tab_MyMapsList() {
-        if (!UI::BeginTabItem(Icons::ListUl + " Map List (" + Globals::shownMaps + ")###my-maps-list"))
+        if (!UI::BeginTabItem(Icons::ListUl + " Maps (" + Globals::shownMaps + ")###my-maps-list"))
             return;
 
         if (Settings::myMapsListText)
