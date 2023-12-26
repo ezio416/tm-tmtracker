@@ -3,6 +3,7 @@
 
 namespace Models { class Record {
     string accountId;
+    string accountName;
     int    mapAuthorDelta = 0;
     uint   mapAuthorTime  = 0;
     string mapId;

@@ -2,6 +2,9 @@
 // m 2023-12-26
 
 namespace Tabs { namespace MyMaps {
+    string accountSearch;
+    string myMapsRecordsMapSearch;
+
     void Tab_MyMapsRecords() {
         if (!UI::BeginTabItem(Icons::Trophy + " Records (" + Globals::myMapsRecords.Length + ")###my-maps-records"))
             return;
@@ -20,7 +23,7 @@ namespace Tabs { namespace MyMaps {
             );
 
         UI::BeginDisabled(Locks::allRecords);
-        if (UI::Button(Icons::Download + " Get All Records"))
+        if (UI::Button(Icons::Download + " Get My Maps' Records"))
             startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
         UI::EndDisabled();
 
@@ -45,6 +48,59 @@ namespace Tabs { namespace MyMaps {
                         " (" + Util::FormatSeconds(now - timestamp) + " ago)" :
                     "never"
             ));
+        }
+
+        if (Settings::myMapsRecordsMapSearch) {
+            myMapsRecordsMapSearch = UI::InputText("search maps", myMapsRecordsMapSearch, false);
+
+            if (myMapsRecordsMapSearch != "") {
+                UI::SameLine();
+                if (UI::Button(Icons::Times + " Clear Search##maps"))
+                    myMapsRecordsMapSearch = "";
+            }
+        } else
+            myMapsRecordsMapSearch = "";
+
+        if (Settings::myMapsRecordsAccountSearch) {
+            accountSearch = UI::InputText("search accounts", accountSearch, false);
+
+            if (accountSearch != "") {
+                UI::SameLine();
+                if (UI::Button(Icons::Times + " Clear Search##accountSearch"))
+                    accountSearch = "";
+            }
+        } else
+            accountSearch = "";
+
+        Table_MyMapsRecords(now);
+
+        UI::EndTabItem();
+    }
+
+    void Table_MyMapsRecords(int64 now) {
+        Models::Record@[] records;
+
+        if (myMapsRecordsMapSearch == "" && accountSearch == "")
+            records = Globals::myMapsRecordsSorted;
+        else {
+            string mapSearchLower = myMapsRecordsMapSearch.ToLower();
+            string accountSearchLower = accountSearch.ToLower();
+
+            for (uint i = 0; i < Globals::myMapsRecordsSorted.Length; i++) {
+                Models::Record@ record = Globals::myMapsRecordsSorted[i];
+
+                Models::Account@ account;
+                if (record.accountName == "" && Globals::accounts.Length > 0 && Globals::accountsDict.Exists(record.accountId)) {
+                    @account = cast<Models::Account@>(Globals::accountsDict[record.accountId]);
+                    record.accountName = account.accountName;
+                }
+
+                if (
+                    (mapSearchLower == "" || (mapSearchLower != "" && record.mapNameText.ToLower().Contains(mapSearchLower))) &&
+                    (accountSearchLower == "" || (accountSearchLower != "" && record.accountName.ToLower().Contains(accountSearchLower)))
+                )
+                    records.InsertLast(record);
+            }
         }
 
         int flags = UI::TableFlags::RowBg |
@@ -113,10 +169,10 @@ namespace Tabs { namespace MyMaps {
                 tableSpecs.Dirty = false;
             }
 
-            UI::ListClipper clipper(Globals::myMapsRecordsSorted.Length);
+            UI::ListClipper clipper(records.Length);
             while (clipper.Step()) {
                 for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                    Models::Record@ record = Globals::myMapsRecordsSorted[i];
+                    Models::Record@ record = records[i];
                     Models::Account@ account = Globals::accounts.Length > 0 ? cast<Models::Account@>(Globals::accountsDict[record.accountId]) : Models::Account();
 
                     UI::TableNextRow();
@@ -154,7 +210,5 @@ namespace Tabs { namespace MyMaps {
             UI::PopStyleColor();
             UI::EndTable();
         }
-
-        UI::EndTabItem();
     }
 }}
