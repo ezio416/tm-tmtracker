@@ -1,5 +1,5 @@
 // c 2023-07-06
-// m 2023-12-25
+// m 2023-12-26
 
 namespace Bulk {
     string[] myRecordsMapIds;
@@ -143,6 +143,7 @@ namespace Bulk {
         while (nameCoro.IsRunning())
             yield();
 
+        Sort::dbSave = true;
         startnew(Sort::MyMapsRecordsCoro);
 
         Globals::recordsTimestampsJson["myMaps"] = Time::Stamp;
