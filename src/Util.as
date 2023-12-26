@@ -1,7 +1,8 @@
 // c 2023-05-20
-// m 2023-10-12
+// m 2023-12-26
 
 namespace Util {
+    uint64 latestNandoRequest = 0;
     SQLite::Database@ timeDB = SQLite::Database(":memory:");
 
     string FormatSeconds(int seconds, bool day = false, bool hour = false, bool minute = false) {
@@ -41,8 +42,8 @@ namespace Util {
     }
 
     void NandoRequestWaitCoro() {
-        if (Globals::latestNandoRequest == 0) {
-            Globals::latestNandoRequest = Time::Now;
+        if (latestNandoRequest == 0) {
+            latestNandoRequest = Time::Now;
             return;
         }
 
@@ -50,15 +51,20 @@ namespace Util {
             yield();
         Locks::requesting = true;
 
-        while (Time::Now - Globals::latestNandoRequest < Settings::nandoRequestWait)
+        while (Time::Now - latestNandoRequest < Settings::nandoRequestWait)
             yield();
 
-        Globals::latestNandoRequest = Time::Now;
+        latestNandoRequest = Time::Now;
     }
 
     void NotifyError(const string &in msg, int time = 5000) {
-        UI::ShowNotification("TMTracker", msg, UI::HSV(0.02, 0.8, 0.9), time);
+        UI::ShowNotification("TMTracker", msg, vec4(0.8f, 0.1f, 0.1f, 0.8f), time);
         Log::Write(Log::Level::Errors, msg);
+    }
+
+    void NotifyGood(const string &in msg) {
+        UI::ShowNotification("TMTracker", msg, vec4(0.1f, 0.8f, 0.3f, 0.8f));
+        Log::Write(Log::Level::Normal, msg);
     }
 
     string StrWrap(const string &in input, const string &in wrapper = "'") {

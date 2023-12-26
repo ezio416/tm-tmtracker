@@ -90,6 +90,9 @@ namespace Settings {
     [Setting category="My Map Records" name="Show account search field"]
     bool myMapsRecordsAccountSearch = true;
 
+    [Setting category="My Map Records" name="Notify when done getting records"]
+    bool myMapsRecordsNotify = true;
+
 
     [Setting category="Viewing Maps" name="Show help text"]
     bool viewingText = true;
@@ -109,4 +112,9 @@ namespace Settings {
 
     [Setting category="My Records" name="Show map search field"]
     bool myRecordsSearch = true;
+
+#if SIG_DEVELOPER
+    [Setting category="Dev" name="Show debug tab"]
+    bool debugTab = false;
+#endif
 }
