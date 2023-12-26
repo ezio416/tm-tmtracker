@@ -1,7 +1,5 @@
-/*
-c 2023-05-16
-m 2023-10-13
-*/
+// c 2023-05-16
+// m 2023-12-26
 
 namespace Models { class Map {
     string       authorId;
@@ -18,6 +16,7 @@ namespace Models { class Map {
     string       mapUid;
     Record@[]    records;
     dictionary   recordsDict;
+    Record@[]    recordsSorted;
     uint         recordsTimestamp;
     uint         silverTime;
     string       thumbnailFile;
@@ -231,12 +230,14 @@ namespace Models { class Map {
         Globals::recordsTimestampsJson[mapId] = recordsTimestamp;
         Files::SaveRecordsTimestamps();
 
-        Meta::PluginCoroutine@ namesCoro = startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
+        Meta::PluginCoroutine@ namesCoro = startnew(Bulk::GetAccountNamesCoro);
         while (namesCoro.IsRunning())
             yield();
 
         if (Globals::singleMapRecordStatus)
             Globals::status.Delete(statusId);
+
+        startnew(CoroutineFunc(SortRecordsCoro));
 
         Log::TimerEnd(timerId);
         Locks::singleRecords = false;
@@ -331,6 +332,24 @@ namespace Models { class Map {
             yield();
 
         Locks::playMap = false;
+    }
+
+    void SortRecordsCoro() {
+        while (Locks::sortSingleRecords)
+            yield();
+        Locks::sortSingleRecords = true;
+        string timerId = Log::TimerBegin(logName + "sorting records");
+
+        recordsSorted.RemoveRange(0, recordsSorted.Length);
+
+        recordsSorted = records;
+
+        Sort::sortLastYield = Time::Now;
+
+        recordsSorted = Sort::QuickSortRecords(recordsSorted, Sort::sortFunctions[Settings::myMapsViewingSortMethod]);
+
+        Log::TimerEnd(timerId);
+        Locks::sortSingleRecords = false;
     }
 
     // courtesy of "Map Info" plugin - https://github.com/MisfitMaid/tm-map-info

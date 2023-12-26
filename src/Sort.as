@@ -1,7 +1,7 @@
 // c 2023-12-25
 // m 2023-12-26
 
-// most things here courtesy of "BetterTOTD" plugin - https://github.com/XertroV/tm-better-totd
+// most things here are courtesy of "BetterTOTD" plugin - https://github.com/XertroV/tm-better-totd
 namespace Sort {
     bool dbSave = false;
     uint64 maxFrameTime = 10;

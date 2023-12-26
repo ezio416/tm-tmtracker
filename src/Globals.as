@@ -1,5 +1,5 @@
 // c 2023-05-16
-// m 2023-12-25
+// m 2023-12-26
 
 namespace Globals {
     Models::Account[] accounts;
@@ -83,6 +83,7 @@ namespace Globals {
         storedRecord.mapNameText = map.mapNameText;
 
         map.records.InsertLast(storedRecord);
+        map.recordsSorted.InsertLast(storedRecord);
         map.recordsDict.Set(record.accountId, storedRecord);
     }
 
@@ -98,6 +99,9 @@ namespace Globals {
             myMapsViewingMapId = map.mapId;
             myMapsViewingSet = true;
         }
+
+        // NOT WORKING???
+        startnew(CoroutineFunc(map.SortRecordsCoro));
     }
 
     void AddMyRecordsMapViewing(Models::Map@ map) {
@@ -134,9 +138,12 @@ namespace Globals {
         Log::Write(Log::Level::Debug, map.logName + "clearing my maps records...");
 
         map.records.RemoveRange(0, map.records.Length);
+        map.recordsSorted.RemoveRange(0, map.recordsSorted.Length);
         map.recordsDict.DeleteAll();
 
-        if (myMapsRecords.Length == 0) return;
+        if (myMapsRecords.Length == 0)
+            return;
+
         for (int i = myMapsRecords.Length - 1; i >= 0; i--)
             if (myMapsRecords[i].mapId == map.mapId)
                 myMapsRecords.RemoveAt(i);

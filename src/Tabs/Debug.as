@@ -1,7 +1,5 @@
-/*
-c 2023-05-26
-m 2023-10-12
-*/
+// c 2023-05-26
+// m 2023-12-26
 
 namespace Tabs {
     void Tab_Debug() {
@@ -173,7 +171,8 @@ namespace Tabs {
                 UI::Text((Locks::requesting        ? "\\$0F0" : "\\$F00") + "requesting");
                 UI::Text((Locks::singleRecords     ? "\\$0F0" : "\\$F00") + "singleRecords");
                 UI::Text((Locks::sortMyMapsRecords ? "\\$0F0" : "\\$F00") + "sortMyMapsRecords");
-                UI::Text((Locks::sortMyRecords     ? "\\$0F0" : "\\$F00") + "sortRecords");
+                UI::Text((Locks::sortMyRecords     ? "\\$0F0" : "\\$F00") + "sortMyRecords");
+                UI::Text((Locks::sortSingleRecords ? "\\$0F0" : "\\$F00") + "sortSingleRecords");
                 UI::Text((Locks::thumbs            ? "\\$0F0" : "\\$F00") + "thumbs");
                 UI::Text((Locks::tmx               ? "\\$0F0" : "\\$F00") + "tmx");
 

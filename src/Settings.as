@@ -1,8 +1,9 @@
 // c 2023-07-16
-// m 2023-12-25
+// m 2023-12-26
 
 namespace Settings {
     [Setting hidden] Sort::SortMethod myMapsRecordsSortMethod = Sort::SortMethod::RecordsNewFirst;
+    [Setting hidden] Sort::SortMethod myMapsViewingSortMethod = Sort::SortMethod::RecordsBestPosFirst;
     [Setting hidden] Sort::SortMethod myRecordsSortMethod = Sort::SortMethod::RecordsNewFirst;
     [Setting hidden] uint nandoRequestWait = 1000;
     [Setting hidden] bool windowOpen = false;
