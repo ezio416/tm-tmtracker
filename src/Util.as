@@ -1,7 +1,5 @@
-/*
-c 2023-05-20
-m 2023-10-12
-*/
+// c 2023-05-20
+// m 2023-10-12
 
 namespace Util {
     SQLite::Database@ timeDB = SQLite::Database(":memory:");
