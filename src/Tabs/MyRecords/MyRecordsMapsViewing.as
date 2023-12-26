@@ -115,8 +115,8 @@ namespace Tabs { namespace MyRecords {
                             (Settings::medalColors ? Globals::colorMedalAuthor : "") + "Author",
                             UI::TableColumnFlags::WidthFixed, Globals::scale * 80
                         );
-                        UI::TableSetupColumn("Timestamp (Local)", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
-                        UI::TableSetupColumn("Recency",           UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
+                        UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
+                        UI::TableSetupColumn("Recency",   UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
                         UI::TableHeadersRow();
 
                         Models::Record@ record = cast<Models::Record@>(Globals::myRecordsDict[map.mapId]);
