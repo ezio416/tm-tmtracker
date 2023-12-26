@@ -44,7 +44,7 @@ namespace Tabs { namespace MyMaps {
             UI::SameLine();
             UI::Text("Last Updated: " + (
                 timestamp > 0 ?
-                    Time::FormatString(Globals::dateFormat + "Local\\$G", timestamp) +
+                    Time::FormatString(Globals::dateFormat, timestamp) +
                         " (" + Util::FormatSeconds(now - timestamp) + " ago)" :
                     "never"
             ));
