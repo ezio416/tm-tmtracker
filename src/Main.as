@@ -27,10 +27,6 @@ void Main() {
 
     if (Settings::refreshMaps)
         startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
-
-#if SIG_DEVELOPER
-    Globals::debugTab = true;
-#endif
 }
 
 void RenderInterface() {
@@ -63,16 +59,18 @@ void RenderInterface() {
         }
 
         if (Settings::welcomeText)
-            UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
+            UI::Text("Welcome to TMTracker!\nAll timestamps are shown in your local time.\nCheck out these tabs to see what the plugin offers:");
 
         UI::BeginTabBar("tabs");
             Tabs::Tab_MyMaps();
             Tabs::Tab_MyRecords();
             if (Settings::infoTab)
                 Tabs::Tab_Info();
-            if (Globals::debugTab)
+#if SIG_DEVELOPER
+            if (Settings::debugTab)
                 Tabs::Tab_Debug();
             // Tabs::Tab_Test();
+#endif
         UI::EndTabBar();
     UI::End();
 }

@@ -155,6 +155,9 @@ namespace Bulk {
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
         Locks::allRecords = false;
+
+        if (Settings::myMapsRecordsNotify)
+            Util::NotifyGood("Done getting records!");
     }
 
     void GetMyRecordsCoro() {

@@ -15,10 +15,8 @@ namespace Globals {
     vec4              colorTableRowBgAlt      = vec4(0.0f, 0.0f, 0.0f, 0.5f);
     string            colorTop5;
     string            dateFormat              = "\\$AAA%a \\$G%Y-%m-%d %H:%M:%S \\$AAA";
-    bool              debugTab                = false;
     bool              getAccountNames         = true;
     Json::Value@      hiddenMapsJson          = Json::Object();
-    uint64            latestNandoRequest      = 0;
     string            myAccountId;
     Models::Map[]     myMaps;
     dictionary        myMapsDict;
