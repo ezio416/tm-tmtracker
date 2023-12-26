@@ -79,4 +79,7 @@ void RenderInterface() {
 
 void OnSettingsChanged() {
     Globals::SetColors();
+
+    if (Settings::maxMaps > 10000)
+        Settings::maxMaps = 10000;
 }

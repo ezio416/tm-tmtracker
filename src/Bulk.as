@@ -94,7 +94,10 @@ namespace Bulk {
                     map.recordsTimestamp = uint(Globals::recordsTimestampsJson.Get(map.mapId));
                 } catch { }  // error should mean no records have been gotten yet
 
-                Globals::AddMyMap(map);
+                if (Settings::maxMaps == 0 || Globals::myMaps.Length < Settings::maxMaps)
+                    Globals::AddMyMap(map);
+                else
+                    break;
             }
 
             if (tooManyMaps)

@@ -73,18 +73,21 @@ namespace Globals {
         if (record.timestampIso == "")
             record.timestampIso = Time::FormatString("%Y-%m-%dT%H:%M:%S+00:00", record.timestampUnix);
 
-        myMapsRecords.InsertLast(record);
-        Models::Record@ storedRecord = @myMapsRecords[myMapsRecords.Length - 1];
-        myMapsRecordsDict.Set(record.recordFakeId, storedRecord);
+        if (myMapsDict.Exists(record.mapId)) {
+            myMapsRecords.InsertLast(record);
+            Models::Record@ storedRecord = @myMapsRecords[myMapsRecords.Length - 1];
+            myMapsRecordsDict.Set(record.recordFakeId, storedRecord);
 
-        Models::Map@ map = cast<Models::Map@>(myMapsDict[record.mapId]);
-        storedRecord.SetMedals(map);
-        storedRecord.mapNameColor = map.mapNameColor;
-        storedRecord.mapNameText = map.mapNameText;
+            Models::Map@ map = cast<Models::Map@>(myMapsDict[record.mapId]);
 
-        map.records.InsertLast(storedRecord);
-        map.recordsSorted.InsertLast(storedRecord);
-        map.recordsDict.Set(record.accountId, storedRecord);
+            storedRecord.SetMedals(map);
+            storedRecord.mapNameColor = map.mapNameColor;
+            storedRecord.mapNameText = map.mapNameText;
+
+            map.records.InsertLast(storedRecord);
+            map.recordsSorted.InsertLast(storedRecord);
+            map.recordsDict.Set(record.accountId, storedRecord);
+        }
     }
 
     void AddMyMapViewing(Models::Map@ map) {

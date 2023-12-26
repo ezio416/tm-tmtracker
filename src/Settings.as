@@ -20,9 +20,11 @@ namespace Settings {
     [Setting category="General" name="Days to keep account names" min=0 max=30]
     uint accountNameValidDays = 7;
 
-    [Setting category="General" name="Max records to get per map"]
+    [Setting category="General" name="Max records to get per map" min=100 max=1000]
     uint maxRecordsPerMap = 100;
 
+    [Setting category="General" name="Max maps to get" description="0 (default) means all maps. If your game crashes, limit to about 500 (exact number unknown)."]
+    uint maxMaps = 0;
 
     [Setting category="Startup" name="Refresh my map list"]
     bool refreshMaps = false;
