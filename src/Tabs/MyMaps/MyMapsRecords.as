@@ -82,8 +82,8 @@ namespace Tabs { namespace MyMaps {
                             }
                         case 1:  // pos
                             switch (colSpecs[0].SortDirection) {
-                                case UI::SortDirection::Ascending:  Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsWorstPosFirst;  break;
-                                case UI::SortDirection::Descending: Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsBestPosFirst; break;
+                                case UI::SortDirection::Ascending:  Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsWorstPosFirst; break;
+                                case UI::SortDirection::Descending: Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsBestPosFirst;  break;
                                 default:;
                             }
                             break;
