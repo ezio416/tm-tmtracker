@@ -1,5 +1,5 @@
 // c 2023-05-16
-// m 2023-12-25
+// m 2023-12-26
 
 namespace Models { class Record {
     string accountId;
@@ -17,10 +17,6 @@ namespace Models { class Record {
     string timestampIso;
     int64  timestampUnix;
     string zoneId;
-
-    string get_zoneName() {
-        return Zones::Get(zoneId);
-    }
 
     Record() { }
     Record(Json::Value@ record) {

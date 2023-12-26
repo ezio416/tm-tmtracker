@@ -7,10 +7,6 @@ namespace Models { class Account {
     int64  nameExpire  = 0;
     string zoneId;
 
-    string get_zoneName() {
-        return Zones::Get(zoneId);
-    }
-
     Account() { }
     Account(const string &in id) {
         accountId = id;

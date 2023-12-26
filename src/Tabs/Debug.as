@@ -33,7 +33,6 @@ namespace Tabs {
                     UI::TableSetupColumn("ID");
                     UI::TableSetupColumn("Name");
                     UI::TableSetupColumn("NameValid");
-                    UI::TableSetupColumn("Zone");
                     UI::TableHeadersRow();
 
                     UI::ListClipper clipper(Globals::accounts.Length);
@@ -48,8 +47,6 @@ namespace Tabs {
                             UI::TableNextColumn();
                             int64 nameValid = account.nameExpire - now;
                             UI::Text("" + (nameValid > 0 ? nameValid : 0));
-                            UI::TableNextColumn();
-                            UI::Text(account.zoneName);
                         }
                     }
 
