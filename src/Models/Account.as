@@ -27,7 +27,7 @@ namespace Models { class Account {
     }
 
     string NameExpireFormatted() {
-        return IsNameExpired() ? "expired" : Time::FormatString(Globals::dateFormat + "Local\\$G", nameExpire);
+        return IsNameExpired() ? "expired" : Time::FormatString(Globals::dateFormat, nameExpire);
     }
 
     void SetNameExpire(uint64 now = 0, int64 timestamp = 0) {

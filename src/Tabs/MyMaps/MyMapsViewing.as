@@ -109,7 +109,7 @@ namespace Tabs { namespace MyMaps {
                     UI::SameLine();
                     UI::Text("Last Updated: " + (
                         map.recordsTimestamp > 0 ?
-                            Time::FormatString(Globals::dateFormat + "Local\\$G", map.recordsTimestamp) +
+                            Time::FormatString(Globals::dateFormat, map.recordsTimestamp) +
                                 " (" + Util::FormatSeconds(now - map.recordsTimestamp) + " ago)" :
                             "never"
                     ));
