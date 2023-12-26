@@ -91,7 +91,7 @@ namespace Tabs { namespace MyRecords {
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
 
             if (tableSpecs !is null && tableSpecs.Dirty) {
-                UI::TableColumnSortSpecs[]@ colSpecs = tableSpecs.get_Specs();
+                UI::TableColumnSortSpecs[]@ colSpecs = tableSpecs.Specs;
 
                 if (colSpecs !is null && colSpecs.Length > 0) {
                     switch (colSpecs[0].ColumnIndex) {
