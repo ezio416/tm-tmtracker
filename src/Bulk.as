@@ -258,6 +258,8 @@ namespace Bulk {
                     Globals::myRecordsMapsDict.Set(map.mapId, @Globals::myRecordsMaps[Globals::myRecordsMaps.Length - 1]);
 
                     Models::Record@ record = cast<Models::Record@>(Globals::myRecordsDict[map.mapId]);
+                    record.mapAuthorTime = map.authorTime;
+                    record.mapAuthorDelta = record.time - map.authorTime;
                     record.mapNameColor = map.mapNameColor;
                     record.mapNameText = map.mapNameText;
                 }

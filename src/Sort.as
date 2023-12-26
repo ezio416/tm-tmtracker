@@ -8,12 +8,34 @@ namespace Sort {
 
     funcdef int RecordSortFunc(Models::Record@ r1, Models::Record@ r2);
 
-    int RecordsNewFirst(Models::Record@ r1, Models::Record@ r2) {
-        return Math::Clamp(r2.timestampUnix - r1.timestampUnix, -1, 1);
+    int RecordsMapsAlpha(Models::Record@ r1, Models::Record@ r2) {
+        string t1 = r1.mapNameText.Trim().ToLower();
+        string t2 = r2.mapNameText.Trim().ToLower();
+
+        if (t1 < t2)
+            return -1;
+        if (t1 > t2)
+            return 1;
+        return 0;
     }
 
-    int RecordsOldFirst(Models::Record@ r1, Models::Record@ r2) {
-        return Math::Clamp(r1.timestampUnix - r2.timestampUnix, -1, 1);
+    int RecordsMapsAlphaRev(Models::Record@ r1, Models::Record@ r2) {
+        string t1 = r1.mapNameText.Trim().ToLower();
+        string t2 = r2.mapNameText.Trim().ToLower();
+
+        if (t1 < t2)
+            return 1;
+        if (t1 > t2)
+            return -1;
+        return 0;
+    }
+
+    int RecordsBestAuthorFirst(Models::Record@ r1, Models::Record@ r2) {
+        return Math::Clamp(r2.mapAuthorTime - r1.mapAuthorTime, -1, 1);
+    }
+
+    int RecordsWorstAuthorFirst(Models::Record@ r1, Models::Record@ r2) {
+        return Math::Clamp(r1.mapAuthorTime - r2.mapAuthorTime, -1, 1);
     }
 
     int RecordsBestFirst(Models::Record@ r1, Models::Record@ r2) {
@@ -24,30 +46,46 @@ namespace Sort {
         return Math::Clamp(r2.time - r1.time, -1, 1);
     }
 
-    // int RecordsShortestAuthorFirst(Models::Record@ r1, Models::Record@ r2) {
-    //     return Math::Clamp(r2.mapAuthorTime - r1.mapAuthorTime, -1, 1);
-    // }
+    int RecordsBestDeltaFirst(Models::Record@ r1, Models::Record@ r2) {
+        return Math::Clamp(r2.mapAuthorDelta - r1.mapAuthorDelta, -1, 1);
+    }
 
-    // int RecordsLongestAuthorFirst(Models::Record@ r1, Models::Record@ r2) {
-    //     return Math::Clamp(r1.mapAuthorTime - r2.mapAuthorTime, -1, 1);
-    // }
+    int RecordsWorstDeltaFirst(Models::Record@ r1, Models::Record@ r2) {
+        return Math::Clamp(r1.mapAuthorDelta - r2.mapAuthorDelta, -1, 1);
+    }
+
+    int RecordsNewFirst(Models::Record@ r1, Models::Record@ r2) {
+        return Math::Clamp(r2.timestampUnix - r1.timestampUnix, -1, 1);
+    }
+
+    int RecordsOldFirst(Models::Record@ r1, Models::Record@ r2) {
+        return Math::Clamp(r1.timestampUnix - r2.timestampUnix, -1, 1);
+    }
 
     enum SortMethod {
-        RecordsNewFirst,
-        RecordsOldFirst,
+        RecordsMapsAlpha,
+        RecordsMapsAlphaRev,
+        RecordsBestAuthorFirst,
+        RecordsWorstAuthorFirst,
         RecordsBestFirst,
-        RecordsWorstFirst
-        // RecordsShortestAuthorFirst,
-        // RecordsLongestAuthorFirst
+        RecordsWorstFirst,
+        RecordsBestDeltaFirst,
+        RecordsWorstDeltaFirst,
+        RecordsNewFirst,
+        RecordsOldFirst
     }
 
     RecordSortFunc@[] sortFunctions = {
-        RecordsNewFirst,
-        RecordsOldFirst,
+        RecordsMapsAlpha,
+        RecordsMapsAlphaRev,
+        RecordsBestAuthorFirst,
+        RecordsWorstAuthorFirst,
         RecordsBestFirst,
-        RecordsWorstFirst
-        // RecordsShortestAuthorFirst,
-        // RecordsLongestAuthorFirst
+        RecordsWorstFirst,
+        RecordsBestDeltaFirst,
+        RecordsWorstDeltaFirst,
+        RecordsNewFirst,
+        RecordsOldFirst
     };
 
     Models::Record@[]@ QuickSortRecords(Models::Record@[]@ arr, RecordSortFunc@ f, int left = 0, int right = -1) {
