@@ -1,9 +1,10 @@
 // c 2023-07-14
-// m 2023-12-25
+// m 2023-12-26
 
 namespace Database {
-    uint sqlLoadBatch = 100;
-    uint sqlMaxValues = 1000;
+    uint groupYieldAfter = 30;
+    uint sqlLoadBatch    = 100;
+    uint sqlMaxValues    = 1000;
 
     string accountColumns = """ (
         accountId   CHAR(36) PRIMARY KEY,
@@ -312,10 +313,14 @@ namespace Database {
 
                 if (i < accountsToAdd - 1)
                     accountValue += ",";
+
+                if (i % groupYieldAfter == 0)
+                    yield();
             }
 
             accounts.RemoveRange(0, accountsToAdd);
             ret.InsertLast(accountValue);
+            yield();
         }
 
         return ret;
@@ -352,10 +357,14 @@ namespace Database {
 
                 if (i < mapsToAdd - 1)
                     mapValue += ",";
+
+                if (i % groupYieldAfter == 0)
+                    yield();
             }
 
             maps.RemoveRange(0, mapsToAdd);
             ret.InsertLast(mapValue);
+            yield();
         }
 
         return ret;
@@ -382,10 +391,14 @@ namespace Database {
 
                 if (i < recordsToAdd - 1)
                     recordValue += ",";
+
+                if (i % groupYieldAfter == 0)
+                    yield();
             }
 
             records.RemoveRange(0, recordsToAdd);
             ret.InsertLast(recordValue);
+            yield();
         }
 
         return ret;
