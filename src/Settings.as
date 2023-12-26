@@ -1,12 +1,11 @@
-/*
-c 2023-07-16
-m 2023-10-12
-*/
+// c 2023-07-16
+// m 2023-12-25
 
 namespace Settings {
+    [Setting hidden] Sort::SortMethod myMapsRecordsSortMethod = Sort::SortMethod::RecordsNewFirst;
+    [Setting hidden] Sort::SortMethod myRecordsSortMethod = Sort::SortMethod::RecordsNewFirst;
     [Setting hidden] uint nandoRequestWait = 1000;
-    [Setting hidden] bool windowOpen       = false;
-
+    [Setting hidden] bool windowOpen = false;
 
     [Setting category="General" name="Show status bar"]
     bool statusBar = true;

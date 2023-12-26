@@ -1,7 +1,5 @@
-/*
-c 2023-07-14
-m 2023-10-12
-*/
+// c 2023-07-14
+// m 2023-12-25
 
 namespace Database {
     uint sqlLoadBatch = 100;
@@ -216,7 +214,7 @@ namespace Database {
         Log::TimerEnd(timerId);
         Locks::db = false;
 
-        startnew(CoroutineFunc(Globals::SortMyMapsRecordsCoro));
+        startnew(Sort::MyMapsRecordsCoro);
     }
 
     void SaveCoro() {

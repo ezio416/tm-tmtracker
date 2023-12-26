@@ -1,9 +1,9 @@
-/*
-c 2023-10-11
-m 2023-10-12
-*/
+// c 2023-10-11
+// m 2023-12-25
 
 namespace Tabs { namespace MyRecords {
+    UI::TableColumnSortSpecs[]@ lastSortSpecs;
+
     void Tab_MyRecordsList() {
         if (!UI::BeginTabItem(Icons::ListUl + " Record List (" + Globals::myRecords.Length + ")###my-records-list"))
             return;
@@ -70,20 +70,73 @@ namespace Tabs { namespace MyRecords {
         }
 
         int flags = UI::TableFlags::RowBg |
-                    UI::TableFlags::ScrollY;
+                    UI::TableFlags::ScrollY |
+                    UI::TableFlags::Sortable;
 
         if (UI::BeginTable("my-records", 7, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
+            int fixed = UI::TableColumnFlags::WidthFixed;
+            int noSort = UI::TableColumnFlags::NoSort;
+            int fixedNoSort = fixed | noSort;
+
             UI::TableSetupScrollFreeze(0, 1);
-            UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("Author",                          UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
-            UI::TableSetupColumn("AT",                              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-            UI::TableSetupColumn("PB",                              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-            UI::TableSetupColumn("\u0394 to AT",                    UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-            UI::TableSetupColumn("Timestamp " + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
-            UI::TableSetupColumn("Recency "   + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
+            UI::TableSetupColumn("Map",          noSort);
+            UI::TableSetupColumn("Author",       fixedNoSort, Globals::scale * 120);
+            UI::TableSetupColumn("AT",           fixedNoSort, Globals::scale * 80);
+            UI::TableSetupColumn("PB",           fixed,       Globals::scale * 80);
+            UI::TableSetupColumn("\u0394 to AT", fixedNoSort, Globals::scale * 80);
+            UI::TableSetupColumn("Timestamp",    fixed,       Globals::scale * 180);
+            UI::TableSetupColumn("Recency"  ,    fixed,       Globals::scale * 120);
             UI::TableHeadersRow();
+
+            UI::TableSortSpecs@ specs = UI::TableGetSortSpecs();
+            if (specs !is null) {
+                UI::TableColumnSortSpecs[]@ colSpecs = specs.get_Specs();
+                if (colSpecs !is null && lastSortSpecs is null)
+                    @lastSortSpecs = colSpecs;
+                else {
+                    if (
+                        colSpecs !is null &&
+                        colSpecs.Length > 0 &&
+                        lastSortSpecs !is null &&
+                        lastSortSpecs.Length > 0 &&
+                        (colSpecs[0].ColumnIndex != lastSortSpecs[0].ColumnIndex || colSpecs[0].SortDirection != lastSortSpecs[0].SortDirection)
+                    ) {
+                        @lastSortSpecs = colSpecs;
+
+                        switch (colSpecs[0].ColumnIndex) {
+                            // case 2:
+                            //     switch (colSpecs[0].SortDirection) {
+                            //         case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsShortestAuthorFirst; break;
+                            //         case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsLongestAuthorFirst;  break;
+                            //         default:;
+                            //     }
+                            //     break;
+                            case 3:
+                                switch (colSpecs[0].SortDirection) {
+                                    case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsBestFirst;  break;
+                                    case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsWorstFirst; break;
+                                    default:;
+                                }
+                                break;
+                            // case 4:
+                            //     print("delta");
+                            //     break;
+                            case 5: case 6:
+                                switch (colSpecs[0].SortDirection) {
+                                    case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsOldFirst; break;
+                                    case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsNewFirst; break;
+                                    default:;
+                                }
+                                break;
+                            default:;
+                        }
+
+                        startnew(Sort::MyRecordsCoro);
+                    }
+                }
+            }
 
             UI::ListClipper clipper(records.Length);
             while (clipper.Step()) {
@@ -95,6 +148,14 @@ namespace Tabs { namespace MyRecords {
                     UI::TableNextColumn();
                     if (Globals::myRecordsMapsDict.Exists(record.mapId)) {
                         @map = cast<Models::Map@>(Globals::myRecordsMapsDict[record.mapId]);
+
+                        if (map !is null) {
+                            if (record.mapAuthorTime == 0) {
+                                record.mapAuthorTime = map.authorTime;
+                                record.mapAuthorDelta = record.time - map.authorTime;
+                            }
+                        }
+
                         if (UI::Selectable((Settings::mapNameColors ? map.mapNameColor : map.mapNameText), false, UI::SelectableFlags::SpanAllColumns))
                             Globals::AddMyRecordsMapViewing(map);
                     } else
@@ -108,7 +169,7 @@ namespace Tabs { namespace MyRecords {
                         UI::Text("unknown");
 
                     UI::TableNextColumn();
-                    UI::Text(map is null ? "unknown" : Globals::colorMedalAuthor + Time::Format(map.authorTime));
+                    UI::Text(map is null ? "unknown" : Globals::colorMedalAuthor + Time::Format(record.mapAuthorTime));
 
                     UI::TableNextColumn();
                     string color;
@@ -123,7 +184,7 @@ namespace Tabs { namespace MyRecords {
                     UI::Text(color + Time::Format(record.time));
 
                     UI::TableNextColumn();
-                    UI::Text(map is null ? "unknown" : Util::TimeFormatColored(int(record.time) - int(map.authorTime)));
+                    UI::Text(map is null ? "unknown" : Util::TimeFormatColored(record.mapAuthorDelta));
 
                     UI::TableNextColumn();
                     UI::Text(Util::UnixToIso(record.timestampUnix));

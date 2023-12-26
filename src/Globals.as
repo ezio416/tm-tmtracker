@@ -1,7 +1,5 @@
-/*
-c 2023-05-16
-m 2023-10-12
-*/
+// c 2023-05-16
+// m 2023-12-25
 
 namespace Globals {
     Models::Account[] accounts;
@@ -198,81 +196,5 @@ namespace Globals {
 
         hiddenMapsJson.Remove(map.mapId);
         Files::SaveHiddenMaps();
-    }
-
-    void SortMyMapsRecordsCoro() {
-        while (Locks::sortMyMapsRecords)
-            yield();
-        Locks::sortMyMapsRecords = true;
-        string timerId = Log::TimerBegin("sorting my maps records");
-        string statusId = "sort-records";
-
-        myMapsRecordsSorted.RemoveRange(0, myMapsRecordsSorted.Length);
-
-        for (uint i = 0; i < myMapsRecords.Length; i++) {
-            Globals::status.Set(statusId, "sorting my maps records... (" + i + "/" + myMapsRecords.Length + ")");
-            Models::Record@ record = @myMapsRecords[i];
-
-            for (uint j = 0; j < myMapsRecordsSorted.Length; j++) {
-                if (record.timestampUnix > myMapsRecordsSorted[j].timestampUnix) {
-                    myMapsRecordsSorted.InsertAt(j, record);
-                    break;
-                }
-
-                if (j == myMapsRecordsSorted.Length - 1) {
-                    myMapsRecordsSorted.InsertLast(record);
-                    break;
-                }
-            }
-
-            if (myMapsRecordsSorted.Length == 0)
-                myMapsRecordsSorted.InsertLast(record);
-
-            if (i % 5 == 0)
-                yield();
-        }
-
-        Globals::status.Delete(statusId);
-        Log::TimerEnd(timerId);
-        Locks::sortMyMapsRecords = false;
-
-        startnew(CoroutineFunc(Database::SaveCoro));
-    }
-
-    void SortMyRecordsCoro() {
-        while (Locks::sortMyRecords)
-            yield();
-        Locks::sortMyRecords = true;
-        string timerId = Log::TimerBegin("sorting my records");
-        string statusId = "sort-my-records";
-
-        myRecordsSorted.RemoveRange(0, myRecordsSorted.Length);
-
-        for (uint i = 0; i < myRecords.Length; i++) {
-            Globals::status.Set(statusId, "sorting my records... (" + i + "/" + myRecords.Length + ")");
-            Models::Record@ record = @myRecords[i];
-
-            for (uint j = 0; j < myRecordsSorted.Length; j++) {
-                if (record.timestampUnix > myRecordsSorted[j].timestampUnix) {
-                    myRecordsSorted.InsertAt(j, record);
-                    break;
-                }
-
-                if (j == myRecordsSorted.Length - 1) {
-                    myRecordsSorted.InsertLast(record);
-                    break;
-                }
-            }
-
-            if (myRecordsSorted.Length == 0)
-                myRecordsSorted.InsertLast(record);
-
-            if (i % 5 == 0)
-                yield();
-        }
-
-        Globals::status.Delete(statusId);
-        Log::TimerEnd(timerId);
-        Locks::sortMyRecords = false;
     }
 }

@@ -1,7 +1,5 @@
-/*
-c 2023-07-06
-m 2023-10-13
-*/
+// c 2023-07-06
+// m 2023-12-25
 
 namespace Bulk {
     string[] myRecordsMapIds;
@@ -65,7 +63,7 @@ namespace Bulk {
         bool tooManyMaps;
 
         do {
-            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 
@@ -109,7 +107,7 @@ namespace Bulk {
         Log::TimerEnd(timerId);
         Locks::myMaps = false;
 
-        startnew(CoroutineFunc(Database::LoadRecordsCoro));
+        startnew(Database::LoadRecordsCoro);
     }
 
     void GetMyMapsRecordsCoro() {
@@ -141,11 +139,11 @@ namespace Bulk {
         Globals::getAccountNames = true;
         Globals::singleMapRecordStatus = true;
 
-        Meta::PluginCoroutine@ nameCoro = startnew(CoroutineFunc(GetAccountNamesCoro));
+        Meta::PluginCoroutine@ nameCoro = startnew(GetAccountNamesCoro);
         while (nameCoro.IsRunning())
             yield();
 
-        startnew(CoroutineFunc(Globals::SortMyMapsRecordsCoro));
+        startnew(Sort::MyMapsRecordsCoro);
 
         Globals::recordsTimestampsJson["myMaps"] = Time::Stamp;
         Files::SaveRecordsTimestamps();
@@ -165,13 +163,14 @@ namespace Bulk {
         Globals::status.Set(statusId, "getting my records...");
 
         Globals::myRecords.RemoveRange(0, Globals::myRecords.Length);
+        Globals::myRecordsSorted.RemoveRange(0, Globals::myRecordsSorted.Length);
         Globals::myRecordsMapsDict.DeleteAll();
         myRecordsMapIds.RemoveRange(0, myRecordsMapIds.Length);
 
         while (!NadeoServices::IsAuthenticated(Globals::apiCore))
             yield();
 
-        Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+        Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
         while (waitCoro.IsRunning())
             yield();
 
@@ -207,8 +206,8 @@ namespace Bulk {
         Log::TimerEnd(timerId);
         Locks::myRecords = false;
 
-        startnew(CoroutineFunc(Globals::SortMyRecordsCoro));
-        startnew(CoroutineFunc(GetMyRecordsMapInfoCoro));
+        startnew(Sort::MyRecordsCoro);
+        startnew(GetMyRecordsMapInfoCoro);
     }
 
     void GetMyRecordsMapInfoCoro() {
@@ -229,7 +228,7 @@ namespace Bulk {
                 group.InsertLast(myRecordsMapIds[i]);
             myRecordsMapIds.RemoveRange(0, idsToAdd);
 
-            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 
@@ -269,6 +268,6 @@ namespace Bulk {
         Log::TimerEnd(timerId);
         Locks::mapInfo = false;
 
-        startnew(CoroutineFunc(GetAccountNamesCoro));
+        startnew(GetAccountNamesCoro);
     }
 }
