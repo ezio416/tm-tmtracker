@@ -65,32 +65,32 @@ namespace Settings {
     Log::Level logLevel = Log::Level::Normal;
 
 
-    [Setting category="Map List" name="Show help text"]
+    [Setting category="My Maps" name="Show help text"]
     bool myMapsListText = true;
 
-    [Setting category="Map List" name="Show map search field"]
+    [Setting category="My Maps" name="Show map search field"]
     bool myMapsSearch = true;
 
-    [Setting category="Map List" name="Show number of records"]
+    [Setting category="My Maps" name="Show number of records"]
     bool myMapsListColRecords = true;
 
-    [Setting category="Map List" name="Show latest record update time"]
+    [Setting category="My Maps" name="Show latest record update time"]
     bool myMapsListColRecordsTime = true;
 
-    [Setting category="Map List" name="Show latest map upload time"]
+    [Setting category="My Maps" name="Show latest map upload time"]
     bool myMapsListColUpload = true;
 
 
-    [Setting category="My Map Records" name="Show time estimate + help text"]
+    [Setting category="My Maps' Records" name="Show time estimate + help text"]
     bool recordsEstimate = true;
 
-    [Setting category="My Map Records" name="Show map search field"]
+    [Setting category="My Maps' Records" name="Show map search field"]
     bool myMapsRecordsMapSearch = true;
 
-    [Setting category="My Map Records" name="Show account search field"]
+    [Setting category="My Maps' Records" name="Show account search field"]
     bool myMapsRecordsAccountSearch = true;
 
-    [Setting category="My Map Records" name="Notify when done getting records"]
+    [Setting category="My Maps' Records" name="Notify when done getting records"]
     bool myMapsRecordsNotify = true;
 
 

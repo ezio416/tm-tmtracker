@@ -5,7 +5,7 @@ namespace Tabs { namespace MyRecords {
     string mapSearch;
 
     void Tab_MyRecordsList() {
-        if (!UI::BeginTabItem(Icons::ListUl + " Record List (" + Globals::myRecords.Length + ")###my-records-list"))
+        if (!UI::BeginTabItem(Icons::ListUl + " Records (" + Globals::myRecords.Length + ")###my-records-list"))
             return;
 
         if (Settings::myRecordsText)
