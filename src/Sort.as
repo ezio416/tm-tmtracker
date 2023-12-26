@@ -1,8 +1,9 @@
 // c 2023-12-25
-// m 2023-12-25
+// m 2023-12-26
 
 // most things here courtesy of "BetterTOTD" plugin - https://github.com/XertroV/tm-better-totd
 namespace Sort {
+    bool dbSave = false;
     uint64 maxFrameTime = 10;
     uint64 sortLastYield = 0;
 
@@ -150,7 +151,10 @@ namespace Sort {
         Log::TimerEnd(timerId);
         Locks::sortMyMapsRecords = false;
 
-        startnew(Database::SaveCoro);
+        if (dbSave)
+            startnew(Database::SaveCoro);
+
+        dbSave = false;
     }
 
     void MyRecordsCoro() {

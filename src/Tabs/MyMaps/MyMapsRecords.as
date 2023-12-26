@@ -1,5 +1,5 @@
 // c 2023-07-12
-// m 2023-12-25
+// m 2023-12-26
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsRecords() {
@@ -47,17 +47,66 @@ namespace Tabs { namespace MyMaps {
             ));
         }
 
-        if (UI::BeginTable("records-table", 6, UI::TableFlags::ScrollY | UI::TableFlags::RowBg)) {
+        int flags = UI::TableFlags::RowBg |
+                    UI::TableFlags::ScrollY |
+                    UI::TableFlags::Sortable;
+
+        if (UI::BeginTable("my-maps-records", 6, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
+
+            int fixed = UI::TableColumnFlags::WidthFixed;
+            int noSort = UI::TableColumnFlags::NoSort;
+            int fixedNoSort = fixed | noSort;
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("Pos",       UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
-            UI::TableSetupColumn("Time",      UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-            UI::TableSetupColumn("Name",      UI::TableColumnFlags::WidthFixed, Globals::scale * 150);
-            UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
-            UI::TableSetupColumn("Recency",   UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
+            UI::TableSetupColumn("Pos",       fixedNoSort, Globals::scale * 35);
+            UI::TableSetupColumn("Time",      fixed,       Globals::scale * 80);
+            UI::TableSetupColumn("Name",      fixedNoSort, Globals::scale * 150);
+            UI::TableSetupColumn("Timestamp", fixed,       Globals::scale * 180);
+            UI::TableSetupColumn("Recency",   fixedNoSort, Globals::scale * 120);
             UI::TableHeadersRow();
+
+            UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
+
+            if (tableSpecs !is null && tableSpecs.Dirty) {
+                UI::TableColumnSortSpecs[]@ colSpecs = tableSpecs.get_Specs();
+
+                if (colSpecs !is null && colSpecs.Length > 0) {
+                    switch (colSpecs[0].ColumnIndex) {
+                        case 0:  // map
+                            switch (colSpecs[0].SortDirection) {
+                                case UI::SortDirection::Ascending:  Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsMapsAlpha;    break;
+                                case UI::SortDirection::Descending: Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsMapsAlphaRev; break;
+                                default:;
+                            }
+                        case 1:  // pos
+                            break;
+                        case 2:  // time
+                            switch (colSpecs[0].SortDirection) {
+                                case UI::SortDirection::Ascending:  Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsBestFirst;  break;
+                                case UI::SortDirection::Descending: Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsWorstFirst; break;
+                                default:;
+                            }
+                            break;
+                        case 3:  // name
+                            break;
+                        case 4:  // timestamp
+                            switch (colSpecs[0].SortDirection) {
+                                case UI::SortDirection::Ascending:  Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsOldFirst; break;
+                                case UI::SortDirection::Descending: Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsNewFirst; break;
+                                default:;
+                            }
+                            break;
+                        default:;
+                    }
+
+                    Sort::dbSave = false;
+                    startnew(Sort::MyMapsRecordsCoro);
+                }
+
+                tableSpecs.Dirty = false;
+            }
 
             UI::ListClipper clipper(Globals::myMapsRecordsSorted.Length);
             while (clipper.Step()) {
