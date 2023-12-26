@@ -1,7 +1,5 @@
-/*
-c 2023-09-19
-m 2023-10-09
-*/
+// c 2023-09-19
+// m 2023-10-09
 
 namespace Log {
     dictionary timers;

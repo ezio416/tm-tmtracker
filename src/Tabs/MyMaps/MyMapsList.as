@@ -1,7 +1,5 @@
-/*
-c 2023-05-26
-m 2023-10-12
-*/
+// c 2023-05-26
+// m 2023-10-12
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsList() {

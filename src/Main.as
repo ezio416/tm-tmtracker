@@ -1,7 +1,5 @@
-/*
-c 2023-05-14
-m 2023-10-12
-*/
+// c 2023-05-14
+// m 2023-12-26
 
 void RenderMenu() {
     if (UI::MenuItem(Globals::title, "", Settings::windowOpen))
