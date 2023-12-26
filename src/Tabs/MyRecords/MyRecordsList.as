@@ -2,6 +2,8 @@
 // m 2023-12-26
 
 namespace Tabs { namespace MyRecords {
+    string mapSearch;
+
     void Tab_MyRecordsList() {
         if (!UI::BeginTabItem(Icons::ListUl + " Record List (" + Globals::myRecords.Length + ")###my-records-list"))
             return;
@@ -40,13 +42,16 @@ namespace Tabs { namespace MyRecords {
             ));
         }
 
-        Globals::myRecordsMapsSearch = UI::InputText("search maps", Globals::myRecordsMapsSearch, false);
+        if (Settings::myRecordsSearch) {
+            mapSearch = UI::InputText("search maps", mapSearch, false);
 
-        if (Globals::myRecordsMapsSearch != "") {
-            UI::SameLine();
-            if (UI::Button(Icons::Times + " Clear Search"))
-                Globals::myRecordsMapsSearch = "";
-        }
+            if (mapSearch != "") {
+                UI::SameLine();
+                if (UI::Button(Icons::Times + " Clear Search"))
+                    mapSearch = "";
+            }
+        } else
+            mapSearch = "";
 
         Table_MyRecordsList(now);
 
@@ -56,13 +61,15 @@ namespace Tabs { namespace MyRecords {
     void Table_MyRecordsList(int64 now) {
         Models::Record@[] records;
 
-        if (Globals::myRecordsMapsSearch == "")
+        if (mapSearch == "")
             records = Globals::myRecordsSorted;
         else {
+            string mapSearchLower = mapSearch.ToLower();
+
             for (uint i = 0; i < Globals::myRecordsSorted.Length; i++) {
                 Models::Record@ record = Globals::myRecordsSorted[i];
 
-                if (record.mapNameText.ToLower().Contains(Globals::myRecordsMapsSearch.ToLower()))
+                if (record.mapNameText.ToLower().Contains(mapSearchLower))
                     records.InsertLast(record);
             }
         }

@@ -1,7 +1,9 @@
 // c 2023-05-26
-// m 2023-10-12
+// m 2023-12-26
 
 namespace Tabs { namespace MyMaps {
+    string mapSearch;
+
     void Tab_MyMapsList() {
         if (!UI::BeginTabItem(Icons::ListUl + " Map List (" + Globals::shownMaps + ")###my-maps-list"))
             return;
@@ -30,13 +32,16 @@ namespace Tabs { namespace MyMaps {
             UI::EndDisabled();
         }
 
-        Globals::myMapsSearch = UI::InputText("search maps", Globals::myMapsSearch, false);
+        if (Settings::myMapsSearch) {
+            mapSearch = UI::InputText("search maps", mapSearch, false);
 
-        if (Globals::myMapsSearch != "") {
-            UI::SameLine();
-            if (UI::Button(Icons::Times + " Clear Search"))
-                Globals::myMapsSearch = "";
-        }
+            if (mapSearch != "") {
+                UI::SameLine();
+                if (UI::Button(Icons::Times + " Clear Search"))
+                    mapSearch = "";
+            }
+        } else
+            mapSearch = "";
 
         Table_MyMapsList();
 
@@ -47,13 +52,15 @@ namespace Tabs { namespace MyMaps {
         int64 now = Time::Stamp;
         Models::Map@[] maps;
 
+        string mapSearchLower = mapSearch.ToLower();
+
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
             Models::Map@ map = @Globals::myMaps[i];
 
             if (map is null || (map.hidden && !Globals::showHidden))
                 continue;
 
-            if (map.mapNameText.ToLower().Contains(Globals::myMapsSearch.ToLower()))
+            if (mapSearchLower == "" || (mapSearchLower != "" && map.mapNameText.ToLower().Contains(mapSearchLower)))
                 maps.InsertLast(map);
         }
 

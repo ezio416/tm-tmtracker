@@ -25,7 +25,6 @@ namespace Globals {
     Models::Record[]  myMapsRecords;
     dictionary        myMapsRecordsDict;
     Models::Record@[] myMapsRecordsSorted;
-    string            myMapsSearch;
     Models::Map@[]    myMapsViewing;
     dictionary        myMapsViewingDict;
     string            myMapsViewingMapId;
@@ -34,7 +33,6 @@ namespace Globals {
     dictionary        myRecordsDict;
     Models::Map[]     myRecordsMaps;
     dictionary        myRecordsMapsDict;
-    string            myRecordsMapsSearch;
     Models::Map@[]    myRecordsMapsViewing;
     dictionary        myRecordsMapsViewingDict;
     string            myRecordsMapsViewingMapId;

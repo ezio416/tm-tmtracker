@@ -68,6 +68,9 @@ namespace Settings {
     [Setting category="Map List" name="Show help text"]
     bool myMapsListText = true;
 
+    [Setting category="Map List" name="Show map search field"]
+    bool myMapsSearch = true;
+
     [Setting category="Map List" name="Show number of records"]
     bool myMapsListColRecords = true;
 
@@ -80,6 +83,12 @@ namespace Settings {
 
     [Setting category="My Map Records" name="Show time estimate + help text"]
     bool recordsEstimate = true;
+
+    [Setting category="My Map Records" name="Show map search field"]
+    bool myMapsRecordsMapSearch = true;
+
+    [Setting category="My Map Records" name="Show account search field"]
+    bool myMapsRecordsAccountSearch = true;
 
 
     [Setting category="Viewing Maps" name="Show help text"]
@@ -97,4 +106,7 @@ namespace Settings {
 
     [Setting category="My Records" name="Show help text"]
     bool myRecordsText = true;
+
+    [Setting category="My Records" name="Show map search field"]
+    bool myRecordsSearch = true;
 }
