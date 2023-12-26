@@ -1,20 +1,20 @@
-/*
-c 2023-05-16
-m 2023-10-11
-*/
+// c 2023-05-16
+// m 2023-12-25
 
 namespace Models { class Record {
     string accountId;
+    int    mapAuthorDelta = 0;
+    uint   mapAuthorTime  = 0;
     string mapId;
     string mapNameColor;
     string mapNameText;
     string mapUid;
-    uint   medals       = 0;
+    uint   medals         = 0;
     uint   position;
     string recordFakeId;
     string recordId;
     uint   time;
-    string timestampIso = "";
+    string timestampIso;
     int64  timestampUnix;
     string zoneId;
 

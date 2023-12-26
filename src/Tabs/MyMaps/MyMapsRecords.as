@@ -1,7 +1,5 @@
-/*
-c 2023-07-12
-m 2023-10-12
-*/
+// c 2023-07-12
+// m 2023-12-25
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsRecords() {
@@ -54,11 +52,11 @@ namespace Tabs { namespace MyMaps {
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("Pos",                             UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
-            UI::TableSetupColumn("Time",                            UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-            UI::TableSetupColumn("Name",                            UI::TableColumnFlags::WidthFixed, Globals::scale * 150);
-            UI::TableSetupColumn("Timestamp " + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
-            UI::TableSetupColumn("Recency "   + Icons::ChevronDown, UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
+            UI::TableSetupColumn("Pos",       UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
+            UI::TableSetupColumn("Time",      UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+            UI::TableSetupColumn("Name",      UI::TableColumnFlags::WidthFixed, Globals::scale * 150);
+            UI::TableSetupColumn("Timestamp", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
+            UI::TableSetupColumn("Recency",   UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
             UI::TableHeadersRow();
 
             UI::ListClipper clipper(Globals::myMapsRecordsSorted.Length);
