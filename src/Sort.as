@@ -31,6 +31,14 @@ namespace Sort {
         return 0;
     }
 
+    int RecordsBestPosFirst(Models::Record@ r1, Models::Record@ r2) {
+        return Math::Clamp(r2.position - r1.position, -1, 1);
+    }
+
+    int RecordsWorstPosFirst(Models::Record@ r1, Models::Record@ r2) {
+        return Math::Clamp(r1.position - r2.position, -1, 1);
+    }
+
     int RecordsBestAuthorFirst(Models::Record@ r1, Models::Record@ r2) {
         return Math::Clamp(r2.mapAuthorTime - r1.mapAuthorTime, -1, 1);
     }
@@ -66,6 +74,8 @@ namespace Sort {
     enum SortMethod {
         RecordsMapsAlpha,
         RecordsMapsAlphaRev,
+        RecordsBestPosFirst,
+        RecordsWorstPosFirst,
         RecordsBestAuthorFirst,
         RecordsWorstAuthorFirst,
         RecordsBestFirst,
@@ -79,6 +89,8 @@ namespace Sort {
     RecordSortFunc@[] sortFunctions = {
         RecordsMapsAlpha,
         RecordsMapsAlphaRev,
+        RecordsBestPosFirst,
+        RecordsWorstPosFirst,
         RecordsBestAuthorFirst,
         RecordsWorstAuthorFirst,
         RecordsBestFirst,
