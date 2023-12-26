@@ -1,7 +1,5 @@
-/*
-c 2023-05-26
-m 2023-10-12
-*/
+// c 2023-05-26
+// m 2023-12-26
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsViewing() {
@@ -116,21 +114,72 @@ namespace Tabs { namespace MyMaps {
                             "never"
                     ));
 
-                    if (UI::BeginTable("table_records", 5, UI::TableFlags::ScrollY | UI::TableFlags::RowBg)) {
+                    int flags = UI::TableFlags::RowBg |
+                                UI::TableFlags::ScrollY |
+                                UI::TableFlags::Sortable;
+
+                    if (UI::BeginTable("table_records", 5, flags)) {
                         UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
+                        int fixed = UI::TableColumnFlags::WidthFixed;
+                        int noSort = UI::TableColumnFlags::NoSort;
+                        int fixedNoSort = fixed | noSort;
+
                         UI::TableSetupScrollFreeze(0, 1);
-                        UI::TableSetupColumn("Pos",               UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
-                        UI::TableSetupColumn("Time",              UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                        UI::TableSetupColumn("Name",              UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
-                        UI::TableSetupColumn("Timestamp (Local)", UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
-                        UI::TableSetupColumn("Recency",           UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
+                        UI::TableSetupColumn("Pos",       fixed,       Globals::scale * 35);
+                        UI::TableSetupColumn("Time",      fixed,       Globals::scale * 80);
+                        UI::TableSetupColumn("Name",      fixedNoSort, Globals::scale * 120);
+                        UI::TableSetupColumn("Timestamp", fixed,       Globals::scale * 180);
+                        UI::TableSetupColumn("Recency",   fixedNoSort, Globals::scale * 120);
                         UI::TableHeadersRow();
 
-                        UI::ListClipper clipper(map.records.Length);
+                        UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
+
+                        if (tableSpecs !is null && tableSpecs.Dirty) {
+                            UI::TableColumnSortSpecs[]@ colSpecs = tableSpecs.get_Specs();
+
+                            if (colSpecs !is null && colSpecs.Length > 0) {
+                                switch (colSpecs[0].ColumnIndex) {
+                                    case 0:  // pos
+                                        switch (colSpecs[0].SortDirection) {
+                                            case UI::SortDirection::Ascending:  Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsMapsAlpha;    break;
+                                            case UI::SortDirection::Descending: Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsMapsAlphaRev; break;
+                                            default:;
+                                        }
+                                    case 1:  // time
+                                        switch (colSpecs[0].SortDirection) {
+                                            case UI::SortDirection::Ascending:  Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsWorstPosFirst; break;
+                                            case UI::SortDirection::Descending: Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsBestPosFirst;  break;
+                                            default:;
+                                        }
+                                        break;
+                                    case 2:  // name
+                                        switch (colSpecs[0].SortDirection) {
+                                            case UI::SortDirection::Ascending:  Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsBestFirst;  break;
+                                            case UI::SortDirection::Descending: Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsWorstFirst; break;
+                                            default:;
+                                        }
+                                        break;
+                                    case 3:  // timestamp
+                                        switch (colSpecs[0].SortDirection) {
+                                            case UI::SortDirection::Ascending:  Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsOldFirst; break;
+                                            case UI::SortDirection::Descending: Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsNewFirst; break;
+                                            default:;
+                                        }
+                                        break;
+                                    default:;
+                                }
+
+                                startnew(CoroutineFunc(map.SortRecordsCoro));
+                            }
+
+                            tableSpecs.Dirty = false;
+                        }
+
+                        UI::ListClipper clipper(map.recordsSorted.Length);
                         while (clipper.Step()) {
                             for (int j = clipper.DisplayStart; j < clipper.DisplayEnd; j++) {
-                                Models::Record@ record = @map.records[j];
+                                Models::Record@ record = @map.recordsSorted[j];
                                 Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.accountId]);
 
                                 UI::TableNextRow();
