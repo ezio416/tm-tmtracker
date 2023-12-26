@@ -16,8 +16,6 @@ void Main() {
     NadeoServices::AddAudience(Globals::apiCore);
     NadeoServices::AddAudience(Globals::apiLive);
 
-    Zones::Load();
-
     IO::CreateFolder(Files::thumbnailFolder);
 
     if (Version::CheckFile()) {
