@@ -62,15 +62,20 @@ void RenderInterface() {
             UI::Text("Welcome to TMTracker!\nAll timestamps are shown in your local time.\nCheck out these tabs to see what the plugin offers:");
 
         UI::BeginTabBar("tabs");
-            Tabs::Tab_MyMaps();
-            Tabs::Tab_MyRecords();
+            if (Settings::myMapsTab)
+                Tabs::Tab_MyMaps();
+
+            if (Settings::myRecordsTab)
+                Tabs::Tab_MyRecords();
+
             if (Settings::infoTab)
                 Tabs::Tab_Info();
+
 #if SIG_DEVELOPER
             if (Settings::debugTab)
                 Tabs::Tab_Debug();
-            // Tabs::Tab_Test();
 #endif
+
         UI::EndTabBar();
     UI::End();
 }

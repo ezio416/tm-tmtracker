@@ -1,9 +1,9 @@
 // c 2023-05-26
-// m 2023-12-27
+// m 2023-10-11
 
 namespace Tabs {
     void Tab_MyMaps() {
-        if (!Settings::myMapsTab || !UI::BeginTabItem(Icons::Map + " My Maps"))
+        if (!UI::BeginTabItem(Icons::Map + " My Maps"))
             return;
 
         UI::BeginTabBar("MyMapsTabs");
