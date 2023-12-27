@@ -40,18 +40,54 @@ namespace Sort {
             return 0;
         }
 
+        int MostRecordsFirst(Models::Map@ m1, Models::Map@ m2) {
+            return Math::Clamp(m2.records.Length - m1.records.Length, -1, 1);
+        }
+
+        int LeastRecordsFirst(Models::Map@ m1, Models::Map@ m2) {
+            return Math::Clamp(m1.records.Length - m2.records.Length, -1, 1);
+        }
+
+        int EarliestRecordsRecencyFirst(Models::Map@ m1, Models::Map@ m2) {
+            return Math::Clamp(m1.recordsTimestamp - m2.recordsTimestamp, -1, 1);
+        }
+
+        int LatestRecordsRecencyFirst(Models::Map@ m1, Models::Map@ m2) {
+            return Math::Clamp(m2.recordsTimestamp - m1.recordsTimestamp, -1, 1);
+        }
+
+        int EarliestUploadFirst(Models::Map@ m1, Models::Map@ m2) {
+            return Math::Clamp(Math::Max(m1.updateTimestamp, m1.uploadTimestamp) - Math::Max(m2.updateTimestamp, m2.uploadTimestamp), -1, 1);
+        }
+
+        int LatestUploadFirst(Models::Map@ m1, Models::Map@ m2) {
+            return Math::Clamp(Math::Max(m2.updateTimestamp, m2.uploadTimestamp) - Math::Max(m1.updateTimestamp, m1.uploadTimestamp), -1, 1);
+        }
+
         enum SortMethod {
             LowestFirst,
             HighestFirst,
             NameAlpha,
-            NameAlphaRev
+            NameAlphaRev,
+            MostRecordsFirst,
+            LeastRecordsFirst,
+            EarliestRecordsRecencyFirst,
+            LatestRecordsRecencyFirst,
+            EarliestUploadFirst,
+            LatestUploadFirst
         }
 
         MapSortFunc@[] sortFunctions = {
             LowestFirst,
             HighestFirst,
             NameAlpha,
-            NameAlphaRev
+            NameAlphaRev,
+            MostRecordsFirst,
+            LeastRecordsFirst,
+            EarliestRecordsRecencyFirst,
+            LatestRecordsRecencyFirst,
+            EarliestUploadFirst,
+            LatestUploadFirst
         };
 
         Models::Map@[]@ QuickSort(Models::Map@[]@ arr, MapSortFunc@ f, int left = 0, int right = -1) {

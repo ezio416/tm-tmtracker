@@ -1,5 +1,5 @@
 // c 2023-07-16
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Settings {
     [Setting hidden] Sort::Maps::SortMethod myMapsSortMethod = Sort::Maps::SortMethod::HighestFirst;
@@ -71,6 +71,9 @@ namespace Settings {
 
     [Setting category="My Maps" name="Show map search field"]
     bool myMapsSearch = true;
+
+    [Setting category="My Maps" name="Show map number"]
+    bool myMapsListColNumber = true;
 
     [Setting category="My Maps" name="Show number of records"]
     bool myMapsListColRecords = true;

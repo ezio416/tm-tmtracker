@@ -1,5 +1,5 @@
 // c 2023-05-26
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Tabs { namespace MyMaps {
     string mapSearch;
@@ -64,7 +64,8 @@ namespace Tabs { namespace MyMaps {
                 maps.InsertLast(map);
         }
 
-        int colCount = 2;
+        int colCount = 1;
+        if (Settings::myMapsListColNumber)      colCount++;
         if (Settings::myMapsListColRecords)     colCount++;
         if (Settings::myMapsListColRecordsTime) colCount++;
         if (Settings::myMapsListColUpload)      colCount++;
@@ -76,16 +77,12 @@ namespace Tabs { namespace MyMaps {
         if (UI::BeginTable("my-maps-table", colCount, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
-            int fixed = UI::TableColumnFlags::WidthFixed;
-            int noSort = UI::TableColumnFlags::NoSort;
-            int fixedNoSort = fixed | noSort;
-
             UI::TableSetupScrollFreeze(0, 1);
-                                                    UI::TableSetupColumn("#",               fixed,       Globals::scale * 35);
+            if (Settings::myMapsListColNumber)      UI::TableSetupColumn("#",       UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
                                                     UI::TableSetupColumn("Name");
-            if (Settings::myMapsListColRecords)     UI::TableSetupColumn("Records",         fixedNoSort, Globals::scale * 50);
-            if (Settings::myMapsListColRecordsTime) UI::TableSetupColumn("Records Recency", noSort);
-            if (Settings::myMapsListColUpload)      UI::TableSetupColumn("Latest Upload",   noSort);
+            if (Settings::myMapsListColRecords)     UI::TableSetupColumn("Records", UI::TableColumnFlags::WidthFixed, Globals::scale * 65);
+            if (Settings::myMapsListColRecordsTime) UI::TableSetupColumn("Records Recency");
+            if (Settings::myMapsListColUpload)      UI::TableSetupColumn("Latest Upload");
             UI::TableHeadersRow();
 
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
@@ -103,15 +100,15 @@ namespace Tabs { namespace MyMaps {
                         case 1:  // name
                             Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::NameAlpha : Sort::Maps::SortMethod::NameAlphaRev;
                             break;
-                        // case 2:  // # records
-                        //     Settings::myMapsSortMethod = ascending ? Sort::Records::SortMethod::BestFirst : Sort::Records::SortMethod::WorstFirst;
-                        //     break;
-                        // case 3:  // recency
-                        //     Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::AccountsAlpha : Sort::Records::SortMethod::AccountsAlphaRev;
-                        //     break;
-                        // case 4:  // upload
-                        //     Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::OldFirst : Sort::Records::SortMethod::NewFirst;
-                        //     break;
+                        case 2:  // # records
+                            Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LeastRecordsFirst : Sort::Maps::SortMethod::MostRecordsFirst;
+                            break;
+                        case 3:  // recency
+                            Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LatestRecordsRecencyFirst : Sort::Maps::SortMethod::EarliestRecordsRecencyFirst;
+                            break;
+                        case 4:  // upload
+                            Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::EarliestUploadFirst : Sort::Maps::SortMethod::LatestUploadFirst;
+                            break;
                         default:;
                     }
 
@@ -127,8 +124,11 @@ namespace Tabs { namespace MyMaps {
                     Models::Map@ map = maps[i];
 
                     UI::TableNextRow();
-                    UI::TableNextColumn();
-                    UI::Text(tostring(map.number));
+
+                    if (Settings::myMapsListColNumber) {
+                        UI::TableNextColumn();
+                        UI::Text(tostring(map.number));
+                    }
 
                     UI::TableNextColumn();
                     if (UI::Selectable((Settings::mapNameColors ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false, UI::SelectableFlags::SpanAllColumns))
