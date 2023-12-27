@@ -341,13 +341,9 @@ namespace Models { class Map {
         Locks::sortSingleRecords = true;
         string timerId = Log::TimerBegin(logName + "sorting records");
 
-        recordsSorted.RemoveRange(0, recordsSorted.Length);
-
-        recordsSorted = records;
-
         Sort::Records::sortLastYield = Time::Now;
 
-        recordsSorted = Sort::Records::QuickSort(recordsSorted, Sort::Records::sortFunctions[Settings::myMapsViewingSortMethod]);
+        recordsSorted = Sort::Records::QuickSort(records, Sort::Records::sortFunctions[Settings::myMapsViewingSortMethod]);
 
         Log::TimerEnd(timerId);
         Locks::sortSingleRecords = false;
