@@ -2,9 +2,10 @@
 // m 2023-12-26
 
 namespace Settings {
-    [Setting hidden] Sort::SortMethod myMapsRecordsSortMethod = Sort::SortMethod::RecordsNewFirst;
-    [Setting hidden] Sort::SortMethod myMapsViewingSortMethod = Sort::SortMethod::RecordsBestPosFirst;
-    [Setting hidden] Sort::SortMethod myRecordsSortMethod = Sort::SortMethod::RecordsNewFirst;
+    [Setting hidden] Sort::Maps::SortMethod myMapsSortMethod = Sort::Maps::SortMethod::HighestFirst;
+    [Setting hidden] Sort::Records::SortMethod myMapsRecordsSortMethod = Sort::Records::SortMethod::NewFirst;
+    [Setting hidden] Sort::Records::SortMethod myMapsViewingSortMethod = Sort::Records::SortMethod::BestPosFirst;
+    [Setting hidden] Sort::Records::SortMethod myRecordsSortMethod = Sort::Records::SortMethod::NewFirst;
     [Setting hidden] uint nandoRequestWait = 1000;
     [Setting hidden] bool windowOpen = false;
 

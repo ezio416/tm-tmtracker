@@ -12,6 +12,7 @@ namespace Locks {
     bool playMap           = false;
     bool requesting        = false;
     bool singleRecords     = false;
+    bool sortMyMaps        = false;
     bool sortMyMapsRecords = false;
     bool sortMyRecords     = false;
     bool sortSingleRecords = false;

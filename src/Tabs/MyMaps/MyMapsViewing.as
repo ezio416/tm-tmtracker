@@ -1,5 +1,5 @@
 // c 2023-05-26
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsViewing() {
@@ -113,8 +113,10 @@ namespace Tabs { namespace MyMaps {
                 UI::EndDisabled();
 
                 UI::BeginDisabled(map.hidden || Locks::singleRecords || Locks::allRecords);
-                if (UI::Button(Icons::Download + " Get Records (" + map.records.Length + ")"))
+                if (UI::Button(Icons::Download + " Get Records (" + map.records.Length + ")")) {
+                    Sort::Records::allMaps = true;
                     startnew(CoroutineFunc(map.GetRecordsCoro));
+                }
                 UI::EndDisabled();
 
                 UI::SameLine();
@@ -154,7 +156,7 @@ namespace Tabs { namespace MyMaps {
 
                             switch (colSpecs[0].ColumnIndex) {
                                 case 0:  // pos
-                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsWorstPosFirst : Sort::SortMethod::RecordsBestPosFirst;
+                                    Settings::myMapsViewingSortMethod = ascending ? Sort::Records::SortMethod::WorstPosFirst : Sort::Records::SortMethod::BestPosFirst;
                                     break;
                                 case 2:  // account
                                     for (uint j = 0; j < map.records.Length; j++) {
@@ -164,17 +166,18 @@ namespace Tabs { namespace MyMaps {
                                             record.accountName = account.accountName;
                                         }
                                     }
-                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsAccountsAlpha : Sort::SortMethod::RecordsAccountsAlphaRev;
+                                    Settings::myMapsViewingSortMethod = ascending ? Sort::Records::SortMethod::AccountsAlpha : Sort::Records::SortMethod::AccountsAlphaRev;
                                     break;
                                 case 3:  // timestamp
-                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsOldFirst : Sort::SortMethod::RecordsNewFirst;
+                                    Settings::myMapsViewingSortMethod = ascending ? Sort::Records::SortMethod::OldFirst : Sort::Records::SortMethod::NewFirst;
                                     break;
                                 case 4:  // recency
-                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsNewFirst : Sort::SortMethod::RecordsOldFirst;
+                                    Settings::myMapsViewingSortMethod = ascending ? Sort::Records::SortMethod::NewFirst : Sort::Records::SortMethod::OldFirst;
                                     break;
                                 default:;
                             }
 
+                            Sort::Records::allMaps = false;
                             startnew(CoroutineFunc(map.SortRecordsCoro));
                         }
 

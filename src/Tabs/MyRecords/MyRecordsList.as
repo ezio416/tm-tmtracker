@@ -127,7 +127,7 @@ namespace Tabs { namespace MyRecords {
 
                     switch (colSpecs[0].ColumnIndex) {
                         case 0:  // map
-                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsMapsAlpha : Sort::SortMethod::RecordsMapsAlphaRev;
+                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::MapsAlpha : Sort::Records::SortMethod::MapsAlphaRev;
                             break;
                         case 1:  // author
                             for (uint i = 0; i < Globals::myRecords.Length; i++) {
@@ -137,28 +137,28 @@ namespace Tabs { namespace MyRecords {
                                     record.mapAuthorName = account.accountName;
                                 }
                             }
-                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsMapAuthorsAlpha : Sort::SortMethod::RecordsMapAuthorsAlphaRev;
+                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::MapAuthorsAlpha : Sort::Records::SortMethod::MapAuthorsAlphaRev;
                             break;
                         case 2:  // AT
-                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsWorstAuthorFirst : Sort::SortMethod::RecordsBestAuthorFirst;
+                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::WorstAuthorFirst : Sort::Records::SortMethod::BestAuthorFirst;
                             break;
                         case 3:  // PB
-                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsBestFirst : Sort::SortMethod::RecordsWorstFirst;
+                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::BestFirst : Sort::Records::SortMethod::WorstFirst;
                             break;
                         case 4:  // delta
-                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsWorstDeltaFirst : Sort::SortMethod::RecordsBestDeltaFirst;
+                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::WorstDeltaFirst : Sort::Records::SortMethod::BestDeltaFirst;
                             break;
                         case 5:  // timestamp
-                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsOldFirst : Sort::SortMethod::RecordsNewFirst;
+                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::OldFirst : Sort::Records::SortMethod::NewFirst;
                             break;
                         case 6:  // recency
-                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsNewFirst : Sort::SortMethod::RecordsOldFirst;
+                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::NewFirst : Sort::Records::SortMethod::OldFirst;
                             break;
                         default:;
                     }
 
                     if (Globals::myRecords.Length > 0)
-                        startnew(Sort::MyRecordsCoro);
+                        startnew(Sort::Records::MyRecordsCoro);
                 }
 
                 tableSpecs.Dirty = false;

@@ -1,5 +1,5 @@
 // c 2023-05-16
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Globals {
     Models::Account[] accounts;
@@ -24,6 +24,7 @@ namespace Globals {
     Models::Record[]  myMapsRecords;
     dictionary        myMapsRecordsDict;
     Models::Record@[] myMapsRecordsSorted;
+    Models::Map@[]    myMapsSorted;
     Models::Map@[]    myMapsViewing;
     dictionary        myMapsViewingDict;
     string            myMapsViewingMapId;
@@ -101,12 +102,12 @@ namespace Globals {
         }
 
         // NOT WORKING???
-        startnew(CoroutineFunc(map.SortRecordsCoro));
+        // startnew(CoroutineFunc(map.SortRecordsCoro));
     }
 
     void AddMyRecordsMapViewing(Models::Map@ map) {
         if (!myRecordsMapsViewingDict.Exists(map.mapId)) {
-            Log::Write(Log::Level::Debug, map.logName + "adding to my records maps viewing...");
+            Log::Write(Log::Level::Debug, map.logName + "adding to my records' maps viewing...");
 
             myRecordsMapsViewing.InsertLast(map);
             myRecordsMapsViewingDict.Set(map.mapId, map);
@@ -135,7 +136,7 @@ namespace Globals {
     }
 
     void ClearMyMapRecords(Models::Map@ map) {
-        Log::Write(Log::Level::Debug, map.logName + "clearing my maps records...");
+        Log::Write(Log::Level::Debug, map.logName + "clearing records...");
 
         map.records.RemoveRange(0, map.records.Length);
         map.recordsSorted.RemoveRange(0, map.recordsSorted.Length);
@@ -150,7 +151,7 @@ namespace Globals {
     }
 
     void ClearMyMapsRecords() {
-        Log::Write(Log::Level::Debug, "clearing my maps records...");
+        Log::Write(Log::Level::Debug, "clearing my maps' records...");
 
         myMapsRecords.RemoveRange(0, myMapsRecords.Length);
         myMapsRecordsDict.DeleteAll();
@@ -164,7 +165,7 @@ namespace Globals {
     }
 
     void ClearMyRecordsMapsViewing() {
-        Log::Write(Log::Level::Debug, "clearing my records maps viewing...");
+        Log::Write(Log::Level::Debug, "clearing my records' maps viewing...");
 
         myRecordsMapsViewing.RemoveRange(0, myRecordsMapsViewing.Length);
         myRecordsMapsViewingDict.DeleteAll();

@@ -133,13 +133,13 @@ namespace Tabs { namespace MyMaps {
 
                     switch (colSpecs[0].ColumnIndex) {
                         case 0:  // map
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::SortMethod::RecordsMapsAlpha : Sort::SortMethod::RecordsMapsAlphaRev;
+                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::MapsAlpha : Sort::Records::SortMethod::MapsAlphaRev;
                             break;
                         case 1:  // pos
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::SortMethod::RecordsWorstPosFirst : Sort::SortMethod::RecordsBestPosFirst;
+                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::WorstPosFirst : Sort::Records::SortMethod::BestPosFirst;
                             break;
                         case 2:  // time
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::SortMethod::RecordsBestFirst : Sort::SortMethod::RecordsWorstFirst;
+                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::BestFirst : Sort::Records::SortMethod::WorstFirst;
                             break;
                         case 3:  // account
                             for (uint i = 0; i < records.Length; i++) {
@@ -149,19 +149,19 @@ namespace Tabs { namespace MyMaps {
                                     record.accountName = account.accountName;
                                 }
                             }
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::SortMethod::RecordsAccountsAlpha : Sort::SortMethod::RecordsAccountsAlphaRev;
+                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::AccountsAlpha : Sort::Records::SortMethod::AccountsAlphaRev;
                             break;
                         case 4:  // timestamp
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::SortMethod::RecordsOldFirst : Sort::SortMethod::RecordsNewFirst;
+                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::OldFirst : Sort::Records::SortMethod::NewFirst;
                             break;
                         case 5:  // recency
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::SortMethod::RecordsNewFirst : Sort::SortMethod::RecordsOldFirst;
+                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::NewFirst : Sort::Records::SortMethod::OldFirst;
                             break;
                         default:;
                     }
 
-                    Sort::dbSave = false;
-                    startnew(Sort::MyMapsRecordsCoro);
+                    Sort::Records::dbSave = false;
+                    startnew(Sort::Records::MyMapsRecordsCoro);
                 }
 
                 tableSpecs.Dirty = false;
