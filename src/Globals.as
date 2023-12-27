@@ -130,7 +130,9 @@ namespace Globals {
         Log::Write(Log::Level::Debug, "clearing my maps...");
 
         myMaps.RemoveRange(0, myMaps.Length);
+        myMapsSorted.RemoveRange(0, myMapsSorted.Length);
         myMapsDict.DeleteAll();
+
         ClearMyMapsViewing();
         shownMaps = 0;
     }
