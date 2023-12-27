@@ -112,11 +112,17 @@ namespace Tabs { namespace MyMaps {
 
         myMapsRecordsResults = records.Length;
 
+        int colCount = 2;
+        if (Settings::myMapsRecordsColPos)       colCount++;
+        if (Settings::myMapsRecordsColTime)      colCount++;
+        if (Settings::myMapsRecordsColTimestamp) colCount++;
+        if (Settings::myMapsRecordsColRecency)   colCount++;
+
         int flags = UI::TableFlags::RowBg |
                     UI::TableFlags::ScrollY |
                     UI::TableFlags::Sortable;
 
-        if (UI::BeginTable("my-maps-records", 6, flags)) {
+        if (UI::BeginTable("my-maps-records", colCount, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
             int fixed = UI::TableColumnFlags::WidthFixed;
@@ -124,12 +130,12 @@ namespace Tabs { namespace MyMaps {
             int fixedNoSort = fixed | noSort;
 
             UI::TableSetupScrollFreeze(0, 1);
-            UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("Pos",       fixed,                                                            Globals::scale * 35);
-            UI::TableSetupColumn("Time",      fixed,                                                            Globals::scale * 75);
-            UI::TableSetupColumn("Account",   (Locks::accountNames || Locks::allRecords ? fixedNoSort : fixed), Globals::scale * 150);
-            UI::TableSetupColumn("Timestamp", fixed,                                                            Globals::scale * 185);
-            UI::TableSetupColumn("Recency",   fixed,                                                            Globals::scale * 125);
+                                                     UI::TableSetupColumn("Map");
+            if (Settings::myMapsRecordsColPos)       UI::TableSetupColumn("Pos",       fixed,                                                            Globals::scale * 35);
+            if (Settings::myMapsRecordsColTime)      UI::TableSetupColumn("Time",      fixed,                                                            Globals::scale * 75);
+                                                     UI::TableSetupColumn("Account",   (Locks::accountNames || Locks::allRecords ? fixedNoSort : fixed), Globals::scale * 150);
+            if (Settings::myMapsRecordsColTimestamp) UI::TableSetupColumn("Timestamp", fixed,                                                            Globals::scale * 185);
+            if (Settings::myMapsRecordsColRecency)   UI::TableSetupColumn("Recency",   fixed,                                                            Globals::scale * 125);
             UI::TableHeadersRow();
 
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
@@ -140,34 +146,46 @@ namespace Tabs { namespace MyMaps {
                 if (colSpecs !is null && colSpecs.Length > 0) {
                     bool ascending = colSpecs[0].SortDirection == UI::SortDirection::Ascending;
 
-                    switch (colSpecs[0].ColumnIndex) {
-                        case 0:  // map
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::MapsAlpha : Sort::Records::SortMethod::MapsAlphaRev;
-                            break;
-                        case 1:  // pos
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::WorstPosFirst : Sort::Records::SortMethod::BestPosFirst;
-                            break;
-                        case 2:  // time
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::BestFirst : Sort::Records::SortMethod::WorstFirst;
-                            break;
-                        case 3:  // account
-                            for (uint i = 0; i < records.Length; i++) {
-                                Models::Record@ record = records[i];
-                                if (record.accountName == "" && Globals::accounts.Length > 0 && Globals::accountsDict.Exists(record.accountId)) {
-                                    Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.accountId]);
-                                    record.accountName = account.accountName;
-                                }
-                            }
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::AccountsAlpha : Sort::Records::SortMethod::AccountsAlphaRev;
-                            break;
-                        case 4:  // timestamp
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::OldFirst : Sort::Records::SortMethod::NewFirst;
-                            break;
-                        case 5:  // recency
-                            Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::NewFirst : Sort::Records::SortMethod::OldFirst;
-                            break;
-                        default:;
+                    int colTime = 1;
+                    int colAccount = 1;
+                    int colTimestamp = 2;
+                    int colRecency = 2;
+
+                    if (Settings::myMapsRecordsColPos) {
+                        colTime++;
+                        colAccount++;
+                        colTimestamp++;
+                        colRecency++;
                     }
+
+                    if (Settings::myMapsRecordsColTime) {
+                        colAccount++;
+                        colTimestamp++;
+                        colRecency++;
+                    }
+
+                    if (Settings::myMapsRecordsColTimestamp)
+                        colRecency++;
+
+                    if (colSpecs[0].ColumnIndex == 0)
+                        Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::MapsAlpha : Sort::Records::SortMethod::MapsAlphaRev;
+                    else if (Settings::myMapsRecordsColPos && colSpecs[0].ColumnIndex == 1)
+                        Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::WorstPosFirst : Sort::Records::SortMethod::BestPosFirst;
+                    else if (Settings::myMapsRecordsColTime && colSpecs[0].ColumnIndex == colTime)
+                        Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::BestFirst : Sort::Records::SortMethod::WorstFirst;
+                    else if (colSpecs[0].ColumnIndex == colAccount) {
+                        for (uint i = 0; i < records.Length; i++) {
+                            Models::Record@ record = records[i];
+                            if (record.accountName == "" && Globals::accounts.Length > 0 && Globals::accountsDict.Exists(record.accountId)) {
+                                Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.accountId]);
+                                record.accountName = account.accountName;
+                            }
+                        }
+                        Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::AccountsAlpha : Sort::Records::SortMethod::AccountsAlphaRev;
+                    } else if (Settings::myMapsRecordsColTimestamp && colSpecs[0].ColumnIndex == colTimestamp)
+                        Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::OldFirst : Sort::Records::SortMethod::NewFirst;
+                    else if (Settings::myMapsRecordsColRecency && colSpecs[0].ColumnIndex == colRecency)
+                        Settings::myMapsRecordsSortMethod = ascending ? Sort::Records::SortMethod::NewFirst : Sort::Records::SortMethod::OldFirst;
 
                     Sort::Records::dbSave = false;
                     startnew(Sort::Records::MyMapsRecordsCoro);
@@ -187,30 +205,38 @@ namespace Tabs { namespace MyMaps {
                     if (UI::Selectable((Settings::mapNameColors ? record.mapNameColor : record.mapNameText) + "##" + i, false))
                         Globals::AddMyMapViewing(cast<Models::Map@>(Globals::myMapsDict[record.mapId]));
 
-                    UI::TableNextColumn();
-                    UI::Text(((Settings::highlightTop5 && record.position < 6) ? Globals::colorTop5 : "") + record.position);
+                    if (Settings::myMapsRecordsColPos) {
+                        UI::TableNextColumn();
+                        UI::Text(((Settings::highlightTop5 && record.position < 6) ? Globals::colorTop5 : "") + record.position);
+                    }
 
-                    UI::TableNextColumn();
-                    string color;
-                    if (Settings::medalColors)
-                        switch (record.medals) {
-                            case 1:  color = Globals::colorMedalBronze; break;
-                            case 2:  color = Globals::colorMedalSilver; break;
-                            case 3:  color = Globals::colorMedalGold;   break;
-                            case 4:  color = Globals::colorMedalAuthor; break;
-                            default: color = Globals::colorMedalNone;
-                        }
-                    UI::Text(color + Time::Format(record.time));
+                    if (Settings::myMapsRecordsColTime) {
+                        UI::TableNextColumn();
+                        string color;
+                        if (Settings::medalColors)
+                            switch (record.medals) {
+                                case 1:  color = Globals::colorMedalBronze; break;
+                                case 2:  color = Globals::colorMedalSilver; break;
+                                case 3:  color = Globals::colorMedalGold;   break;
+                                case 4:  color = Globals::colorMedalAuthor; break;
+                                default: color = Globals::colorMedalNone;
+                            }
+                        UI::Text(color + Time::Format(record.time));
+                    }
 
                     UI::TableNextColumn();
                     if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : "\\$888" + account.accountId) + "##" + i, false))
                         Util::TmioPlayer(account.accountId);
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::UnixToIso(record.timestampUnix));
+                    if (Settings::myMapsRecordsColTimestamp) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::UnixToIso(record.timestampUnix));
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::FormatSeconds(now - record.timestampUnix));
+                    if (Settings::myMapsRecordsColRecency) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::FormatSeconds(now - record.timestampUnix));
+                    }
                 }
             }
 

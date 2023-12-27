@@ -102,24 +102,36 @@ namespace Tabs { namespace MyMaps {
                 if (colSpecs !is null && colSpecs.Length > 0) {
                     bool ascending = colSpecs[0].SortDirection == UI::SortDirection::Ascending;
 
-                    switch (colSpecs[0].ColumnIndex) {
-                        case 0:  // number
-                            Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LowestFirst : Sort::Maps::SortMethod::HighestFirst;
-                            break;
-                        case 1:  // name
-                            Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::NameAlpha : Sort::Maps::SortMethod::NameAlphaRev;
-                            break;
-                        case 2:  // # records
-                            Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LeastRecordsFirst : Sort::Maps::SortMethod::MostRecordsFirst;
-                            break;
-                        case 3:  // recency
-                            Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LatestRecordsRecencyFirst : Sort::Maps::SortMethod::EarliestRecordsRecencyFirst;
-                            break;
-                        case 4:  // upload
-                            Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::EarliestUploadFirst : Sort::Maps::SortMethod::LatestUploadFirst;
-                            break;
-                        default:;
+                    int colName = 0;
+                    int colRecords = 1;
+                    int colRecency = 1;
+                    int colUpload = 1;
+
+                    if (Settings::myMapsListColNumber) {
+                        colName++;
+                        colRecords++;
+                        colRecency++;
+                        colUpload++;
                     }
+
+                    if (Settings::myMapsListColRecords) {
+                        colRecency++;
+                        colUpload++;
+                    }
+
+                    if (Settings::myMapsListColRecordsTime)
+                        colUpload++;
+
+                    if (Settings::myMapsListColNumber && colSpecs[0].ColumnIndex == 0)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LowestFirst : Sort::Maps::SortMethod::HighestFirst;
+                    else if (colSpecs[0].ColumnIndex == colName)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::NameAlpha : Sort::Maps::SortMethod::NameAlphaRev;
+                    else if (Settings::myMapsListColRecords && colSpecs[0].ColumnIndex == colRecords)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LeastRecordsFirst : Sort::Maps::SortMethod::MostRecordsFirst;
+                    else if (Settings::myMapsListColRecordsTime && colSpecs[0].ColumnIndex == colRecency)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LatestRecordsRecencyFirst : Sort::Maps::SortMethod::EarliestRecordsRecencyFirst;
+                    else if (Settings::myMapsListColUpload && colSpecs[0].ColumnIndex == colUpload)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::EarliestUploadFirst : Sort::Maps::SortMethod::LatestUploadFirst;
 
                     startnew(Sort::Maps::MyMapsCoro);
                 }

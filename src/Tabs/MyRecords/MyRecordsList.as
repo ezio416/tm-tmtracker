@@ -105,11 +105,19 @@ namespace Tabs { namespace MyRecords {
 
         myRecordsResults = records.Length;
 
+        int colCount = 1;
+        if (Settings::myRecordsColAuthor)    colCount++;
+        if (Settings::myRecordsColAT)        colCount++;
+        if (Settings::myRecordsColPB)        colCount++;
+        if (Settings::myRecordsColDelta)     colCount++;
+        if (Settings::myRecordsColTimestamp) colCount++;
+        if (Settings::myRecordsColRecency)   colCount++;
+
         int flags = UI::TableFlags::RowBg |
                     UI::TableFlags::ScrollY |
                     UI::TableFlags::Sortable;
 
-        if (UI::BeginTable("my-records", 7, flags)) {
+        if (UI::BeginTable("my-records", colCount, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
             int fixed = UI::TableColumnFlags::WidthFixed;
@@ -117,13 +125,13 @@ namespace Tabs { namespace MyRecords {
             int fixedNoSort = fixed | noSort;
 
             UI::TableSetupScrollFreeze(0, 1);
-            UI::TableSetupColumn("Map",          (Locks::mapInfo ? noSort : 0));
-            UI::TableSetupColumn("Author",       (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 120);
-            UI::TableSetupColumn("AT",           (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 75);
-            UI::TableSetupColumn("PB",           fixed,                                  Globals::scale * 75);
-            UI::TableSetupColumn("\u0394 to AT", (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 75);
-            UI::TableSetupColumn("Timestamp",    fixed,                                  Globals::scale * 185);
-            UI::TableSetupColumn("Recency",      fixed,                                  Globals::scale * 125);
+                                                 UI::TableSetupColumn("Map",          (Locks::mapInfo ? noSort : 0));
+            if (Settings::myRecordsColAuthor)    UI::TableSetupColumn("Author",       (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 120);
+            if (Settings::myRecordsColAT)        UI::TableSetupColumn("AT",           (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 75);
+            if (Settings::myRecordsColPB)        UI::TableSetupColumn("PB",           fixed,                                  Globals::scale * 75);
+            if (Settings::myRecordsColDelta)     UI::TableSetupColumn("\u0394 to AT", (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 75);
+            if (Settings::myRecordsColTimestamp) UI::TableSetupColumn("Timestamp",    fixed,                                  Globals::scale * 185);
+            if (Settings::myRecordsColRecency)   UI::TableSetupColumn("Recency",      fixed,                                  Globals::scale * 125);
             UI::TableHeadersRow();
 
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
@@ -134,37 +142,63 @@ namespace Tabs { namespace MyRecords {
                 if (colSpecs !is null && colSpecs.Length > 0) {
                     bool ascending = colSpecs[0].SortDirection == UI::SortDirection::Ascending;
 
-                    switch (colSpecs[0].ColumnIndex) {
-                        case 0:  // map
-                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::MapsAlpha : Sort::Records::SortMethod::MapsAlphaRev;
-                            break;
-                        case 1:  // author
-                            for (uint i = 0; i < Globals::myRecords.Length; i++) {
-                                Models::Record@ record = @Globals::myRecords[i];
-                                if (record.mapAuthorName == "" && Globals::accounts.Length > 0 && Globals::accountsDict.Exists(record.mapAuthorId)) {
-                                    Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.mapAuthorId]);
-                                    record.mapAuthorName = account.accountName;
-                                }
-                            }
-                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::MapAuthorsAlpha : Sort::Records::SortMethod::MapAuthorsAlphaRev;
-                            break;
-                        case 2:  // AT
-                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::WorstAuthorFirst : Sort::Records::SortMethod::BestAuthorFirst;
-                            break;
-                        case 3:  // PB
-                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::BestFirst : Sort::Records::SortMethod::WorstFirst;
-                            break;
-                        case 4:  // delta
-                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::WorstDeltaFirst : Sort::Records::SortMethod::BestDeltaFirst;
-                            break;
-                        case 5:  // timestamp
-                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::OldFirst : Sort::Records::SortMethod::NewFirst;
-                            break;
-                        case 6:  // recency
-                            Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::NewFirst : Sort::Records::SortMethod::OldFirst;
-                            break;
-                        default:;
+                    int colAuthor = 1;
+                    int colAT = 1;
+                    int colPB = 1;
+                    int colDelta = 1;
+                    int colTimestamp = 1;
+                    int colRecency = 1;
+
+                    if (Settings::myRecordsColAuthor) {
+                        colAT++;
+                        colPB++;
+                        colDelta++;
+                        colTimestamp++;
+                        colRecency++;
                     }
+
+                    if (Settings::myRecordsColAT) {
+                        colPB++;
+                        colDelta++;
+                        colTimestamp++;
+                        colRecency++;
+                    }
+
+                    if (Settings::myRecordsColPB) {
+                        colDelta++;
+                        colTimestamp++;
+                        colRecency++;
+                    }
+
+                    if (Settings::myRecordsColDelta) {
+                        colTimestamp++;
+                        colRecency++;
+                    }
+
+                    if (Settings::myRecordsColTimestamp)
+                        colRecency++;
+
+                    if (colSpecs[0].ColumnIndex == 0)
+                        Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::MapsAlpha : Sort::Records::SortMethod::MapsAlphaRev;
+                    else if (Settings::myRecordsColAuthor && colSpecs[0].ColumnIndex == colAuthor) {
+                        for (uint i = 0; i < Globals::myRecords.Length; i++) {
+                            Models::Record@ record = @Globals::myRecords[i];
+                            if (record.mapAuthorName == "" && Globals::accounts.Length > 0 && Globals::accountsDict.Exists(record.mapAuthorId)) {
+                                Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.mapAuthorId]);
+                                record.mapAuthorName = account.accountName;
+                            }
+                        }
+                        Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::MapAuthorsAlpha : Sort::Records::SortMethod::MapAuthorsAlphaRev;
+                    } else if (Settings::myRecordsColAT && colSpecs[0].ColumnIndex == colAT)
+                        Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::WorstAuthorFirst : Sort::Records::SortMethod::BestAuthorFirst;
+                    else if (Settings::myRecordsColPB && colSpecs[0].ColumnIndex == colPB)
+                        Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::BestFirst : Sort::Records::SortMethod::WorstFirst;
+                    else if (Settings::myRecordsColDelta && colSpecs[0].ColumnIndex == colDelta)
+                        Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::WorstDeltaFirst : Sort::Records::SortMethod::BestDeltaFirst;
+                    else if (Settings::myRecordsColTimestamp && colSpecs[0].ColumnIndex == colTimestamp)
+                        Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::OldFirst : Sort::Records::SortMethod::NewFirst;
+                    else if (Settings::myRecordsColRecency && colSpecs[0].ColumnIndex == colRecency)
+                        Settings::myRecordsSortMethod = ascending ? Sort::Records::SortMethod::NewFirst : Sort::Records::SortMethod::OldFirst;
 
                     if (Globals::myRecords.Length > 0)
                         startnew(Sort::Records::MyRecordsCoro);
@@ -188,36 +222,48 @@ namespace Tabs { namespace MyRecords {
                     } else
                         UI::Text("\\$888" + record.mapId);
 
-                    UI::TableNextColumn();
-                    if (map !is null && Globals::accountsDict.Exists(map.authorId)) {
-                        Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[map.authorId]);
-                        UI::Text(account.accountName == "" ? ("\\$888" + account.accountId) : account.accountName);
-                    } else
-                        UI::Text("\\$888unknown");
+                    if (Settings::myRecordsColAuthor) {
+                        UI::TableNextColumn();
+                        if (map !is null && Globals::accountsDict.Exists(map.authorId)) {
+                            Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[map.authorId]);
+                            UI::Text(account.accountName == "" ? ("\\$888" + account.accountId) : account.accountName);
+                        } else
+                            UI::Text("\\$888unknown");
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(map is null ? "\\$888unknown" : Globals::colorMedalAuthor + Time::Format(record.mapAuthorTime));
+                    if (Settings::myRecordsColAT) {
+                        UI::TableNextColumn();
+                        UI::Text(map is null ? "\\$888unknown" : Globals::colorMedalAuthor + Time::Format(record.mapAuthorTime));
+                    }
 
-                    UI::TableNextColumn();
-                    string color;
-                    if (Settings::medalColors)
-                        switch (record.medals) {
-                            case 1:  color = Globals::colorMedalBronze; break;
-                            case 2:  color = Globals::colorMedalSilver; break;
-                            case 3:  color = Globals::colorMedalGold;   break;
-                            case 4:  color = Globals::colorMedalAuthor; break;
-                            default: color = Globals::colorMedalNone;
-                        }
-                    UI::Text(color + Time::Format(record.time));
+                    if (Settings::myRecordsColPB) {
+                        UI::TableNextColumn();
+                        string color;
+                        if (Settings::medalColors)
+                            switch (record.medals) {
+                                case 1:  color = Globals::colorMedalBronze; break;
+                                case 2:  color = Globals::colorMedalSilver; break;
+                                case 3:  color = Globals::colorMedalGold;   break;
+                                case 4:  color = Globals::colorMedalAuthor; break;
+                                default: color = Globals::colorMedalNone;
+                            }
+                        UI::Text(color + Time::Format(record.time));
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(map is null ? "\\$888unknown" : Util::TimeFormatColored(record.mapAuthorDelta));
+                    if (Settings::myRecordsColDelta) {
+                        UI::TableNextColumn();
+                        UI::Text(map is null ? "\\$888unknown" : Util::TimeFormatColored(record.mapAuthorDelta));
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::UnixToIso(record.timestampUnix));
+                    if (Settings::myRecordsColTimestamp) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::UnixToIso(record.timestampUnix));
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::FormatSeconds(now - record.timestampUnix));
+                    if (Settings::myRecordsColRecency) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::FormatSeconds(now - record.timestampUnix));
+                    }
                 }
             }
 

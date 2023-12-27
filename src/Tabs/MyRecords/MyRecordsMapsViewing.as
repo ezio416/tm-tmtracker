@@ -1,5 +1,5 @@
 // c 2023-10-11
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Tabs { namespace MyRecords {
     void Tab_MyRecordsMapsViewing() {
@@ -105,17 +105,25 @@ namespace Tabs { namespace MyRecords {
                     startnew(CoroutineFunc(map.TmxCoro));
                 UI::EndDisabled();
 
-                if (UI::BeginTable("table_records", 7, UI::TableFlags::RowBg | UI::TableFlags::ScrollY)) {
+                int colCount = 1;
+                if (Settings::viewingMyRecordColBronze)    colCount++;
+                if (Settings::viewingMyRecordColSilver)    colCount++;
+                if (Settings::viewingMyRecordColGold)      colCount++;
+                if (Settings::viewingMyRecordColAT)        colCount++;
+                if (Settings::viewingMyRecordColTimestamp) colCount++;
+                if (Settings::viewingMyRecordColRecency)   colCount++;
+
+                if (UI::BeginTable("table_records", colCount, UI::TableFlags::RowBg | UI::TableFlags::ScrollY)) {
                     UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
                     UI::TableSetupScrollFreeze(0, 1);
-                    UI::TableSetupColumn("PB",                                                                UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                    UI::TableSetupColumn((Settings::medalColors ? Globals::colorMedalBronze : "") + "Bronze", UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                    UI::TableSetupColumn((Settings::medalColors ? Globals::colorMedalSilver : "") + "Silver", UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                    UI::TableSetupColumn((Settings::medalColors ? Globals::colorMedalGold   : "") + "Gold",   UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                    UI::TableSetupColumn((Settings::medalColors ? Globals::colorMedalAuthor : "") + "Author", UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
-                    UI::TableSetupColumn("Timestamp",                                                         UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
-                    UI::TableSetupColumn("Recency",                                                           UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
+                                                               UI::TableSetupColumn("PB",                                                                UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+                    if (Settings::viewingMyRecordColBronze)    UI::TableSetupColumn((Settings::medalColors ? Globals::colorMedalBronze : "") + "Bronze", UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+                    if (Settings::viewingMyRecordColSilver)    UI::TableSetupColumn((Settings::medalColors ? Globals::colorMedalSilver : "") + "Silver", UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+                    if (Settings::viewingMyRecordColGold)      UI::TableSetupColumn((Settings::medalColors ? Globals::colorMedalGold   : "") + "Gold",   UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+                    if (Settings::viewingMyRecordColAT)        UI::TableSetupColumn((Settings::medalColors ? Globals::colorMedalAuthor : "") + "Author", UI::TableColumnFlags::WidthFixed, Globals::scale * 80);
+                    if (Settings::viewingMyRecordColTimestamp) UI::TableSetupColumn("Timestamp",                                                         UI::TableColumnFlags::WidthFixed, Globals::scale * 180);
+                    if (Settings::viewingMyRecordColRecency)   UI::TableSetupColumn("Recency",                                                           UI::TableColumnFlags::WidthFixed, Globals::scale * 120);
                     UI::TableHeadersRow();
 
                     Models::Record@ record = cast<Models::Record@>(Globals::myRecordsDict[map.mapId]);
@@ -133,23 +141,35 @@ namespace Tabs { namespace MyRecords {
                         }
                     UI::Text(color + Time::Format(record.time));
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::TimeFormatColored(int(record.time) - int(map.bronzeTime)));
+                    if (Settings::viewingMyRecordColBronze) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::TimeFormatColored(int(record.time) - int(map.bronzeTime)));
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::TimeFormatColored(int(record.time) - int(map.silverTime)));
+                    if (Settings::viewingMyRecordColSilver) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::TimeFormatColored(int(record.time) - int(map.silverTime)));
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::TimeFormatColored(int(record.time) - int(map.goldTime)));
+                    if (Settings::viewingMyRecordColGold) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::TimeFormatColored(int(record.time) - int(map.goldTime)));
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::TimeFormatColored(int(record.time) - int(map.authorTime)));
+                    if (Settings::viewingMyRecordColAT) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::TimeFormatColored(int(record.time) - int(map.authorTime)));
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::UnixToIso(record.timestampUnix));
+                    if (Settings::viewingMyRecordColTimestamp) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::UnixToIso(record.timestampUnix));
+                    }
 
-                    UI::TableNextColumn();
-                    UI::Text(Util::FormatSeconds(now - record.timestampUnix));
+                    if (Settings::viewingMyRecordColRecency) {
+                        UI::TableNextColumn();
+                        UI::Text(Util::FormatSeconds(now - record.timestampUnix));
+                    }
 
                     UI::PopStyleColor();
                     UI::EndTable();

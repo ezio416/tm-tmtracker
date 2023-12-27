@@ -69,21 +69,24 @@ namespace Settings {
     [Setting category="My Maps" name="Show map search field"]
     bool myMapsSearch = true;
 
-    [Setting category="My Maps" name="Show map number"]
+    [Setting category="My Maps" name="Show column: map number"]
     bool myMapsListColNumber = true;
 
-    [Setting category="My Maps" name="Show number of records"]
+    [Setting category="My Maps" name="Show column: number of records"]
     bool myMapsListColRecords = true;
 
-    [Setting category="My Maps" name="Show latest record update time"]
+    [Setting category="My Maps" name="Show column: latest record update time"]
     bool myMapsListColRecordsTime = true;
 
-    [Setting category="My Maps" name="Show latest map upload time"]
+    [Setting category="My Maps" name="Show column: latest map upload time"]
     bool myMapsListColUpload = true;
 
 
     [Setting category="My Maps' Records" name="Show time estimate + help text"]
     bool recordsEstimate = true;
+
+    [Setting category="My Maps' Records" name="Notify when done getting records"]
+    bool myMapsRecordsNotify = true;
 
     [Setting category="My Maps' Records" name="Show map search field"]
     bool myMapsRecordsMapSearch = true;
@@ -91,8 +94,17 @@ namespace Settings {
     [Setting category="My Maps' Records" name="Show account search field"]
     bool myMapsRecordsAccountSearch = true;
 
-    [Setting category="My Maps' Records" name="Notify when done getting records"]
-    bool myMapsRecordsNotify = true;
+    [Setting category="My Maps' Records" name="Show column: position"]
+    bool myMapsRecordsColPos = true;
+
+    [Setting category="My Maps' Records" name="Show column: time"]
+    bool myMapsRecordsColTime = true;
+
+    [Setting category="My Maps' Records" name="Show column: timestamp"]
+    bool myMapsRecordsColTimestamp = true;
+
+    [Setting category="My Maps' Records" name="Show column: recency"]
+    bool myMapsRecordsColRecency = true;
 
 
     [Setting category="My Records" name="Show help text"]
@@ -103,6 +115,24 @@ namespace Settings {
 
     [Setting category="My Records" name="Show author search field"]
     bool myRecordsAuthorSearch = true;
+
+    [Setting category="My Records" name="Show column: author"]
+    bool myRecordsColAuthor = true;
+
+    [Setting category="My Records" name="Show column: author time"]
+    bool myRecordsColAT = true;
+
+    [Setting category="My Records" name="Show column: personal best"]
+    bool myRecordsColPB = true;
+
+    [Setting category="My Records" name="Show column: delta to author medal"]
+    bool myRecordsColDelta = true;
+
+    [Setting category="My Records" name="Show column: timestamp"]
+    bool myRecordsColTimestamp = true;
+
+    [Setting category="My Records" name="Show column: recency"]
+    bool myRecordsColRecency = true;
 
 
     [Setting category="Viewing Maps" name="Show help text"]
@@ -119,6 +149,36 @@ namespace Settings {
 
     [Setting category="Viewing Maps" name="Show map's last upload time"]
     bool viewingMapUploadTime = true;
+
+    [Setting category="Viewing Maps" name="(My maps) Show column: position"]
+    bool viewingMyMapColPos = true;
+
+    [Setting category="Viewing Maps" name="(My maps) Show column: time"]
+    bool viewingMyMapColTime = true;
+
+    [Setting category="Viewing Maps" name="(My maps) Show column: timestamp"]
+    bool viewingMyMapColTimestamp = true;
+
+    [Setting category="Viewing Maps" name="(My maps) Show column: recency"]
+    bool viewingMyMapColRecency = true;
+
+    [Setting category="Viewing Maps" name="(My records) Show column: delta to bronze medal"]
+    bool viewingMyRecordColBronze = true;
+
+    [Setting category="Viewing Maps" name="(My records) Show column: delta to silver medal"]
+    bool viewingMyRecordColSilver = true;
+
+    [Setting category="Viewing Maps" name="(My records) Show column: delta to gold medal"]
+    bool viewingMyRecordColGold = true;
+
+    [Setting category="Viewing Maps" name="(My records) Show column: delta to author medal"]
+    bool viewingMyRecordColAT = true;
+
+    [Setting category="Viewing Maps" name="(My records) Show column: timestamp"]
+    bool viewingMyRecordColTimestamp = true;
+
+    [Setting category="Viewing Maps" name="(My records) Show column: recency"]
+    bool viewingMyRecordColRecency = true;
 
 
     [Setting category="Logging" name="Log level" description="Debug clutters the log - only use if needed!"]
