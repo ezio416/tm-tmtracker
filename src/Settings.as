@@ -15,7 +15,13 @@ namespace Settings {
     [Setting category="General" name="Show welcome text"]
     bool welcomeText = true;
 
-    [Setting category="General" name="Show info tab"]
+    [Setting category="General" name="Show My Maps tab"]
+    bool myMapsTab = true;
+
+    [Setting category="General" name="Show My Records tab"]
+    bool myRecordsTab = true;
+
+    [Setting category="General" name="Show Info tab"]
     bool infoTab = true;
 
     [Setting category="General" name="Days to keep account names" min=0 max=30]
