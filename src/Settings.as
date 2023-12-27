@@ -106,6 +106,9 @@ namespace Settings {
     [Setting category="Viewing Maps" name="Thumbnail width" min=100 max=1000]
     uint viewingThumbWidth = uint(Globals::scale * 150);
 
+    [Setting category="Viewing Maps" name="Show map's last upload time"]
+    bool viewingMapUploadTime = true;
+
 
     [Setting category="My Records" name="Show help text"]
     bool myRecordsText = true;

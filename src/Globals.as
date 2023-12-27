@@ -15,6 +15,7 @@ namespace Globals {
     vec4              colorTableRowBgAlt      = vec4(0.0f, 0.0f, 0.0f, 0.5f);
     string            colorTop5;
     string            dateFormat              = "%Y-%m-%d \\$AAA@ \\$G%H:%M:%S \\$AAA(%a)\\$G";
+    string            dateFormatSplit         = "%Y-%m-%d \\$AAA@\n\\$G%H:%M:%S \\$AAA(%a)\\$G";
     bool              getAccountNames         = true;
     Json::Value@      hiddenMapsJson          = Json::Object();
     string            myAccountId;
