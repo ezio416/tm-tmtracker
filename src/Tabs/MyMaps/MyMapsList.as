@@ -12,7 +12,7 @@ namespace Tabs { namespace MyMaps {
 
         if (Settings::myMapsListText)
             UI::TextWrapped(
-                "Unfortunately, it's impossible to know the original upload date of any map." +
+                "Unfortunately, it's impossible to know the original upload date for basically any map." +
                 "\nIf you upload a map again or add it to a club campaign, the upload date changes, so keep that in mind." +
                 "\nClick on a map to add it to the \"Viewing Maps\" tab above."
             );
