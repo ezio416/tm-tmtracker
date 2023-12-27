@@ -71,6 +71,9 @@ namespace Tabs { namespace MyMaps {
                 UI::Text(map.mapNameText);
                 UI::PopTextWrapPos();
 
+                if (Settings::viewingMapUploadTime)
+                    UI::Text(Util::UnixToIso(Math::Max(map.uploadTimestamp, map.updateTimestamp), true));
+
                 UI::Text(Globals::colorMedalAuthor + Icons::Circle + " " + Time::Format(map.authorTime));
                 UI::Text(Globals::colorMedalGold   + Icons::Circle + " " + Time::Format(map.goldTime));
                 UI::Text(Globals::colorMedalSilver + Icons::Circle + " " + Time::Format(map.silverTime));

@@ -85,7 +85,7 @@ namespace Util {
         OpenBrowserURL("https://trackmania.io/#/player/" + accountId);
     }
 
-    string UnixToIso(uint timestamp) {
-        return Time::FormatString(Globals::dateFormat, timestamp);
+    string UnixToIso(uint timestamp, bool split = false) {
+        return Time::FormatString(split ? Globals::dateFormatSplit : Globals::dateFormat, timestamp);
     }
 }
