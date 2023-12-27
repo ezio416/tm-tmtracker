@@ -116,11 +116,11 @@ namespace Tabs { namespace MyMaps {
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
-            UI::TableSetupColumn("Pos",       fixed,       Globals::scale * 35);
-            UI::TableSetupColumn("Time",      fixed,       Globals::scale * 80);
-            UI::TableSetupColumn("Account",   fixedNoSort, Globals::scale * 150);
-            UI::TableSetupColumn("Timestamp", fixed,       Globals::scale * 180);
-            UI::TableSetupColumn("Recency",   fixed,       Globals::scale * 120);
+            UI::TableSetupColumn("Pos",       fixed,                                                            Globals::scale * 35);
+            UI::TableSetupColumn("Time",      fixed,                                                            Globals::scale * 80);
+            UI::TableSetupColumn("Account",   (Locks::accountNames || Locks::allRecords ? fixedNoSort : fixed), Globals::scale * 150);
+            UI::TableSetupColumn("Timestamp", fixed,                                                            Globals::scale * 180);
+            UI::TableSetupColumn("Recency",   fixed,                                                            Globals::scale * 120);
             UI::TableHeadersRow();
 
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
@@ -140,6 +140,16 @@ namespace Tabs { namespace MyMaps {
                             break;
                         case 2:  // time
                             Settings::myMapsRecordsSortMethod = ascending ? Sort::SortMethod::RecordsBestFirst : Sort::SortMethod::RecordsWorstFirst;
+                            break;
+                        case 3:  // account
+                            for (uint i = 0; i < records.Length; i++) {
+                                Models::Record@ record = records[i];
+                                if (record.accountName == "" && Globals::accounts.Length > 0 && Globals::accountsDict.Exists(record.accountId)) {
+                                    Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.accountId]);
+                                    record.accountName = account.accountName;
+                                }
+                            }
+                            Settings::myMapsRecordsSortMethod = ascending ? Sort::SortMethod::RecordsAccountsAlpha : Sort::SortMethod::RecordsAccountsAlphaRev;
                             break;
                         case 4:  // timestamp
                             Settings::myMapsRecordsSortMethod = ascending ? Sort::SortMethod::RecordsOldFirst : Sort::SortMethod::RecordsNewFirst;
