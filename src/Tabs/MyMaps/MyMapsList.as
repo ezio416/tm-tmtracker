@@ -4,6 +4,7 @@
 namespace Tabs { namespace MyMaps {
     string mapSearch;
     uint myMapsResults = 0;
+    bool showHidden = false;
 
     void Tab_MyMapsList() {
         if (!UI::BeginTabItem(Icons::ListUl + " Maps (" + Globals::shownMaps + ")###my-maps-list"))
@@ -23,13 +24,13 @@ namespace Tabs { namespace MyMaps {
 
         UI::SameLine();
         int hiddenMapCount = Globals::hiddenMapsJson.GetKeys().Length;
-        if (Globals::showHidden) {
+        if (showHidden) {
             if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + hiddenMapCount + ")"))
-                Globals::showHidden = false;
+                showHidden = false;
         } else {
             UI::BeginDisabled(Globals::myMaps.Length == 0);
             if (UI::Button(Icons::Eye + " Show Hidden (" + hiddenMapCount + ")"))
-                Globals::showHidden = true;
+                showHidden = true;
             UI::EndDisabled();
         }
 
@@ -61,7 +62,7 @@ namespace Tabs { namespace MyMaps {
         for (uint i = 0; i < Globals::myMapsSorted.Length; i++) {
             Models::Map@ map = Globals::myMapsSorted[i];
 
-            if (map is null || (map.hidden && !Globals::showHidden))
+            if (map is null || (map.hidden && !showHidden))
                 continue;
 
             if (mapSearchLower == "" || (mapSearchLower != "" && map.mapNameText.ToLower().Contains(mapSearchLower)))
