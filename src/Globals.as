@@ -99,9 +99,6 @@ namespace Globals {
             myMapsViewingMapId = map.mapId;
             myMapsViewingSet = true;
         }
-
-        // NOT WORKING???
-        // startnew(CoroutineFunc(map.SortRecordsCoro));
     }
 
     void AddMyRecordsMapViewing(Models::Map@ map) {

@@ -21,7 +21,7 @@ namespace Tabs {
 
                 UI::SameLine();
                 if (UI::Button(Icons::Download + " Get Names"))
-                    startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
+                    startnew(Bulk::GetAccountNamesCoro);
 
                 int64 now = Time::Stamp;
 
@@ -100,7 +100,7 @@ namespace Tabs {
 
                 UI::SameLine();
                 if (UI::Button(Icons::Download + " Get All"))
-                    startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
+                    startnew(Bulk::GetMyMapsRecordsCoro);
 
                 int flags =
                     UI::TableFlags::Resizable |
@@ -152,7 +152,7 @@ namespace Tabs {
 
             if (UI::BeginTabItem("database")) {
                 if (UI::Button("clear"))
-                    startnew(CoroutineFunc(Database::ClearCoro));
+                    startnew(Database::ClearCoro);
 
                 UI::EndTabItem();
             }

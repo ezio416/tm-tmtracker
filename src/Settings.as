@@ -27,6 +27,7 @@ namespace Settings {
     [Setting category="General" name="Max maps to get" description="0 (default) means all maps. If your game crashes, limit to about 500 (exact number unknown)."]
     uint maxMaps = 0;
 
+
     [Setting category="Startup" name="Refresh my map list"]
     bool refreshMaps = false;
 
@@ -62,10 +63,6 @@ namespace Settings {
     vec3 colorMedalNone = vec3(1.0f, 1.0f, 1.0f);
 
 
-    [Setting category="Logging" name="Log level" description="Debug clutters the log - only use if needed!"]
-    Log::Level logLevel = Log::Level::Normal;
-
-
     [Setting category="My Maps" name="Show help text"]
     bool myMapsListText = true;
 
@@ -98,6 +95,16 @@ namespace Settings {
     bool myMapsRecordsNotify = true;
 
 
+    [Setting category="My Records" name="Show help text"]
+    bool myRecordsText = true;
+
+    [Setting category="My Records" name="Show map search field"]
+    bool myRecordsMapSearch = true;
+
+    [Setting category="My Records" name="Show author search field"]
+    bool myRecordsAuthorSearch = true;
+
+
     [Setting category="Viewing Maps" name="Show help text"]
     bool viewingText = true;
 
@@ -114,14 +121,9 @@ namespace Settings {
     bool viewingMapUploadTime = true;
 
 
-    [Setting category="My Records" name="Show help text"]
-    bool myRecordsText = true;
+    [Setting category="Logging" name="Log level" description="Debug clutters the log - only use if needed!"]
+    Log::Level logLevel = Log::Level::Normal;
 
-    [Setting category="My Records" name="Show map search field"]
-    bool myRecordsMapSearch = true;
-
-    [Setting category="My Records" name="Show author search field"]
-    bool myRecordsAuthorSearch = true;
 
 #if SIG_DEVELOPER
     [Setting category="Dev" name="Show debug tab"]

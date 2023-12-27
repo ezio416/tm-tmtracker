@@ -1,5 +1,5 @@
 // c 2023-10-09
-// m 2023-10-11
+// m 2023-12-27
 
 namespace Tabs {
     void Tab_Test() {
@@ -7,7 +7,7 @@ namespace Tabs {
             return;
 
         if (UI::Button("get my records"))
-            startnew(CoroutineFunc(Test::GetMyRecordsCoro));
+            startnew(Test::GetMyRecordsCoro);
 
         UI::EndTabItem();
     }
@@ -40,7 +40,7 @@ namespace Test {
         for (uint i = 0; i < myRecords.Length; i++)
             mapIds.InsertLast(myRecords[i]["mapId"]);
 
-        startnew(CoroutineFunc(GetMapInfoCoro));
+        startnew(GetMapInfoCoro);
     }
 
     void GetMapInfoCoro() {

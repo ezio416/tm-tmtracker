@@ -1,5 +1,5 @@
 // c 2023-05-14
-// m 2023-12-26
+// m 2023-12-27
 
 void RenderMenu() {
     if (UI::MenuItem(Globals::title, "", Settings::windowOpen))
@@ -19,14 +19,14 @@ void Main() {
     IO::CreateFolder(Files::thumbnailFolder);
 
     if (Version::CheckFile()) {
-        startnew(CoroutineFunc(Database::LoadAccountsCoro));
+        startnew(Database::LoadAccountsCoro);
 
         Files::LoadHiddenMaps();
         Files::LoadRecordsTimestamps();
     }
 
     if (Settings::refreshMaps)
-        startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
+        startnew(Bulk::GetMyMapsCoro);
 }
 
 void RenderInterface() {

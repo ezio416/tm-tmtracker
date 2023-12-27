@@ -25,7 +25,7 @@ namespace Tabs { namespace MyMaps {
 
         UI::BeginDisabled(Locks::allRecords);
         if (UI::Button(Icons::Download + " Get My Maps' Records"))
-            startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
+            startnew(Bulk::GetMyMapsRecordsCoro);
         UI::EndDisabled();
 
         UI::BeginDisabled(!Locks::allRecords || Globals::cancelAllRecords);
