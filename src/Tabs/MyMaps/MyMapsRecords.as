@@ -126,10 +126,10 @@ namespace Tabs { namespace MyMaps {
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map");
             UI::TableSetupColumn("Pos",       fixed,                                                            Globals::scale * 35);
-            UI::TableSetupColumn("Time",      fixed,                                                            Globals::scale * 80);
+            UI::TableSetupColumn("Time",      fixed,                                                            Globals::scale * 75);
             UI::TableSetupColumn("Account",   (Locks::accountNames || Locks::allRecords ? fixedNoSort : fixed), Globals::scale * 150);
-            UI::TableSetupColumn("Timestamp", fixed,                                                            Globals::scale * 180);
-            UI::TableSetupColumn("Recency",   fixed,                                                            Globals::scale * 120);
+            UI::TableSetupColumn("Timestamp", fixed,                                                            Globals::scale * 185);
+            UI::TableSetupColumn("Recency",   fixed,                                                            Globals::scale * 125);
             UI::TableHeadersRow();
 
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
@@ -203,7 +203,7 @@ namespace Tabs { namespace MyMaps {
                     UI::Text(color + Time::Format(record.time));
 
                     UI::TableNextColumn();
-                    if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : account.accountId) + "##" + i, false))
+                    if (UI::Selectable((account.accountName.Length > 0 ? account.accountName : "\\$888" + account.accountId) + "##" + i, false))
                         Util::TmioPlayer(account.accountId);
 
                     UI::TableNextColumn();
