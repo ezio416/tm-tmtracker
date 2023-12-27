@@ -123,13 +123,11 @@ namespace Tabs { namespace MyRecords {
                 UI::TableColumnSortSpecs[]@ colSpecs = tableSpecs.Specs;
 
                 if (colSpecs !is null && colSpecs.Length > 0) {
+                    bool ascending = colSpecs[0].SortDirection == UI::SortDirection::Ascending;
+
                     switch (colSpecs[0].ColumnIndex) {
                         case 0:  // map
-                            switch (colSpecs[0].SortDirection) {
-                                case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsMapsAlpha;    break;
-                                case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsMapsAlphaRev; break;
-                                default:;
-                            }
+                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsMapsAlpha : Sort::SortMethod::RecordsMapsAlphaRev;
                             break;
                         case 1:  // author
                             for (uint i = 0; i < Globals::myRecords.Length; i++) {
@@ -139,46 +137,22 @@ namespace Tabs { namespace MyRecords {
                                     record.mapAuthorName = account.accountName;
                                 }
                             }
-                            switch (colSpecs[0].SortDirection) {
-                                case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsMapAuthorsAlpha;    break;
-                                case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsMapAuthorsAlphaRev; break;
-                                default:;
-                            }
+                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsMapAuthorsAlpha : Sort::SortMethod::RecordsMapAuthorsAlphaRev;
                             break;
                         case 2:  // AT
-                            switch (colSpecs[0].SortDirection) {
-                                case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsWorstAuthorFirst; break;
-                                case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsBestAuthorFirst;  break;
-                                default:;
-                            }
+                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsWorstAuthorFirst : Sort::SortMethod::RecordsBestAuthorFirst;
                             break;
                         case 3:  // PB
-                            switch (colSpecs[0].SortDirection) {
-                                case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsBestFirst;  break;
-                                case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsWorstFirst; break;
-                                default:;
-                            }
+                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsBestFirst : Sort::SortMethod::RecordsWorstFirst;
                             break;
                         case 4:  // delta
-                            switch (colSpecs[0].SortDirection) {
-                                case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsWorstDeltaFirst; break;
-                                case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsBestDeltaFirst;  break;
-                                default:;
-                            }
+                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsWorstDeltaFirst : Sort::SortMethod::RecordsBestDeltaFirst;
                             break;
                         case 5:  // timestamp
-                            switch (colSpecs[0].SortDirection) {
-                                case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsOldFirst; break;
-                                case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsNewFirst; break;
-                                default:;
-                            }
+                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsOldFirst : Sort::SortMethod::RecordsNewFirst;
                             break;
                         case 6:  // recency
-                            switch (colSpecs[0].SortDirection) {
-                                case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsNewFirst; break;
-                                case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsOldFirst; break;
-                                default:;
-                            }
+                            Settings::myRecordsSortMethod = ascending ? Sort::SortMethod::RecordsNewFirst : Sort::SortMethod::RecordsOldFirst;
                             break;
                         default:;
                     }

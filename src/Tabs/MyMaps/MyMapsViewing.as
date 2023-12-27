@@ -31,17 +31,17 @@ namespace Tabs { namespace MyMaps {
 
         UI::BeginTabBar("my-maps-viewing", barFlags);
 
+        int64 now = Time::Stamp;
+
         for (uint i = 0; i < Globals::myMapsViewing.Length; i++)
-            Tab_MyMapsViewingSingle(i);
+            Tab_MyMapsViewingSingle(now, i);
 
         UI::EndTabBar();
 
         UI::EndTabItem();
     }
 
-    void Tab_MyMapsViewingSingle(uint i) {
-        int64 now = Time::Stamp;
-
+    void Tab_MyMapsViewingSingle(int64 now, uint i) {
         Models::Map@ map = @Globals::myMapsViewing[i];
 
         int mapTabFlags = UI::TabItemFlags::Trailing;
@@ -147,34 +147,20 @@ namespace Tabs { namespace MyMaps {
                         UI::TableColumnSortSpecs[]@ colSpecs = tableSpecs.Specs;
 
                         if (colSpecs !is null && colSpecs.Length > 0) {
+                            bool ascending = colSpecs[0].SortDirection == UI::SortDirection::Ascending;
+
                             switch (colSpecs[0].ColumnIndex) {
                                 case 0:  // pos
-                                    switch (colSpecs[0].SortDirection) {
-                                        case UI::SortDirection::Ascending:  Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsWorstPosFirst; break;
-                                        case UI::SortDirection::Descending: Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsBestPosFirst;  break;
-                                        default:;
-                                    }
+                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsWorstPosFirst : Sort::SortMethod::RecordsBestPosFirst;
                                     break;
                                 case 1:  // time
-                                    switch (colSpecs[0].SortDirection) {
-                                        case UI::SortDirection::Ascending:  Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsBestFirst;  break;
-                                        case UI::SortDirection::Descending: Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsWorstFirst; break;
-                                        default:;
-                                    }
+                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsBestFirst : Sort::SortMethod::RecordsWorstFirst;
                                     break;
                                 case 3:  // timestamp
-                                    switch (colSpecs[0].SortDirection) {
-                                        case UI::SortDirection::Ascending:  Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsOldFirst; break;
-                                        case UI::SortDirection::Descending: Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsNewFirst; break;
-                                        default:;
-                                    }
+                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsOldFirst : Sort::SortMethod::RecordsNewFirst;
                                     break;
                                 case 4:  // recency
-                                    switch (colSpecs[0].SortDirection) {
-                                        case UI::SortDirection::Ascending:  Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsNewFirst; break;
-                                        case UI::SortDirection::Descending: Settings::myMapsViewingSortMethod = Sort::SortMethod::RecordsOldFirst; break;
-                                        default:;
-                                    }
+                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsNewFirst : Sort::SortMethod::RecordsOldFirst;
                                     break;
                                 default:;
                             }
