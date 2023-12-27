@@ -117,7 +117,12 @@ namespace Bulk {
         Locks::myMaps = false;
 
         startnew(Sort::Maps::MyMapsCoro);
-        startnew(Database::LoadRecordsCoro);
+
+        Meta::PluginCoroutine@ loadCoro = startnew(Database::LoadRecordsCoro);
+        while (loadCoro.IsRunning())
+            yield();
+
+        startnew(Database::SaveCoro);
     }
 
     void GetMyMapsRecordsCoro() {
