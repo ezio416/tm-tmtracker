@@ -55,7 +55,7 @@ namespace Tabs { namespace MyMaps {
 
             if (myMapsRecordsMapSearch != "") {
                 UI::SameLine();
-                if (UI::Button(Icons::Times + " Clear Search##maps"))
+                if (UI::Button(Icons::Times + " Clear Search##mapSearch"))
                     myMapsRecordsMapSearch = "";
             }
         } else

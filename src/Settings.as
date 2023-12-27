@@ -111,7 +111,10 @@ namespace Settings {
     bool myRecordsText = true;
 
     [Setting category="My Records" name="Show map search field"]
-    bool myRecordsSearch = true;
+    bool myRecordsMapSearch = true;
+
+    [Setting category="My Records" name="Show author search field"]
+    bool myRecordsAuthorSearch = true;
 
 #if SIG_DEVELOPER
     [Setting category="Dev" name="Show debug tab"]

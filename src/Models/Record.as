@@ -5,6 +5,8 @@ namespace Models { class Record {
     string accountId;
     string accountName;
     int    mapAuthorDelta = 0;
+    string mapAuthorId;
+    string mapAuthorName;
     uint   mapAuthorTime  = 0;
     string mapId;
     string mapNameColor;

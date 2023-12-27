@@ -269,6 +269,7 @@ namespace Bulk {
                     record.mapAuthorDelta = record.time - map.authorTime;
                     record.mapNameColor = map.mapNameColor;
                     record.mapNameText = map.mapNameText;
+                    record.mapAuthorId = map.authorId;
                 }
             }
         }

@@ -31,6 +31,28 @@ namespace Sort {
         return 0;
     }
 
+    int RecordsMapAuthorsAlpha(Models::Record@ r1, Models::Record@ r2) {
+        string t1 = r1.mapAuthorName.ToLower();
+        string t2 = r2.mapAuthorName.ToLower();
+
+        if (t1 < t2)
+            return -1;
+        if (t1 > t2)
+            return 1;
+        return 0;
+    }
+
+    int RecordsMapAuthorsAlphaRev(Models::Record@ r1, Models::Record@ r2) {
+        string t1 = r1.mapAuthorName.ToLower();
+        string t2 = r2.mapAuthorName.ToLower();
+
+        if (t1 < t2)
+            return 1;
+        if (t1 > t2)
+            return -1;
+        return 0;
+    }
+
     int RecordsBestPosFirst(Models::Record@ r1, Models::Record@ r2) {
         return Math::Clamp(r2.position - r1.position, -1, 1);
     }
@@ -74,6 +96,8 @@ namespace Sort {
     enum SortMethod {
         RecordsMapsAlpha,
         RecordsMapsAlphaRev,
+        RecordsMapAuthorsAlpha,
+        RecordsMapAuthorsAlphaRev,
         RecordsBestPosFirst,
         RecordsWorstPosFirst,
         RecordsBestAuthorFirst,
@@ -89,6 +113,8 @@ namespace Sort {
     RecordSortFunc@[] sortFunctions = {
         RecordsMapsAlpha,
         RecordsMapsAlphaRev,
+        RecordsMapAuthorsAlpha,
+        RecordsMapAuthorsAlphaRev,
         RecordsBestPosFirst,
         RecordsWorstPosFirst,
         RecordsBestAuthorFirst,
