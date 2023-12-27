@@ -3,6 +3,7 @@
 
 namespace Tabs { namespace MyMaps {
     string mapSearch;
+    uint myMapsResults = 0;
 
     void Tab_MyMapsList() {
         if (!UI::BeginTabItem(Icons::ListUl + " Maps (" + Globals::shownMaps + ")###my-maps-list"))
@@ -39,6 +40,9 @@ namespace Tabs { namespace MyMaps {
                 UI::SameLine();
                 if (UI::Button(Icons::Times + " Clear Search"))
                     mapSearch = "";
+
+                UI::SameLine();
+                UI::Text(myMapsResults + " results");
             }
         } else
             mapSearch = "";
@@ -63,6 +67,8 @@ namespace Tabs { namespace MyMaps {
             if (mapSearchLower == "" || (mapSearchLower != "" && map.mapNameText.ToLower().Contains(mapSearchLower)))
                 maps.InsertLast(map);
         }
+
+        myMapsResults = maps.Length;
 
         int colCount = 1;
         if (Settings::myMapsListColNumber)      colCount++;

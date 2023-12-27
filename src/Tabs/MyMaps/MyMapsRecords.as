@@ -1,9 +1,10 @@
 // c 2023-07-12
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Tabs { namespace MyMaps {
     string accountSearch;
     string myMapsRecordsMapSearch;
+    uint myMapsRecordsResults = 0;
 
     void Tab_MyMapsRecords() {
         if (!UI::BeginTabItem(Icons::Trophy + " Records (" + Globals::myMapsRecords.Length + ")###my-maps-records"))
@@ -57,6 +58,9 @@ namespace Tabs { namespace MyMaps {
                 UI::SameLine();
                 if (UI::Button(Icons::Times + " Clear Search##mapSearch"))
                     myMapsRecordsMapSearch = "";
+
+                UI::SameLine();
+                UI::Text(myMapsRecordsResults + " results");
             }
         } else
             myMapsRecordsMapSearch = "";
@@ -68,6 +72,9 @@ namespace Tabs { namespace MyMaps {
                 UI::SameLine();
                 if (UI::Button(Icons::Times + " Clear Search##accountSearch"))
                     accountSearch = "";
+
+                UI::SameLine();
+                UI::Text(myMapsRecordsResults + " results");
             }
         } else
             accountSearch = "";
@@ -102,6 +109,8 @@ namespace Tabs { namespace MyMaps {
                     records.InsertLast(record);
             }
         }
+
+        myMapsRecordsResults = records.Length;
 
         int flags = UI::TableFlags::RowBg |
                     UI::TableFlags::ScrollY |

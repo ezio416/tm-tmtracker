@@ -1,9 +1,10 @@
 // c 2023-10-11
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Tabs { namespace MyRecords {
     string authorSearch;
     string mapSearch;
+    uint myRecordsResults = 0;
 
     void Tab_MyRecordsList() {
         if (!UI::BeginTabItem(Icons::ListUl + " Records (" + Globals::myRecords.Length + ")###my-records-list"))
@@ -50,6 +51,9 @@ namespace Tabs { namespace MyRecords {
                 UI::SameLine();
                 if (UI::Button(Icons::Times + " Clear Search##mapSearch"))
                     mapSearch = "";
+
+                UI::SameLine();
+                UI::Text(myRecordsResults + " results");
             }
         } else
             mapSearch = "";
@@ -61,6 +65,9 @@ namespace Tabs { namespace MyRecords {
                 UI::SameLine();
                 if (UI::Button(Icons::Times + " Clear Search##authorSearch"))
                     authorSearch = "";
+
+                UI::SameLine();
+                UI::Text(myRecordsResults + " results");
             }
         } else
             authorSearch = "";
@@ -95,6 +102,8 @@ namespace Tabs { namespace MyRecords {
                     records.InsertLast(record);
             }
         }
+
+        myRecordsResults = records.Length;
 
         int flags = UI::TableFlags::RowBg |
                     UI::TableFlags::ScrollY |
