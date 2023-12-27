@@ -116,12 +116,11 @@ namespace Bulk {
         Log::TimerEnd(timerId);
         Locks::myMaps = false;
 
-        startnew(Sort::Maps::MyMapsCoro);
-
         Meta::PluginCoroutine@ loadCoro = startnew(Database::LoadRecordsCoro);
         while (loadCoro.IsRunning())
             yield();
 
+        startnew(Sort::Maps::MyMapsCoro);
         startnew(Database::SaveCoro);
     }
 
