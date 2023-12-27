@@ -1,5 +1,5 @@
 // c 2023-07-14
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Database {
     uint groupYieldAfter = 30;
@@ -215,7 +215,7 @@ namespace Database {
         Log::TimerEnd(timerId);
         Locks::db = false;
 
-        startnew(Sort::MyMapsRecordsCoro);
+        startnew(Sort::Records::MyMapsRecordsCoro);
     }
 
     void SaveCoro() {

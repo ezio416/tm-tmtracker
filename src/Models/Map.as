@@ -1,5 +1,5 @@
 // c 2023-05-16
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Models { class Map {
     string       authorId;
@@ -14,6 +14,7 @@ namespace Models { class Map {
     string       mapNameRaw;
     string       mapNameText;
     string       mapUid;
+    uint         number;
     Record@[]    records;
     dictionary   recordsDict;
     Record@[]    recordsSorted;
@@ -137,7 +138,7 @@ namespace Models { class Map {
         Globals::ClearMyMapRecords(this);
 
         do {
-            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 
@@ -190,7 +191,7 @@ namespace Models { class Map {
                 group.InsertLast(accountIds[i]);
             accountIds.RemoveRange(0, idsToAdd);
 
-            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 
@@ -344,12 +345,17 @@ namespace Models { class Map {
 
         recordsSorted = records;
 
-        Sort::sortLastYield = Time::Now;
+        Sort::Records::sortLastYield = Time::Now;
 
-        recordsSorted = Sort::QuickSortRecords(recordsSorted, Sort::sortFunctions[Settings::myMapsViewingSortMethod]);
+        recordsSorted = Sort::Records::QuickSort(recordsSorted, Sort::Records::sortFunctions[Settings::myMapsViewingSortMethod]);
 
         Log::TimerEnd(timerId);
         Locks::sortSingleRecords = false;
+
+        if (Sort::Records::allMaps) {
+            Sort::Records::dbSave = true;
+            startnew(Sort::Records::MyMapsRecordsCoro);
+        }
     }
 
     // courtesy of "Map Info" plugin - https://github.com/MisfitMaid/tm-map-info

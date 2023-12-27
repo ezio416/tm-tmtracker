@@ -1,5 +1,5 @@
 // c 2023-07-06
-// m 2023-12-26
+// m 2023-12-27
 
 namespace Bulk {
     string[] myRecordsMapIds;
@@ -104,12 +104,19 @@ namespace Bulk {
                 Log::Write(Log::Level::Debug, "tooManyMaps, getting more...");
         } while (tooManyMaps);
 
+        uint runningNumber = 1;
+        for (int i = Globals::myMaps.Length - 1; i >= 0; i--) {
+            Globals::myMaps[i].number = runningNumber;
+            runningNumber++;
+        }
+
         Log::Write(Log::Level::Debug, "number of maps gotten: " + Globals::myMaps.Length);
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);
         Locks::myMaps = false;
 
+        startnew(Sort::Maps::MyMapsCoro);
         startnew(Database::LoadRecordsCoro);
     }
 
@@ -124,10 +131,13 @@ namespace Bulk {
         Globals::getAccountNames = false;
         Globals::singleMapRecordStatus = false;
 
+        Sort::Records::allMaps = false;
+
         for (uint i = 0; i < Globals::myMaps.Length; i++) {
             Globals::status.Set(statusId, "getting my maps records... (" + (i + 1) + "/" + Globals::myMaps.Length + ")");
 
             Models::Map@ map = @Globals::myMaps[i];
+
             Meta::PluginCoroutine@ recordsCoro = startnew(CoroutineFunc(map.GetRecordsCoro));
             while (recordsCoro.IsRunning())
                 yield();
@@ -139,6 +149,8 @@ namespace Bulk {
             }
         }
 
+        Sort::Records::allMaps = true;
+
         Globals::getAccountNames = true;
         Globals::singleMapRecordStatus = true;
 
@@ -146,8 +158,8 @@ namespace Bulk {
         while (nameCoro.IsRunning())
             yield();
 
-        Sort::dbSave = true;
-        startnew(Sort::MyMapsRecordsCoro);
+        Sort::Records::dbSave = true;
+        startnew(Sort::Records::MyMapsRecordsCoro);
 
         Globals::recordsTimestampsJson["myMaps"] = Time::Stamp;
         Files::SaveRecordsTimestamps();
@@ -213,7 +225,7 @@ namespace Bulk {
         Log::TimerEnd(timerId);
         Locks::myRecords = false;
 
-        startnew(Sort::MyRecordsCoro);
+        startnew(Sort::Records::MyRecordsCoro);
         startnew(GetMyRecordsMapInfoCoro);
     }
 
