@@ -118,9 +118,9 @@ namespace Tabs { namespace MyMaps {
             UI::TableSetupColumn("Map");
             UI::TableSetupColumn("Pos",       fixed,       Globals::scale * 35);
             UI::TableSetupColumn("Time",      fixed,       Globals::scale * 80);
-            UI::TableSetupColumn("Name",      fixedNoSort, Globals::scale * 150);
+            UI::TableSetupColumn("Account",   fixedNoSort, Globals::scale * 150);
             UI::TableSetupColumn("Timestamp", fixed,       Globals::scale * 180);
-            UI::TableSetupColumn("Recency",   fixedNoSort, Globals::scale * 120);
+            UI::TableSetupColumn("Recency",   fixed,       Globals::scale * 120);
             UI::TableHeadersRow();
 
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
@@ -150,12 +150,17 @@ namespace Tabs { namespace MyMaps {
                                 default:;
                             }
                             break;
-                        case 3:  // name
-                            break;
                         case 4:  // timestamp
                             switch (colSpecs[0].SortDirection) {
                                 case UI::SortDirection::Ascending:  Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsOldFirst; break;
                                 case UI::SortDirection::Descending: Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsNewFirst; break;
+                                default:;
+                            }
+                            break;
+                        case 5:  // recency
+                            switch (colSpecs[0].SortDirection) {
+                                case UI::SortDirection::Ascending:  Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsNewFirst; break;
+                                case UI::SortDirection::Descending: Settings::myMapsRecordsSortMethod = Sort::SortMethod::RecordsOldFirst; break;
                                 default:;
                             }
                             break;

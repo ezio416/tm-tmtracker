@@ -92,7 +92,7 @@ namespace Tabs { namespace MyRecords {
             UI::TableSetupColumn("PB",           fixed,                                  Globals::scale * 80);
             UI::TableSetupColumn("\u0394 to AT", (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 80);
             UI::TableSetupColumn("Timestamp",    fixed,                                  Globals::scale * 180);
-            UI::TableSetupColumn("Recency",      fixedNoSort,                            Globals::scale * 120);
+            UI::TableSetupColumn("Recency",      fixed,                                  Globals::scale * 120);
             UI::TableHeadersRow();
 
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
@@ -137,10 +137,18 @@ namespace Tabs { namespace MyRecords {
                                 default:;
                             }
                             break;
+                        case 6:  // recency
+                            switch (colSpecs[0].SortDirection) {
+                                case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsNewFirst; break;
+                                case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsOldFirst; break;
+                                default:;
+                            }
+                            break;
                         default:;
                     }
 
-                    startnew(Sort::MyRecordsCoro);
+                    if (Globals::myRecords.Length > 0)
+                        startnew(Sort::MyRecordsCoro);
                 }
 
                 tableSpecs.Dirty = false;
