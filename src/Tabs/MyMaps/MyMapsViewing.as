@@ -134,11 +134,11 @@ namespace Tabs { namespace MyMaps {
                     int fixedNoSort = fixed | noSort;
 
                     UI::TableSetupScrollFreeze(0, 1);
-                    UI::TableSetupColumn("Pos",       fixed,       Globals::scale * 35);
-                    UI::TableSetupColumn("Time",      fixed,       Globals::scale * 80);
-                    UI::TableSetupColumn("Account",   fixedNoSort, Globals::scale * 120);
-                    UI::TableSetupColumn("Timestamp", fixed,       Globals::scale * 180);
-                    UI::TableSetupColumn("Recency",   fixed,       Globals::scale * 120);
+                    UI::TableSetupColumn("Pos",       fixed,                                                                                    Globals::scale * 35);
+                    UI::TableSetupColumn("Time",      fixedNoSort,                                                                              Globals::scale * 80);
+                    UI::TableSetupColumn("Account",   (Locks::accountNames || Locks::allRecords || Locks::singleRecords ? fixedNoSort : fixed), Globals::scale * 120);
+                    UI::TableSetupColumn("Timestamp", fixed,                                                                                    Globals::scale * 180);
+                    UI::TableSetupColumn("Recency",   fixed,                                                                                    Globals::scale * 120);
                     UI::TableHeadersRow();
 
                     UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
@@ -153,8 +153,15 @@ namespace Tabs { namespace MyMaps {
                                 case 0:  // pos
                                     Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsWorstPosFirst : Sort::SortMethod::RecordsBestPosFirst;
                                     break;
-                                case 1:  // time
-                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsBestFirst : Sort::SortMethod::RecordsWorstFirst;
+                                case 2:  // account
+                                    for (uint j = 0; j < map.records.Length; j++) {
+                                        Models::Record@ record = map.records[j];
+                                        if (record.accountName == "" && Globals::accounts.Length > 0 && Globals::accountsDict.Exists(record.accountId)) {
+                                            Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.accountId]);
+                                            record.accountName = account.accountName;
+                                        }
+                                    }
+                                    Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsAccountsAlpha : Sort::SortMethod::RecordsAccountsAlphaRev;
                                     break;
                                 case 3:  // timestamp
                                     Settings::myMapsViewingSortMethod = ascending ? Sort::SortMethod::RecordsOldFirst : Sort::SortMethod::RecordsNewFirst;
