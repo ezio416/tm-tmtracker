@@ -40,7 +40,6 @@ namespace Globals {
     Models::Record@[] myRecordsSorted;
     Json::Value@      recordsTimestampsJson   = Json::Object();
     float             scale                   = UI::GetScale();
-    bool              showHidden              = false;
     uint              shownMaps               = 0;
     bool              singleMapRecordStatus   = true;
     dictionary        status;
