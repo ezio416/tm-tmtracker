@@ -15,6 +15,15 @@ namespace Settings {
     [Setting category="General" name="Show welcome text"]
     bool welcomeText = true;
 
+    [Setting category="General" name="Days to keep account names" min=0 max=30]
+    uint accountNameValidDays = 7;
+
+    [Setting category="General" name="Max records to get per map" min=100 max=1000]
+    uint maxRecordsPerMap = 100;
+
+    [Setting category="General" name="Max recent maps to get" description="0 (default) means all maps. If your game crashes, limit to about 500 (exact number unknown)."]
+    uint maxMaps = 0;
+
     [Setting category="General" name="Show My Maps tab"]
     bool myMapsTab = true;
 
@@ -24,14 +33,10 @@ namespace Settings {
     [Setting category="General" name="Show Info tab"]
     bool infoTab = true;
 
-    [Setting category="General" name="Days to keep account names" min=0 max=30]
-    uint accountNameValidDays = 7;
-
-    [Setting category="General" name="Max records to get per map" min=100 max=1000]
-    uint maxRecordsPerMap = 100;
-
-    [Setting category="General" name="Max recent maps to get" description="0 (default) means all maps. If your game crashes, limit to about 500 (exact number unknown)."]
-    uint maxMaps = 0;
+#if SIG_DEVELOPER
+    [Setting category="General" name="Show Debug tab" description="Developer mode only"]
+    bool debugTab = false;
+#endif
 
 
     [Setting category="Startup" name="Refresh my map list"]
@@ -189,10 +194,4 @@ namespace Settings {
 
     [Setting category="Logging" name="Log level" description="Debug clutters the log - only use if needed!"]
     Log::Level logLevel = Log::Level::Normal;
-
-
-#if SIG_DEVELOPER
-    [Setting category="Dev" name="Show debug tab"]
-    bool debugTab = false;
-#endif
 }
