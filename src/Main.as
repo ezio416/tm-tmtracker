@@ -1,7 +1,5 @@
-/*
-c 2023-05-14
-m 2023-10-12
-*/
+// c 2023-05-14
+// m 2023-12-27
 
 void RenderMenu() {
     if (UI::MenuItem(Globals::title, "", Settings::windowOpen))
@@ -18,23 +16,17 @@ void Main() {
     NadeoServices::AddAudience(Globals::apiCore);
     NadeoServices::AddAudience(Globals::apiLive);
 
-    Zones::Load();
-
     IO::CreateFolder(Files::thumbnailFolder);
 
     if (Version::CheckFile()) {
-        startnew(CoroutineFunc(Database::LoadAccountsCoro));
+        startnew(Database::LoadAccountsCoro);
 
         Files::LoadHiddenMaps();
         Files::LoadRecordsTimestamps();
     }
 
     if (Settings::refreshMaps)
-        startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
-
-#if SIG_DEVELOPER
-    Globals::debugTab = true;
-#endif
+        startnew(Bulk::GetMyMapsCoro);
 }
 
 void RenderInterface() {
@@ -67,20 +59,30 @@ void RenderInterface() {
         }
 
         if (Settings::welcomeText)
-            UI::Text("Welcome to TMTracker! Check out these tabs to see what the plugin offers:");
+            UI::Text("Welcome to TMTracker!\nAll timestamps are shown in your local time.\nCheck out these tabs to see what the plugin offers:");
 
         UI::BeginTabBar("tabs");
-            Tabs::Tab_MyMaps();
-            Tabs::Tab_MyRecords();
+            if (Settings::myMapsTab)
+                Tabs::Tab_MyMaps();
+
+            if (Settings::myRecordsTab)
+                Tabs::Tab_MyRecords();
+
             if (Settings::infoTab)
                 Tabs::Tab_Info();
-            if (Globals::debugTab)
+
+#if SIG_DEVELOPER
+            if (Settings::debugTab)
                 Tabs::Tab_Debug();
-            // Tabs::Tab_Test();
+#endif
+
         UI::EndTabBar();
     UI::End();
 }
 
 void OnSettingsChanged() {
     Globals::SetColors();
+
+    if (Settings::maxMaps > 10000)
+        Settings::maxMaps = 10000;
 }

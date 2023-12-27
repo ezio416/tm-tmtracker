@@ -1,7 +1,5 @@
-/*
-c 2023-05-16
-m 2023-10-13
-*/
+// c 2023-05-16
+// m 2023-12-27
 
 namespace Models { class Map {
     string       authorId;
@@ -16,8 +14,10 @@ namespace Models { class Map {
     string       mapNameRaw;
     string       mapNameText;
     string       mapUid;
+    uint         number;
     Record@[]    records;
     dictionary   recordsDict;
+    Record@[]    recordsSorted;
     uint         recordsTimestamp;
     uint         silverTime;
     string       thumbnailFile;
@@ -138,7 +138,7 @@ namespace Models { class Map {
         Globals::ClearMyMapRecords(this);
 
         do {
-            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 
@@ -191,7 +191,7 @@ namespace Models { class Map {
                 group.InsertLast(accountIds[i]);
             accountIds.RemoveRange(0, idsToAdd);
 
-            Meta::PluginCoroutine@ waitCoro = startnew(CoroutineFunc(Util::NandoRequestWaitCoro));
+            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 
@@ -231,12 +231,14 @@ namespace Models { class Map {
         Globals::recordsTimestampsJson[mapId] = recordsTimestamp;
         Files::SaveRecordsTimestamps();
 
-        Meta::PluginCoroutine@ namesCoro = startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
+        Meta::PluginCoroutine@ namesCoro = startnew(Bulk::GetAccountNamesCoro);
         while (namesCoro.IsRunning())
             yield();
 
         if (Globals::singleMapRecordStatus)
             Globals::status.Delete(statusId);
+
+        startnew(CoroutineFunc(SortRecordsCoro));
 
         Log::TimerEnd(timerId);
         Locks::singleRecords = false;
@@ -331,6 +333,25 @@ namespace Models { class Map {
             yield();
 
         Locks::playMap = false;
+    }
+
+    void SortRecordsCoro() {
+        while (Locks::sortSingleRecords)
+            yield();
+        Locks::sortSingleRecords = true;
+        string timerId = Log::TimerBegin(logName + "sorting records");
+
+        Sort::Records::sortLastYield = Time::Now;
+
+        recordsSorted = Sort::Records::QuickSort(records, Sort::Records::sortFunctions[Settings::myMapsViewingSortMethod]);
+
+        Log::TimerEnd(timerId);
+        Locks::sortSingleRecords = false;
+
+        if (Sort::Records::allMaps) {
+            Sort::Records::dbSave = true;
+            startnew(Sort::Records::MyMapsRecordsCoro);
+        }
     }
 
     // courtesy of "Map Info" plugin - https://github.com/MisfitMaid/tm-map-info

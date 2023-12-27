@@ -1,7 +1,5 @@
-/*
-c 2023-05-26
-m 2023-10-12
-*/
+// c 2023-05-26
+// m 2023-12-27
 
 namespace Tabs {
     void Tab_Debug() {
@@ -10,7 +8,8 @@ namespace Tabs {
 
         UI::TextWrapped(
             "I take no responsibility if you break the plugin, your game, " +
-            "or get yourself banned in here. \\$DA2You've been warned."
+            "or get yourself banned in here. \\$DA2You've been warned." +
+            "\n\\$GThis tab is not kept up-to-date with plugin changes."
         );
 
         UI::Separator();
@@ -22,7 +21,7 @@ namespace Tabs {
 
                 UI::SameLine();
                 if (UI::Button(Icons::Download + " Get Names"))
-                    startnew(CoroutineFunc(Bulk::GetAccountNamesCoro));
+                    startnew(Bulk::GetAccountNamesCoro);
 
                 int64 now = Time::Stamp;
 
@@ -35,7 +34,6 @@ namespace Tabs {
                     UI::TableSetupColumn("ID");
                     UI::TableSetupColumn("Name");
                     UI::TableSetupColumn("NameValid");
-                    UI::TableSetupColumn("Zone");
                     UI::TableHeadersRow();
 
                     UI::ListClipper clipper(Globals::accounts.Length);
@@ -50,8 +48,6 @@ namespace Tabs {
                             UI::TableNextColumn();
                             int64 nameValid = account.nameExpire - now;
                             UI::Text("" + (nameValid > 0 ? nameValid : 0));
-                            UI::TableNextColumn();
-                            UI::Text(account.zoneName);
                         }
                     }
 
@@ -104,7 +100,7 @@ namespace Tabs {
 
                 UI::SameLine();
                 if (UI::Button(Icons::Download + " Get All"))
-                    startnew(CoroutineFunc(Bulk::GetMyMapsRecordsCoro));
+                    startnew(Bulk::GetMyMapsRecordsCoro);
 
                 int flags =
                     UI::TableFlags::Resizable |
@@ -156,7 +152,7 @@ namespace Tabs {
 
             if (UI::BeginTabItem("database")) {
                 if (UI::Button("clear"))
-                    startnew(CoroutineFunc(Database::ClearCoro));
+                    startnew(Database::ClearCoro);
 
                 UI::EndTabItem();
             }
@@ -172,8 +168,10 @@ namespace Tabs {
                 UI::Text((Locks::playMap           ? "\\$0F0" : "\\$F00") + "playMap");
                 UI::Text((Locks::requesting        ? "\\$0F0" : "\\$F00") + "requesting");
                 UI::Text((Locks::singleRecords     ? "\\$0F0" : "\\$F00") + "singleRecords");
+                UI::Text((Locks::sortMyMaps        ? "\\$0F0" : "\\$F00") + "sortMyMaps");
                 UI::Text((Locks::sortMyMapsRecords ? "\\$0F0" : "\\$F00") + "sortMyMapsRecords");
-                UI::Text((Locks::sortMyRecords     ? "\\$0F0" : "\\$F00") + "sortRecords");
+                UI::Text((Locks::sortMyRecords     ? "\\$0F0" : "\\$F00") + "sortMyRecords");
+                UI::Text((Locks::sortSingleRecords ? "\\$0F0" : "\\$F00") + "sortSingleRecords");
                 UI::Text((Locks::thumbs            ? "\\$0F0" : "\\$F00") + "thumbs");
                 UI::Text((Locks::tmx               ? "\\$0F0" : "\\$F00") + "tmx");
 

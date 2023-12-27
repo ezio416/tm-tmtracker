@@ -1,17 +1,11 @@
-/*
-c 2023-05-16
-m 2023-10-12
-*/
+// c 2023-05-16
+// m 2023-12-26
 
 namespace Models { class Account {
     string accountId;
     string accountName = "";
     int64  nameExpire  = 0;
     string zoneId;
-
-    string get_zoneName() {
-        return Zones::Get(zoneId);
-    }
 
     Account() { }
     Account(const string &in id) {
@@ -33,7 +27,7 @@ namespace Models { class Account {
     }
 
     string NameExpireFormatted() {
-        return IsNameExpired() ? "expired" : Time::FormatString(Globals::dateFormat + "Local\\$G", nameExpire);
+        return IsNameExpired() ? "expired" : Time::FormatString(Globals::dateFormat, nameExpire);
     }
 
     void SetNameExpire(uint64 now = 0, int64 timestamp = 0) {

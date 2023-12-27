@@ -1,44 +1,52 @@
-/*
-c 2023-05-26
-m 2023-10-12
-*/
+// c 2023-05-26
+// m 2023-12-27
 
 namespace Tabs { namespace MyMaps {
+    string mapSearch;
+    uint myMapsResults = 0;
+    bool showHidden = false;
+
     void Tab_MyMapsList() {
-        if (!UI::BeginTabItem(Icons::ListUl + " Map List (" + Globals::shownMaps + ")###my-maps-list"))
+        if (!UI::BeginTabItem(Icons::ListUl + " Maps (" + Globals::shownMaps + ")###my-maps-list"))
             return;
 
         if (Settings::myMapsListText)
             UI::TextWrapped(
-                "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
-                "\nIf you upload a map again or add it to a club campaign, it's moved to the top of the list." +
+                "Unfortunately, it's impossible to know the original upload date for basically any map." +
+                "\nIf you upload a map again or add it to a club campaign, the upload date changes, so keep that in mind." +
                 "\nClick on a map to add it to the \"Viewing Maps\" tab above."
             );
 
         UI::BeginDisabled(Locks::myMaps);
         if (UI::Button(Icons::Refresh + " Refresh Maps"))
-            startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
+            startnew(Bulk::GetMyMapsCoro);
         UI::EndDisabled();
 
         UI::SameLine();
         int hiddenMapCount = Globals::hiddenMapsJson.GetKeys().Length;
-        if (Globals::showHidden) {
+        if (showHidden) {
             if (UI::Button(Icons::EyeSlash + " Hide Hidden (" + hiddenMapCount + ")"))
-                Globals::showHidden = false;
+                showHidden = false;
         } else {
             UI::BeginDisabled(Globals::myMaps.Length == 0);
             if (UI::Button(Icons::Eye + " Show Hidden (" + hiddenMapCount + ")"))
-                Globals::showHidden = true;
+                showHidden = true;
             UI::EndDisabled();
         }
 
-        Globals::myMapsSearch = UI::InputText("search maps", Globals::myMapsSearch, false);
+        if (Settings::myMapsSearch) {
+            mapSearch = UI::InputText("search maps", mapSearch, false);
 
-        if (Globals::myMapsSearch != "") {
-            UI::SameLine();
-            if (UI::Button(Icons::Times + " Clear Search"))
-                Globals::myMapsSearch = "";
-        }
+            if (mapSearch != "") {
+                UI::SameLine();
+                if (UI::Button(Icons::Times + " Clear Search"))
+                    mapSearch = "";
+
+                UI::SameLine();
+                UI::Text(myMapsResults + " results");
+            }
+        } else
+            mapSearch = "";
 
         Table_MyMapsList();
 
@@ -49,37 +57,87 @@ namespace Tabs { namespace MyMaps {
         int64 now = Time::Stamp;
         Models::Map@[] maps;
 
-        for (uint i = 0; i < Globals::myMaps.Length; i++) {
-            Models::Map@ map = @Globals::myMaps[i];
+        string mapSearchLower = mapSearch.ToLower();
 
-            if (map is null || (map.hidden && !Globals::showHidden))
+        for (uint i = 0; i < Globals::myMapsSorted.Length; i++) {
+            Models::Map@ map = Globals::myMapsSorted[i];
+
+            if (map is null || (map.hidden && !showHidden))
                 continue;
 
-            if (map.mapNameText.ToLower().Contains(Globals::myMapsSearch.ToLower()))
+            if (mapSearchLower == "" || (mapSearchLower != "" && map.mapNameText.ToLower().Contains(mapSearchLower)))
                 maps.InsertLast(map);
         }
 
+        myMapsResults = maps.Length;
+
         int colCount = 1;
+        if (Settings::myMapsListColNumber)      colCount++;
         if (Settings::myMapsListColRecords)     colCount++;
         if (Settings::myMapsListColRecordsTime) colCount++;
         if (Settings::myMapsListColUpload)      colCount++;
 
-        int flags = UI::TableFlags::Resizable |
-                    UI::TableFlags::RowBg |
-                    UI::TableFlags::ScrollY;
+        int flags = UI::TableFlags::RowBg |
+                    UI::TableFlags::ScrollY |
+                    UI::TableFlags::Sortable;
 
         if (UI::BeginTable("my-maps-table", colCount, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
+            int fixed = UI::TableColumnFlags::WidthFixed;
+
             UI::TableSetupScrollFreeze(0, 1);
-            UI::TableSetupColumn("Name");
-            if (Settings::myMapsListColRecords)
-                UI::TableSetupColumn("# of Records");
-            if (Settings::myMapsListColRecordsTime)
-                UI::TableSetupColumn("Records Recency");
-            if (Settings::myMapsListColUpload)
-                UI::TableSetupColumn("Latest Upload");
+            if (Settings::myMapsListColNumber)      UI::TableSetupColumn("#",               fixed, Globals::scale * 35);
+                                                    UI::TableSetupColumn("Name");
+            if (Settings::myMapsListColRecords)     UI::TableSetupColumn("Records",         fixed, Globals::scale * 65);
+            if (Settings::myMapsListColRecordsTime) UI::TableSetupColumn("Records Recency", fixed, Globals::scale * 125);
+            if (Settings::myMapsListColUpload)      UI::TableSetupColumn("Latest Upload",   fixed, Globals::scale * 185);
             UI::TableHeadersRow();
+
+            UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
+
+            if (tableSpecs !is null && tableSpecs.Dirty) {
+                UI::TableColumnSortSpecs[]@ colSpecs = tableSpecs.Specs;
+
+                if (colSpecs !is null && colSpecs.Length > 0) {
+                    bool ascending = colSpecs[0].SortDirection == UI::SortDirection::Ascending;
+
+                    int colName = 0;
+                    int colRecords = 1;
+                    int colRecency = 1;
+                    int colUpload = 1;
+
+                    if (Settings::myMapsListColNumber) {
+                        colName++;
+                        colRecords++;
+                        colRecency++;
+                        colUpload++;
+                    }
+
+                    if (Settings::myMapsListColRecords) {
+                        colRecency++;
+                        colUpload++;
+                    }
+
+                    if (Settings::myMapsListColRecordsTime)
+                        colUpload++;
+
+                    if (Settings::myMapsListColNumber && colSpecs[0].ColumnIndex == 0)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LowestFirst : Sort::Maps::SortMethod::HighestFirst;
+                    else if (colSpecs[0].ColumnIndex == colName)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::NameAlpha : Sort::Maps::SortMethod::NameAlphaRev;
+                    else if (Settings::myMapsListColRecords && colSpecs[0].ColumnIndex == colRecords)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LeastRecordsFirst : Sort::Maps::SortMethod::MostRecordsFirst;
+                    else if (Settings::myMapsListColRecordsTime && colSpecs[0].ColumnIndex == colRecency)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::LatestRecordsRecencyFirst : Sort::Maps::SortMethod::EarliestRecordsRecencyFirst;
+                    else if (Settings::myMapsListColUpload && colSpecs[0].ColumnIndex == colUpload)
+                        Settings::myMapsSortMethod = ascending ? Sort::Maps::SortMethod::EarliestUploadFirst : Sort::Maps::SortMethod::LatestUploadFirst;
+
+                    startnew(Sort::Maps::MyMapsCoro);
+                }
+
+                tableSpecs.Dirty = false;
+            }
 
             UI::ListClipper clipper(maps.Length);
             while (clipper.Step()) {
@@ -87,6 +145,12 @@ namespace Tabs { namespace MyMaps {
                     Models::Map@ map = maps[i];
 
                     UI::TableNextRow();
+
+                    if (Settings::myMapsListColNumber) {
+                        UI::TableNextColumn();
+                        UI::Text(tostring(map.number));
+                    }
+
                     UI::TableNextColumn();
                     if (UI::Selectable((Settings::mapNameColors ? map.mapNameColor : map.mapNameText) + "##" + map.mapUid, false, UI::SelectableFlags::SpanAllColumns))
                         Globals::AddMyMapViewing(map);

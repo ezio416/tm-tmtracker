@@ -1,26 +1,25 @@
-/*
-c 2023-05-16
-m 2023-10-11
-*/
+// c 2023-05-16
+// m 2023-12-26
 
 namespace Models { class Record {
     string accountId;
+    string accountName;
+    int    mapAuthorDelta = 0;
+    string mapAuthorId;
+    string mapAuthorName;
+    uint   mapAuthorTime  = 0;
     string mapId;
     string mapNameColor;
     string mapNameText;
     string mapUid;
-    uint   medals       = 0;
+    uint   medals         = 0;
     uint   position;
     string recordFakeId;
     string recordId;
     uint   time;
-    string timestampIso = "";
+    string timestampIso;
     int64  timestampUnix;
     string zoneId;
-
-    string get_zoneName() {
-        return Zones::Get(zoneId);
-    }
 
     Record() { }
     Record(Json::Value@ record) {
