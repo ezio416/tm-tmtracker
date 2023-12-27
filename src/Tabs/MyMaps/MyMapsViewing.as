@@ -42,7 +42,7 @@ namespace Tabs { namespace MyMaps {
     }
 
     void Tab_MyMapsViewingSingle(int64 now, uint i) {
-        Models::Map@ map = @Globals::myMapsViewing[i];
+        Models::Map@ map = Globals::myMapsViewing[i];
 
         int mapTabFlags = UI::TabItemFlags::Trailing;
         if (Globals::myMapsViewingMapId == map.mapId) {
