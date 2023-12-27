@@ -18,7 +18,7 @@ namespace Tabs { namespace MyRecords {
 
         UI::BeginDisabled(Locks::myRecords || Locks::mapInfo);
         if (UI::Button(Icons::Download + " Get My Records"))
-            startnew(CoroutineFunc(Bulk::GetMyRecordsCoro));
+            startnew(Bulk::GetMyRecordsCoro);
         UI::EndDisabled();
 
         int64 now = Time::Stamp;

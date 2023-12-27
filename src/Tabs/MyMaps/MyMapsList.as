@@ -19,7 +19,7 @@ namespace Tabs { namespace MyMaps {
 
         UI::BeginDisabled(Locks::myMaps);
         if (UI::Button(Icons::Refresh + " Refresh Maps"))
-            startnew(CoroutineFunc(Bulk::GetMyMapsCoro));
+            startnew(Bulk::GetMyMapsCoro);
         UI::EndDisabled();
 
         UI::SameLine();
