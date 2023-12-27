@@ -1,9 +1,9 @@
 // c 2023-10-09
-// m 2023-10-11
+// m 2023-12-27
 
 namespace Tabs {
     void Tab_MyRecords() {
-        if (!UI::BeginTabItem(Icons::Trophy + " My Records"))
+        if (!Settings::myRecordsTab || !UI::BeginTabItem(Icons::Trophy + " My Records"))
             return;
 
         UI::BeginTabBar("MyRecordsTabs");
