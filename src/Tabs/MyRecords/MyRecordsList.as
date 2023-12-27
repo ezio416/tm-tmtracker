@@ -2,6 +2,7 @@
 // m 2023-12-26
 
 namespace Tabs { namespace MyRecords {
+    string authorSearch;
     string mapSearch;
 
     void Tab_MyRecordsList() {
@@ -42,16 +43,27 @@ namespace Tabs { namespace MyRecords {
             ));
         }
 
-        if (Settings::myRecordsSearch) {
+        if (Settings::myRecordsMapSearch) {
             mapSearch = UI::InputText("search maps", mapSearch, false);
 
             if (mapSearch != "") {
                 UI::SameLine();
-                if (UI::Button(Icons::Times + " Clear Search"))
+                if (UI::Button(Icons::Times + " Clear Search##mapSearch"))
                     mapSearch = "";
             }
         } else
             mapSearch = "";
+
+        if (Settings::myRecordsAuthorSearch) {
+            authorSearch = UI::InputText("search authors", authorSearch, false);
+
+            if (authorSearch != "") {
+                UI::SameLine();
+                if (UI::Button(Icons::Times + " Clear Search##authorSearch"))
+                    authorSearch = "";
+            }
+        } else
+            authorSearch = "";
 
         Table_MyRecordsList(now);
 
@@ -61,15 +73,25 @@ namespace Tabs { namespace MyRecords {
     void Table_MyRecordsList(int64 now) {
         Models::Record@[] records;
 
-        if (mapSearch == "")
+        if (mapSearch == "" && authorSearch == "")
             records = Globals::myRecordsSorted;
         else {
             string mapSearchLower = mapSearch.ToLower();
+            string authorSearchLower = authorSearch.ToLower();
 
             for (uint i = 0; i < Globals::myRecordsSorted.Length; i++) {
                 Models::Record@ record = Globals::myRecordsSorted[i];
 
-                if (record.mapNameText.ToLower().Contains(mapSearchLower))
+                Models::Account@ account;
+                if (record.mapAuthorName == "" && Globals::accounts.Length > 0 && Globals::accountsDict.Exists(record.mapAuthorId)) {
+                    @account = cast<Models::Account@>(Globals::accountsDict[record.mapAuthorId]);
+                    record.mapAuthorName = account.accountName;
+                }
+
+                if (
+                    (mapSearchLower == "" || (mapSearchLower != "" && record.mapNameText.ToLower().Contains(mapSearchLower))) &&
+                    (authorSearchLower == "" || (authorSearchLower != "" && record.mapAuthorName.ToLower().Contains(authorSearchLower)))
+                )
                     records.InsertLast(record);
             }
         }
@@ -87,7 +109,7 @@ namespace Tabs { namespace MyRecords {
 
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map",          (Locks::mapInfo ? noSort : 0));
-            UI::TableSetupColumn("Author",       fixedNoSort,                            Globals::scale * 120);
+            UI::TableSetupColumn("Author",       (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 120);
             UI::TableSetupColumn("AT",           (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 80);
             UI::TableSetupColumn("PB",           fixed,                                  Globals::scale * 80);
             UI::TableSetupColumn("\u0394 to AT", (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 80);
@@ -106,6 +128,20 @@ namespace Tabs { namespace MyRecords {
                             switch (colSpecs[0].SortDirection) {
                                 case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsMapsAlpha;    break;
                                 case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsMapsAlphaRev; break;
+                                default:;
+                            }
+                            break;
+                        case 1:  // author
+                            for (uint i = 0; i < Globals::myRecords.Length; i++) {
+                                Models::Record@ record = @Globals::myRecords[i];
+                                if (record.mapAuthorName == "" && Globals::accounts.Length > 0 && Globals::accountsDict.Exists(record.mapAuthorId)) {
+                                    Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[record.mapAuthorId]);
+                                    record.mapAuthorName = account.accountName;
+                                }
+                            }
+                            switch (colSpecs[0].SortDirection) {
+                                case UI::SortDirection::Ascending:  Settings::myRecordsSortMethod = Sort::SortMethod::RecordsMapAuthorsAlpha;    break;
+                                case UI::SortDirection::Descending: Settings::myRecordsSortMethod = Sort::SortMethod::RecordsMapAuthorsAlphaRev; break;
                                 default:;
                             }
                             break;
