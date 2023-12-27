@@ -12,7 +12,7 @@ namespace Tabs { namespace MyRecords {
 
         if (Settings::myRecordsText)
             UI::TextWrapped(
-                "This tab shows records you've driven on any map, sorted by when you drove them." +
+                "This tab shows records you've driven on any map." +
                 "\nClick on a record to add it to the \"Viewing Maps\" tab above."
             );
 
@@ -119,11 +119,11 @@ namespace Tabs { namespace MyRecords {
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Map",          (Locks::mapInfo ? noSort : 0));
             UI::TableSetupColumn("Author",       (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 120);
-            UI::TableSetupColumn("AT",           (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 80);
-            UI::TableSetupColumn("PB",           fixed,                                  Globals::scale * 80);
-            UI::TableSetupColumn("\u0394 to AT", (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 80);
-            UI::TableSetupColumn("Timestamp",    fixed,                                  Globals::scale * 180);
-            UI::TableSetupColumn("Recency",      fixed,                                  Globals::scale * 120);
+            UI::TableSetupColumn("AT",           (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 75);
+            UI::TableSetupColumn("PB",           fixed,                                  Globals::scale * 75);
+            UI::TableSetupColumn("\u0394 to AT", (Locks::mapInfo ? fixedNoSort : fixed), Globals::scale * 75);
+            UI::TableSetupColumn("Timestamp",    fixed,                                  Globals::scale * 185);
+            UI::TableSetupColumn("Recency",      fixed,                                  Globals::scale * 125);
             UI::TableHeadersRow();
 
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
@@ -186,17 +186,17 @@ namespace Tabs { namespace MyRecords {
                         if (UI::Selectable((Settings::mapNameColors ? map.mapNameColor : map.mapNameText), false, UI::SelectableFlags::SpanAllColumns))
                             Globals::AddMyRecordsMapViewing(map);
                     } else
-                        UI::Text(record.mapId);
+                        UI::Text("\\$888" + record.mapId);
 
                     UI::TableNextColumn();
                     if (map !is null && Globals::accountsDict.Exists(map.authorId)) {
                         Models::Account@ account = cast<Models::Account@>(Globals::accountsDict[map.authorId]);
-                        UI::Text(account.accountName == "" ? account.accountId : account.accountName);
+                        UI::Text(account.accountName == "" ? ("\\$888" + account.accountId) : account.accountName);
                     } else
-                        UI::Text("unknown");
+                        UI::Text("\\$888unknown");
 
                     UI::TableNextColumn();
-                    UI::Text(map is null ? "unknown" : Globals::colorMedalAuthor + Time::Format(record.mapAuthorTime));
+                    UI::Text(map is null ? "\\$888unknown" : Globals::colorMedalAuthor + Time::Format(record.mapAuthorTime));
 
                     UI::TableNextColumn();
                     string color;
@@ -211,7 +211,7 @@ namespace Tabs { namespace MyRecords {
                     UI::Text(color + Time::Format(record.time));
 
                     UI::TableNextColumn();
-                    UI::Text(map is null ? "unknown" : Util::TimeFormatColored(record.mapAuthorDelta));
+                    UI::Text(map is null ? "\\$888unknown" : Util::TimeFormatColored(record.mapAuthorDelta));
 
                     UI::TableNextColumn();
                     UI::Text(Util::UnixToIso(record.timestampUnix));

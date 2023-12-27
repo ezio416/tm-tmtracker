@@ -8,7 +8,8 @@ namespace Tabs {
 
         UI::TextWrapped(
             "I take no responsibility if you break the plugin, your game, " +
-            "or get yourself banned in here. \\$DA2You've been warned."
+            "or get yourself banned in here. \\$DA2You've been warned." +
+            "\n\\$GThis tab is not kept up-to-date with plugin changes."
         );
 
         UI::Separator();

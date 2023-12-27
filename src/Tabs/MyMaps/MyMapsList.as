@@ -11,8 +11,8 @@ namespace Tabs { namespace MyMaps {
 
         if (Settings::myMapsListText)
             UI::TextWrapped(
-                "Map upload times are unreliable, so the order is just how they come from Nadeo (roughly newest-oldest)." +
-                "\nIf you upload a map again or add it to a club campaign, it's moved to the top of the list." +
+                "Unfortunately, it's impossible to know the original upload date of any map." +
+                "\nIf you upload a map again or add it to a club campaign, the upload date changes, so keep that in mind." +
                 "\nClick on a map to add it to the \"Viewing Maps\" tab above."
             );
 
@@ -83,12 +83,14 @@ namespace Tabs { namespace MyMaps {
         if (UI::BeginTable("my-maps-table", colCount, flags)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, Globals::colorTableRowBgAlt);
 
+            int fixed = UI::TableColumnFlags::WidthFixed;
+
             UI::TableSetupScrollFreeze(0, 1);
-            if (Settings::myMapsListColNumber)      UI::TableSetupColumn("#",       UI::TableColumnFlags::WidthFixed, Globals::scale * 35);
+            if (Settings::myMapsListColNumber)      UI::TableSetupColumn("#",               fixed, Globals::scale * 35);
                                                     UI::TableSetupColumn("Name");
-            if (Settings::myMapsListColRecords)     UI::TableSetupColumn("Records", UI::TableColumnFlags::WidthFixed, Globals::scale * 65);
-            if (Settings::myMapsListColRecordsTime) UI::TableSetupColumn("Records Recency");
-            if (Settings::myMapsListColUpload)      UI::TableSetupColumn("Latest Upload");
+            if (Settings::myMapsListColRecords)     UI::TableSetupColumn("Records",         fixed, Globals::scale * 65);
+            if (Settings::myMapsListColRecordsTime) UI::TableSetupColumn("Records Recency", fixed, Globals::scale * 125);
+            if (Settings::myMapsListColUpload)      UI::TableSetupColumn("Latest Upload",   fixed, Globals::scale * 185);
             UI::TableHeadersRow();
 
             UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
