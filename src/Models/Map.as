@@ -1,5 +1,5 @@
 // c 2023-05-16
-// m 2023-12-27
+// m 2024-01-08
 
 namespace Models { class Map {
     string       authorId;
@@ -313,7 +313,7 @@ namespace Models { class Map {
         Log::Write(Log::Level::Normal, logName + "loading map for playing");
 
         if (!Permissions::PlayLocalMap()) {
-            Util::NotifyError("Paid access required - can't load map " + mapNameText);
+            Util::NotifyError("Club access required - can't load map " + mapNameText);
             Locks::playMap = false;
             return;
         }
