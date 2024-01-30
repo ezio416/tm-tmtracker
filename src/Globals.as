@@ -1,49 +1,49 @@
 // c 2023-05-16
-// m 2023-12-27
+// m 2024-01-19
 
 namespace Globals {
     Models::Account[] accounts;
-    dictionary        accountsDict;
-    string            apiCore                 = "NadeoServices";
-    string            apiLive                 = "NadeoLiveServices";
-    bool              cancelAllRecords        = false;
+    dictionary@       accountsDict             = dictionary();
+    string            apiCore                  = "NadeoServices";
+    string            apiLive                  = "NadeoLiveServices";
+    bool              cancelAllRecords         = false;
     string            colorMedalAuthor;
     string            colorMedalBronze;
     string            colorMedalGold;
     string            colorMedalNone;
     string            colorMedalSilver;
-    vec4              colorTableRowBgAlt      = vec4(0.0f, 0.0f, 0.0f, 0.5f);
+    vec4              colorTableRowBgAlt       = vec4(0.0f, 0.0f, 0.0f, 0.5f);
     string            colorTop5;
-    string            dateFormat              = "%Y-%m-%d \\$AAA@ \\$G%H:%M:%S \\$AAA(%a)\\$G";
-    string            dateFormatSplit         = "%Y-%m-%d \\$AAA@\n\\$G%H:%M:%S \\$AAA(%a)\\$G";
-    bool              getAccountNames         = true;
-    Json::Value@      hiddenMapsJson          = Json::Object();
+    string            dateFormat               = "%Y-%m-%d \\$AAA@ \\$G%H:%M:%S \\$AAA(%a)\\$G";
+    string            dateFormatSplit          = "%Y-%m-%d \\$AAA@\n\\$G%H:%M:%S \\$AAA(%a)\\$G";
+    bool              getAccountNames          = true;
+    Json::Value@      hiddenMapsJson           = Json::Object();
     string            myAccountId;
     Models::Map[]     myMaps;
-    dictionary        myMapsDict;
+    dictionary@       myMapsDict               = dictionary();
     Models::Record[]  myMapsRecords;
-    dictionary        myMapsRecordsDict;
+    dictionary@       myMapsRecordsDict        = dictionary();
     Models::Record@[] myMapsRecordsSorted;
     Models::Map@[]    myMapsSorted;
     Models::Map@[]    myMapsViewing;
-    dictionary        myMapsViewingDict;
+    dictionary@       myMapsViewingDict        = dictionary();
     string            myMapsViewingMapId;
-    bool              myMapsViewingSet        = false;
+    bool              myMapsViewingSet         = false;
     Models::Record[]  myRecords;
-    dictionary        myRecordsDict;
+    dictionary@       myRecordsDict            = dictionary();
     Models::Map[]     myRecordsMaps;
-    dictionary        myRecordsMapsDict;
+    dictionary@       myRecordsMapsDict        = dictionary();
     Models::Map@[]    myRecordsMapsViewing;
-    dictionary        myRecordsMapsViewingDict;
+    dictionary@       myRecordsMapsViewingDict = dictionary();
     string            myRecordsMapsViewingMapId;
-    bool              myRecordsMapsViewingSet = false;
+    bool              myRecordsMapsViewingSet  = false;
     Models::Record@[] myRecordsSorted;
-    Json::Value@      recordsTimestampsJson   = Json::Object();
-    float             scale                   = UI::GetScale();
-    uint              shownMaps               = 0;
-    bool              singleMapRecordStatus   = true;
-    dictionary        status;
-    string            title                   = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
+    Json::Value@      recordsTimestampsJson    = Json::Object();
+    float             scale                    = UI::GetScale();
+    uint              shownMaps                = 0;
+    bool              singleMapRecordStatus    = true;
+    dictionary@       status                   = dictionary();
+    string            title                    = "\\$2F3" + Icons::MapO + "\\$G TMTracker";
 
     void AddAccount(Models::Account account) {
         if (accountsDict.Exists(account.accountId))

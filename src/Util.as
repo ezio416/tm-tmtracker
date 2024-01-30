@@ -1,9 +1,9 @@
 // c 2023-05-20
-// m 2023-12-26
+// m 2024-01-19
 
 namespace Util {
-    uint64 latestNandoRequest = 0;
-    SQLite::Database@ timeDB = SQLite::Database(":memory:");
+    uint64            latestNandoRequest = 0;
+    SQLite::Database@ timeDB             = SQLite::Database(":memory:");
 
     string FormatSeconds(int seconds, bool day = false, bool hour = false, bool minute = false) {
         int minutes = seconds / 60;

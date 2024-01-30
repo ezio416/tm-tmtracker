@@ -1,5 +1,5 @@
 // c 2023-05-16
-// m 2024-01-08
+// m 2024-01-19
 
 namespace Models { class Map {
     string       authorId;
@@ -16,7 +16,7 @@ namespace Models { class Map {
     string       mapUid;
     uint         number;
     Record@[]    records;
-    dictionary   recordsDict;
+    dictionary@  recordsDict = dictionary();
     Record@[]    recordsSorted;
     uint         recordsTimestamp;
     uint         silverTime;
