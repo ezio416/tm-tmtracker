@@ -272,7 +272,7 @@ namespace Bulk {
             }
 
             if (maps !is null) {
-                for (uint i = 0; i < maps.Length; i++) {
+                for (uint i = 0; i < maps.Length; i++) {  //! json not object or array 2024-02-25
                     Models::Map map = Models::Map(maps[i], true);
 
                     Globals::AddAccount(Models::Account(map.authorId));
