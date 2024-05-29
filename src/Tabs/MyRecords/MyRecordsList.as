@@ -1,10 +1,10 @@
 // c 2023-10-11
-// m 2023-12-27
+// m 2024-01-19
 
 namespace Tabs { namespace MyRecords {
     string authorSearch;
     string mapSearch;
-    uint myRecordsResults = 0;
+    uint   myRecordsResults = 0;
 
     void Tab_MyRecordsList() {
         if (!UI::BeginTabItem(Icons::ListUl + " Records (" + Globals::myRecords.Length + ")###my-records-list"))

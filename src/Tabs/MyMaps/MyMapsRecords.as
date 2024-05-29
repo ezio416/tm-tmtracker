@@ -1,10 +1,10 @@
 // c 2023-07-12
-// m 2023-12-27
+// m 2024-01-19
 
 namespace Tabs { namespace MyMaps {
     string accountSearch;
     string myMapsRecordsMapSearch;
-    uint myMapsRecordsResults = 0;
+    uint   myMapsRecordsResults = 0;
 
     void Tab_MyMapsRecords() {
         if (!UI::BeginTabItem(Icons::Trophy + " Records (" + Globals::myMapsRecords.Length + ")###my-maps-records"))

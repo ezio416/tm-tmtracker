@@ -1,5 +1,5 @@
 // c 2023-05-16
-// m 2024-01-08
+// m 2024-05-28
 
 namespace Models { class Map {
     string       authorId;
@@ -16,7 +16,7 @@ namespace Models { class Map {
     string       mapUid;
     uint         number;
     Record@[]    records;
-    dictionary   recordsDict;
+    dictionary@  recordsDict = dictionary();
     Record@[]    recordsSorted;
     uint         recordsTimestamp;
     uint         silverTime;
@@ -34,8 +34,8 @@ namespace Models { class Map {
         thumbnailFile   = Files::thumbnailFolder + "/" + mapUid + ".jpg";  // needs to be Uid
         mapId           = map["mapId"];
         mapNameRaw      = map["name"];
-        mapNameColor    = ColoredString(mapNameRaw);
-        mapNameText     = StripFormatCodes(mapNameRaw);
+        mapNameColor    = Text::OpenplanetFormatCodes(mapNameRaw);
+        mapNameText     = Text::StripFormatCodes(mapNameRaw);
         logName         = "MAP[ " + mapNameText + " ] - ";
         authorId        = map["author"];
         authorTime      = map["authorTime"];
@@ -55,8 +55,8 @@ namespace Models { class Map {
         goldTime        = map["goldScore"];
         mapId           = map["mapId"];
         mapNameRaw      = map["name"];
-        mapNameColor    = ColoredString(mapNameRaw);
-        mapNameText     = StripFormatCodes(mapNameRaw);
+        mapNameColor    = Text::OpenplanetFormatCodes(mapNameRaw);
+        mapNameText     = Text::StripFormatCodes(mapNameRaw);
         logName         = "MAP[ " + mapNameText + " ] - ";
         mapUid          = map["mapUid"];
         silverTime      = map["silverScore"];
@@ -73,8 +73,8 @@ namespace Models { class Map {
         goldTime         = s.GetColumnInt   ("goldTime");
         mapId            = s.GetColumnString("mapId");
         mapNameRaw       = s.GetColumnString("mapNameRaw");
-        mapNameColor     = ColoredString(mapNameRaw);
-        mapNameText      = StripFormatCodes(mapNameRaw);
+        mapNameColor     = Text::OpenplanetFormatCodes(mapNameRaw);
+        mapNameText      = Text::StripFormatCodes(mapNameRaw);
         logName          = "MAP[ " + mapNameText + " ] - ";
         mapUid           = s.GetColumnString("mapUid");
         recordsTimestamp = s.GetColumnInt   ("recordsTimestamp");

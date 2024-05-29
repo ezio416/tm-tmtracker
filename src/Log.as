@@ -1,9 +1,9 @@
 // c 2023-09-19
-// m 2023-10-09
+// m 2024-01-19
 
 namespace Log {
-    dictionary timers;
-    uint       timersCount = 0;
+    dictionary@ timers      = dictionary();
+    uint        timersCount = 0;
 
     enum Level {
         Errors,

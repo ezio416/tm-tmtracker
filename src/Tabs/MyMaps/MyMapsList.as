@@ -1,10 +1,10 @@
 // c 2023-05-26
-// m 2023-12-27
+// m 2024-01-19
 
 namespace Tabs { namespace MyMaps {
     string mapSearch;
-    uint myMapsResults = 0;
-    bool showHidden = false;
+    uint   myMapsResults = 0;
+    bool   showHidden    = false;
 
     void Tab_MyMapsList() {
         if (!UI::BeginTabItem(Icons::ListUl + " Maps (" + Globals::shownMaps + ")###my-maps-list"))
