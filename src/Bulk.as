@@ -1,5 +1,5 @@
 // c 2023-07-06
-// m 2023-12-27
+// m 2024-10-25
 
 namespace Bulk {
     string[] myRecordsMapIds;
@@ -67,25 +67,30 @@ namespace Bulk {
             while (waitCoro.IsRunning())
                 yield();
 
+            // Net::HttpRequest@ req = NadeoServices::Get(
+            //     Globals::apiLive,
+            //     NadeoServices::BaseURLLive() + "/api/token/map?length=1000&offset=" + offset
+            // );
             Net::HttpRequest@ req = NadeoServices::Get(
-                Globals::apiLive,
-                NadeoServices::BaseURLLive() + "/api/token/map?length=1000&offset=" + offset
+                Globals::apiCore,
+                NadeoServices::BaseURLCore() + "/maps/by-author?offset=" + offset
             );
             req.Start();
             while (!req.Finished())
                 yield();
             Locks::requesting = false;
-            offset += 1000;
+            offset += 100;
 
             Json::Value@ mapList;
             try {
-                @mapList = Json::Parse(req.String())["mapList"];
+                @mapList = req.Json()["mapList"];
             } catch {
                 Log::Write(Log::Level::Errors, "error parsing mapList: " + getExceptionInfo());
                 break;
             }
 
-            tooManyMaps = mapList.Length == 1000;
+            print("mapList.Length: " + mapList.Length);
+            tooManyMaps = mapList.Length == 100;
 
             for (uint i = 0; i < mapList.Length; i++) {
                 Models::Map map = Models::Map(mapList[i]);

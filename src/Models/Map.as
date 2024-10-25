@@ -1,5 +1,5 @@
 // c 2023-05-16
-// m 2024-05-28
+// m 2024-10-25
 
 namespace Models { class Map {
     string       authorId;
@@ -30,7 +30,7 @@ namespace Models { class Map {
 
     Map() { }
     Map(Json::Value@ map) {
-        mapUid          = map["uid"];
+        mapUid          = map["mapUid"];
         thumbnailFile   = Files::thumbnailFolder + "/" + mapUid + ".jpg";  // needs to be Uid
         mapId           = map["mapId"];
         mapNameRaw      = map["name"];
@@ -38,14 +38,15 @@ namespace Models { class Map {
         mapNameText     = Text::StripFormatCodes(mapNameRaw);
         logName         = "MAP[ " + mapNameText + " ] - ";
         authorId        = map["author"];
-        authorTime      = map["authorTime"];
-        goldTime        = map["goldTime"];
-        silverTime      = map["silverTime"];
-        bronzeTime      = map["bronzeTime"];
-        downloadUrl     = string(map["downloadUrl"]).Replace("\\", "");
+        authorTime      = map["authorScore"];
+        goldTime        = map["goldScore"];
+        silverTime      = map["silverScore"];
+        bronzeTime      = map["bronzeScore"];
+        downloadUrl     = string(map["fileUrl"]).Replace("\\", "");
         thumbnailUrl    = string(map["thumbnailUrl"]).Replace("\\", "");
-        uploadTimestamp = map["uploadTimestamp"];
-        updateTimestamp = map["updateTimestamp"];
+        // uploadTimestamp = map["uploadTimestamp"];
+        uploadTimestamp = Util::IsoToUnix(string(map["timestamp"]));
+        // updateTimestamp = map["updateTimestamp"];
     }
     Map(Json::Value@ map, bool fromMapInfo) {
         authorId        = map["author"];
