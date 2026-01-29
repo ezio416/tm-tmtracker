@@ -45,7 +45,7 @@ namespace Tabs { namespace MyRecords {
         }
 
         if (Settings::myRecordsMapSearch) {
-            mapSearch = UI::InputText("search maps", mapSearch, false);
+            mapSearch = UI::InputText("search maps", mapSearch);
 
             if (mapSearch != "") {
                 UI::SameLine();
@@ -59,7 +59,7 @@ namespace Tabs { namespace MyRecords {
             mapSearch = "";
 
         if (Settings::myRecordsAuthorSearch) {
-            authorSearch = UI::InputText("search authors", authorSearch, false);
+            authorSearch = UI::InputText("search authors", authorSearch);
 
             if (authorSearch != "") {
                 UI::SameLine();
