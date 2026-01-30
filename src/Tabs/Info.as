@@ -5,8 +5,7 @@ namespace Tabs {
 
         UI::TextWrapped(
             "TMTracker is a project I started back in December of 2022.\nIt has moved from Python " + Icons::ArrowRight +
-            " C# " + Icons::ArrowRight + " Angelscript (this), which will probably be the final version.\nThis is by far my " +
-            "largest coding project with hundreds of hours put in, so I hope you find it useful! "
+            " C# " + Icons::ArrowRight + " Angelscript (this), which will probably be the final version."
         );
 
         UI::Separator();
