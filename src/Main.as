@@ -62,8 +62,8 @@ void RenderInterface() {
             if (Settings::myMapsTab)
                 Tabs::Tab_MyMaps();
 
-            if (Settings::myRecordsTab)
-                Tabs::Tab_MyRecords();
+            // if (Settings::myRecordsTab)
+            //     Tabs::Tab_MyRecords();
 
             if (Settings::infoTab)
                 Tabs::Tab_Info();

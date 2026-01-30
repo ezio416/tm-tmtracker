@@ -24,8 +24,8 @@ namespace Settings {
     [Setting category="General" name="Show My Maps tab"]
     bool myMapsTab = true;
 
-    [Setting category="General" name="Show My Records tab"]
-    bool myRecordsTab = true;
+    // [Setting category="General" name="Show My Records tab"]
+    // bool myRecordsTab = true;
 
     [Setting category="General" name="Show Info tab"]
     bool infoTab = true;
