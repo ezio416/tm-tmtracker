@@ -1,6 +1,3 @@
-// c 2023-12-25
-// m 2023-12-27
-
 // most things here are courtesy of "BetterTOTD" plugin - https://github.com/XertroV/tm-better-totd
 namespace Sort {
     uint64 maxFrameTime = 10;

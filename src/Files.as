@@ -1,6 +1,3 @@
-// c 2023-09-19
-// m 2023-10-12
-
 namespace Files {
     string db                   = storageFolder + "TMTracker.db";
     string hiddenMaps           = storageFolder + "hiddenMaps.json";

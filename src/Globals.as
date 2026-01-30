@@ -1,6 +1,3 @@
-// c 2023-05-16
-// m 2024-01-19
-
 namespace Globals {
     Models::Account[] accounts;
     dictionary@       accountsDict             = dictionary();

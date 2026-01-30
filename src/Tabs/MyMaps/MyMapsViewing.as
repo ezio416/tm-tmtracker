@@ -1,6 +1,3 @@
-// c 2023-05-26
-// m 2023-12-27
-
 namespace Tabs { namespace MyMaps {
     void Tab_MyMapsViewing() {
         int tabFlags = 0;

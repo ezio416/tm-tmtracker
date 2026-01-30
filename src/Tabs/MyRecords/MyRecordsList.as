@@ -1,6 +1,3 @@
-// c 2023-10-11
-// m 2024-01-19
-
 namespace Tabs { namespace MyRecords {
     string authorSearch;
     string mapSearch;

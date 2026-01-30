@@ -1,6 +1,3 @@
-// c 2023-09-19
-// m 2023-10-12
-
 namespace Version {
     int3 version;
 

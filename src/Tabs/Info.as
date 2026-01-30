@@ -1,6 +1,3 @@
-// c 2023-05-26
-// m 2023-10-12
-
 namespace Tabs {
     void Tab_Info() {
         if (!UI::BeginTabItem(Icons::Info + " Info"))

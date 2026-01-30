@@ -1,6 +1,3 @@
-// c 2023-05-26
-// m 2024-01-19
-
 namespace Tabs { namespace MyMaps {
     string mapSearch;
     uint   myMapsResults = 0;

@@ -1,6 +1,3 @@
-// c 2023-07-11
-// m 2023-12-26
-
 namespace Locks {
     bool accountNames      = false;
     bool allRecords        = false;

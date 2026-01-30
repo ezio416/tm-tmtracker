@@ -1,6 +1,3 @@
-// c 2023-07-16
-// m 2024-01-19
-
 namespace Settings {
     [Setting hidden] Sort::Maps::SortMethod    myMapsSortMethod        = Sort::Maps::SortMethod::HighestFirst;
     [Setting hidden] Sort::Records::SortMethod myMapsRecordsSortMethod = Sort::Records::SortMethod::NewFirst;

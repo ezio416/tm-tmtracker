@@ -1,6 +1,3 @@
-// c 2023-10-11
-// m 2023-12-27
-
 namespace Tabs { namespace MyRecords {
     void Tab_MyRecordsMapsViewing() {
         int tabFlags = 0;

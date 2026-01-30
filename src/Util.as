@@ -1,6 +1,3 @@
-// c 2023-05-20
-// m 2024-01-19
-
 namespace Util {
     uint64            latestNandoRequest = 0;
     SQLite::Database@ timeDB             = SQLite::Database(":memory:");

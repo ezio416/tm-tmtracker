@@ -1,6 +1,3 @@
-// c 2023-05-14
-// m 2023-12-27
-
 void RenderMenu() {
     if (UI::MenuItem(Globals::title, "", Settings::windowOpen))
         Settings::windowOpen = !Settings::windowOpen;

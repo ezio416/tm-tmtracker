@@ -1,6 +1,3 @@
-// c 2023-05-16
-// m 2023-12-26
-
 namespace Models { class Account {
     string accountId;
     string accountName = "";

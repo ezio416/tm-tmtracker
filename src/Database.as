@@ -1,6 +1,3 @@
-// c 2023-07-14
-// m 2023-12-27
-
 namespace Database {
     uint groupYieldAfter = 30;
     uint sqlLoadBatch    = 100;

@@ -1,6 +1,3 @@
-// c 2023-05-16
-// m 2024-10-25
-
 namespace Models { class Map {
     string       authorId;
     uint         authorTime;

@@ -1,6 +1,3 @@
-// c 2023-05-26
-// m 2023-12-27
-
 namespace Tabs {
     void Tab_Debug() {
         if (!UI::BeginTabItem(Icons::CodeFork + " Debug"))

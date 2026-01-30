@@ -1,6 +1,3 @@
-// c 2023-09-19
-// m 2024-01-19
-
 namespace Log {
     dictionary@ timers      = dictionary();
     uint        timersCount = 0;

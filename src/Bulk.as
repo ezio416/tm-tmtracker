@@ -1,6 +1,3 @@
-// c 2023-07-06
-// m 2024-10-25
-
 namespace Bulk {
     string[] myRecordsMapIds;
 
