@@ -2,7 +2,7 @@
 name = "TMTracker"
 author = "Ezio"
 category = "Utilities"
-version = "3.4.1"
+version = "3.5.0"
 siteid = 426
 
 [script]
