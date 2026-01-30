@@ -49,7 +49,7 @@ namespace Tabs { namespace MyMaps {
         }
 
         if (Settings::myMapsRecordsMapSearch) {
-            myMapsRecordsMapSearch = UI::InputText("search maps", myMapsRecordsMapSearch, false);
+            myMapsRecordsMapSearch = UI::InputText("search maps", myMapsRecordsMapSearch);
 
             if (myMapsRecordsMapSearch != "") {
                 UI::SameLine();
@@ -63,7 +63,7 @@ namespace Tabs { namespace MyMaps {
             myMapsRecordsMapSearch = "";
 
         if (Settings::myMapsRecordsAccountSearch) {
-            accountSearch = UI::InputText("search accounts", accountSearch, false);
+            accountSearch = UI::InputText("search accounts", accountSearch);
 
             if (accountSearch != "") {
                 UI::SameLine();

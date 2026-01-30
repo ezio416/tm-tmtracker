@@ -32,7 +32,7 @@ namespace Tabs { namespace MyMaps {
         }
 
         if (Settings::myMapsSearch) {
-            mapSearch = UI::InputText("search maps", mapSearch, false);
+            mapSearch = UI::InputText("search maps", mapSearch);
 
             if (mapSearch != "") {
                 UI::SameLine();
