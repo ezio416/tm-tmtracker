@@ -136,7 +136,7 @@ namespace Models { class Map {
         Globals::ClearMyMapRecords(this);
 
         do {
-            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
+            awaitable@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 
@@ -189,7 +189,7 @@ namespace Models { class Map {
                 group.InsertLast(accountIds[i]);
             accountIds.RemoveRange(0, idsToAdd);
 
-            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
+            awaitable@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 
@@ -229,7 +229,7 @@ namespace Models { class Map {
         Globals::recordsTimestampsJson[mapId] = recordsTimestamp;
         Files::SaveRecordsTimestamps();
 
-        Meta::PluginCoroutine@ namesCoro = startnew(Bulk::GetAccountNamesCoro);
+        awaitable@ namesCoro = startnew(Bulk::GetAccountNamesCoro);
         while (namesCoro.IsRunning())
             yield();
 
@@ -291,7 +291,7 @@ namespace Models { class Map {
         string timerId = Log::TimerBegin(logName + "loading thumbnail");
         thumbnailLoading = true;
 
-        Meta::PluginCoroutine@ thumbCoro = startnew(CoroutineFunc(GetThumbnailCoro));
+        awaitable@ thumbCoro = startnew(CoroutineFunc(GetThumbnailCoro));
         while (thumbCoro.IsRunning()) yield();
 
         IO::File file(thumbnailFile, IO::FileMode::Read);

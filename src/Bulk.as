@@ -60,7 +60,7 @@ namespace Bulk {
         bool tooManyMaps;
 
         do {
-            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
+            awaitable@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 
@@ -118,7 +118,7 @@ namespace Bulk {
         Log::TimerEnd(timerId);
         Locks::myMaps = false;
 
-        Meta::PluginCoroutine@ loadCoro = startnew(Database::LoadRecordsCoro);
+        awaitable@ loadCoro = startnew(Database::LoadRecordsCoro);
         while (loadCoro.IsRunning())
             yield();
 
@@ -144,7 +144,7 @@ namespace Bulk {
 
             Models::Map@ map = @Globals::myMaps[i];
 
-            Meta::PluginCoroutine@ recordsCoro = startnew(CoroutineFunc(map.GetRecordsCoro));
+            awaitable@ recordsCoro = startnew(CoroutineFunc(map.GetRecordsCoro));
             while (recordsCoro.IsRunning())
                 yield();
 
@@ -160,7 +160,7 @@ namespace Bulk {
         Globals::getAccountNames = true;
         Globals::singleMapRecordStatus = true;
 
-        Meta::PluginCoroutine@ nameCoro = startnew(GetAccountNamesCoro);
+        awaitable@ nameCoro = startnew(GetAccountNamesCoro);
         while (nameCoro.IsRunning())
             yield();
 
@@ -195,7 +195,7 @@ namespace Bulk {
         while (!NadeoServices::IsAuthenticated(Globals::apiCore))
             yield();
 
-        Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
+        awaitable@ waitCoro = startnew(Util::NandoRequestWaitCoro);
         while (waitCoro.IsRunning())
             yield();
 
@@ -253,7 +253,7 @@ namespace Bulk {
                 group.InsertLast(myRecordsMapIds[i]);
             myRecordsMapIds.RemoveRange(0, idsToAdd);
 
-            Meta::PluginCoroutine@ waitCoro = startnew(Util::NandoRequestWaitCoro);
+            awaitable@ waitCoro = startnew(Util::NandoRequestWaitCoro);
             while (waitCoro.IsRunning())
                 yield();
 

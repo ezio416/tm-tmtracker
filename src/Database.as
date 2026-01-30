@@ -91,15 +91,15 @@ namespace Database {
         string statusId = "db-load";
         Globals::status.Set(statusId, "loading database...");
 
-        Meta::PluginCoroutine@ mapsCoro = startnew(LoadMapsCoro);
+        awaitable@ mapsCoro = startnew(LoadMapsCoro);
         while (mapsCoro.IsRunning())
             yield();
 
-        Meta::PluginCoroutine@ accountsCoro = startnew(LoadAccountsCoro);
+        awaitable@ accountsCoro = startnew(LoadAccountsCoro);
         while (accountsCoro.IsRunning())
             yield();
 
-        Meta::PluginCoroutine@ recordsCoro = startnew(LoadRecordsCoro);
+        awaitable@ recordsCoro = startnew(LoadRecordsCoro);
         while (recordsCoro.IsRunning())
             yield();
 
