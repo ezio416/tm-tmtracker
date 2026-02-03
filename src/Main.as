@@ -33,7 +33,7 @@ void RenderInterface() {
     UI::SetNextWindowSize(600, 540, UI::Cond::FirstUseEver);
     UI::SetNextWindowPos(300, 300, UI::Cond::FirstUseEver);
 
-    int flags = 0;
+    int flags = UI::GetDefaultWindowFlags();
     if (Settings::statusBar)
         flags |= UI::WindowFlags::MenuBar;
 
