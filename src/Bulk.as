@@ -259,7 +259,7 @@ namespace Bulk {
 
             Net::HttpRequest@ req = NadeoServices::Get(
                 Globals::apiCore,
-                NadeoServices::BaseURLCore() + "/maps/?mapIdList=" + string::Join(group, "%2C")
+                NadeoServices::BaseURLCore() + "/maps/?mapIdList=" + Text::Join(group, "%2C")
             );
             req.Start();
             while (!req.Finished())

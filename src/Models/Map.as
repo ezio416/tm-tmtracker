@@ -196,7 +196,7 @@ namespace Models { class Map {
             Net::HttpRequest@ req = NadeoServices::Get(  // sorted by timestamp asc
                 Globals::apiCore,
                 NadeoServices::BaseURLCore() +
-                "/mapRecords/?accountIdList=" + string::Join(group, "%2C") +
+                "/mapRecords/?accountIdList=" + Text::Join(group, "%2C") +
                 "&mapIdList=" + mapId
             );
             req.Start();
