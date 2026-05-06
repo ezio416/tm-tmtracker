@@ -84,7 +84,7 @@ namespace Bulk {
                 break;
             }
 
-            print("mapList.Length: " + mapList.Length);
+            trace("mapList.Length: " + mapList.Length);
             tooManyMaps = mapList.Length == 100;
 
             for (uint i = 0; i < mapList.Length; i++) {
