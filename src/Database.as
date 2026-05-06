@@ -133,6 +133,8 @@ namespace Database {
 
         Log::TimerEnd(timerId);
         Locks::db = false;
+
+        Sort::Maps::MyMapsCoro();
     }
 
     void LoadAccountsCoro() {

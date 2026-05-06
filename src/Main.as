@@ -18,6 +18,10 @@ void Main() {
     if (Version::CheckFile()) {
         startnew(Database::LoadAccountsCoro);
 
+        if (!Settings::refreshMaps) {
+            startnew(Database::LoadCoro);
+        }
+
         Files::LoadHiddenMaps();
         Files::LoadRecordsTimestamps();
     }
