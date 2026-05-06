@@ -91,17 +91,9 @@ namespace Database {
         string statusId = "db-load";
         Globals::status.Set(statusId, "loading database...");
 
-        awaitable@ mapsCoro = startnew(LoadMapsCoro);
-        while (mapsCoro.IsRunning())
-            yield();
-
-        awaitable@ accountsCoro = startnew(LoadAccountsCoro);
-        while (accountsCoro.IsRunning())
-            yield();
-
-        awaitable@ recordsCoro = startnew(LoadRecordsCoro);
-        while (recordsCoro.IsRunning())
-            yield();
+        LoadMapsCoro();
+        LoadAccountsCoro();
+        LoadRecordsCoro();
 
         Globals::status.Delete(statusId);
         Log::TimerEnd(timerId);

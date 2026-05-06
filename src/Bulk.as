@@ -60,9 +60,7 @@ namespace Bulk {
         bool tooManyMaps;
 
         do {
-            awaitable@ waitCoro = startnew(Util::NandoRequestWaitCoro);
-            while (waitCoro.IsRunning())
-                yield();
+            Util::NandoRequestWaitCoro();
 
             // Net::HttpRequest@ req = NadeoServices::Get(
             //     Globals::apiLive,
@@ -118,9 +116,7 @@ namespace Bulk {
         Log::TimerEnd(timerId);
         Locks::myMaps = false;
 
-        awaitable@ loadCoro = startnew(Database::LoadRecordsCoro);
-        while (loadCoro.IsRunning())
-            yield();
+        Database::LoadRecordsCoro();
 
         startnew(Sort::Maps::MyMapsCoro);
         startnew(Database::SaveCoro);
@@ -144,9 +140,7 @@ namespace Bulk {
 
             Models::Map@ map = @Globals::myMaps[i];
 
-            awaitable@ recordsCoro = startnew(CoroutineFunc(map.GetRecordsCoro));
-            while (recordsCoro.IsRunning())
-                yield();
+            map.GetRecordsCoro();
 
             if (Globals::cancelAllRecords) {
                 Globals::cancelAllRecords = false;
@@ -160,9 +154,7 @@ namespace Bulk {
         Globals::getAccountNames = true;
         Globals::singleMapRecordStatus = true;
 
-        awaitable@ nameCoro = startnew(GetAccountNamesCoro);
-        while (nameCoro.IsRunning())
-            yield();
+        GetAccountNamesCoro();
 
         Sort::Records::dbSave = true;
         startnew(Sort::Records::MyMapsRecordsCoro);
@@ -195,9 +187,7 @@ namespace Bulk {
         while (!NadeoServices::IsAuthenticated(Globals::apiCore))
             yield();
 
-        awaitable@ waitCoro = startnew(Util::NandoRequestWaitCoro);
-        while (waitCoro.IsRunning())
-            yield();
+        Util::NandoRequestWaitCoro();
 
         Net::HttpRequest@ req = NadeoServices::Get(
             Globals::apiCore,
@@ -253,9 +243,7 @@ namespace Bulk {
                 group.InsertLast(myRecordsMapIds[i]);
             myRecordsMapIds.RemoveRange(0, idsToAdd);
 
-            awaitable@ waitCoro = startnew(Util::NandoRequestWaitCoro);
-            while (waitCoro.IsRunning())
-                yield();
+            Util::NandoRequestWaitCoro();
 
             Net::HttpRequest@ req = NadeoServices::Get(
                 Globals::apiCore,
