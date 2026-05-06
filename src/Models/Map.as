@@ -206,7 +206,11 @@ namespace Models { class Map {
 
             Json::Value@ coreRecords;
             try {
-                @coreRecords = Json::Parse(req.String());
+                @coreRecords = req.Json();
+                if (coreRecords.GetType() != Json::Type::Array) {
+                    Log::Write(Log::Level::Warnings, logName + "coreRecords isn't an array");
+                    continue;
+                }
             } catch {
                 Log::Write(Log::Level::Errors, logName + "error parsing coreRecords: " + getExceptionInfo());
                 continue;
